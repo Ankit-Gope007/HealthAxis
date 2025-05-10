@@ -1,0 +1,124 @@
+/* Reset and base styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'inria-serif', serif;
+  }
+  
+  /* Main layout */
+  .login-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Left image section */
+  .left-section {
+    width: 50%;
+    height: 100%;
+  }
+  
+  .login-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Right login form section */
+  .right-section {
+    width: 50%;
+    background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .form-wrapper {
+    width: 80%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .tabs button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .tabs .login {
+    color: white;
+    background-color: #4CAF50;
+    border-radius: 20px;
+    padding: 6px 20px;
+    font-family: 'inria-serif', serif;
+  }
+  
+  /* Tagline */
+  .tagline {
+    font-size: 20px;
+    color: #555;
+    font-weight: lighter
+  }
+  
+  /* Email input */
+  .email-input {
+    padding: 12px;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  /* Continue button */
+  .continue-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #999;
+    font-size: 14px;
+  }
+  
+  .divider hr {
+    flex: 1;
+    border: none;
+    border-top: 1px solid #ccc;
+  }
+  
+  /* Google button */
+  .google-btn {
+    background-color: #4285F4;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  /* motions */
+.signup:active{
+    transform: scale(0.95);
+    transition: transform 0.1s ease-in-out;
+}
