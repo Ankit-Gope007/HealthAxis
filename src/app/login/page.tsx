@@ -1,9 +1,14 @@
+
 import React from 'react'
 import Image from 'next/image'
-import loginImage from '@/../public/images/loginPageImage.jpeg'
+import loginImage from '@/public/images/loginPageImage.jpeg'
 import './page.css'
+import { signIn } from '@/auth'
+import { useRouter } from 'next/navigation'
 
 const page = () => {
+    
+   
   return (
     <div className="login-container">
     <div className="left-section">
@@ -19,6 +24,12 @@ const page = () => {
           Your health journey starts here, <br />
           log in to connect, consult, and care.
         </p>
+        <form action={async () => {
+        "use server"
+        await signIn("google");
+        
+
+      }}>
         <input type="email" placeholder="Your Email" className="email-input" />
         <button className="continue-btn">Continue</button>
         <div className="divider">
@@ -26,8 +37,12 @@ const page = () => {
           <span>OR</span>
           <hr />
         </div>
-        <button className="google-btn">Continue with Google</button>
-      </div>
+        <button
+        type ="submit"
+         className="google-btn">Continue with Google</button>
+     
+        </form>
+       </div>
     </div>
   </div>
   )
