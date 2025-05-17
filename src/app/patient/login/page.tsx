@@ -56,7 +56,7 @@ const LoginPage = () => {
 
         {/* CONTINUE WITH GOOGLE BUTTON */}
           <button
-            onClick={() => signIn('google', { callbackUrl: '/patient/profile' })}
+            onClick={() => signIn('google', { callbackUrl: '/patient/dashboard' })}
             className="google-btn">
 
             <img className="google-icon" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" />

@@ -37,7 +37,7 @@ const sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
 
   return (
     <>
-      
+
       <div className='divider'></div>
       <div className={`sidebar ${isSidebarOpen ? "visible" : "invisible"}`}>
         <div className={` ${isSidebarOpen ? 'menu' : 'menu-hidden'}`}>
@@ -50,7 +50,21 @@ const sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
               {item.icon} {item.label}
             </div>
           ))}
-
+        </div>
+        <div 
+        className='profile'
+        onClick={() => {
+          setIsSidebarOpen(!isSidebarOpen);
+          router.push('/patient/profile');
+        }}
+        >
+          <div className='profile-icon'>
+            <FaRegUser />
+          </div>
+          <div className='profile-details'>
+            <p className='profile-name'>Ankit Gope</p>
+            <p className='profile-role'> Patient</p>
+          </div>
         </div>
 
 

@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className='left-part'>
                 <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
                 <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}
-                    className={` ${isSidebarOpen ? "visible":"invisible"}`}  // Add this line
+                    className={` ${isSidebarOpen ? "visible":"invisible"}`}  
                 />
             </div>
             <div className={`right-part ${isSidebarOpen?"invisible":"visible"}`}>
