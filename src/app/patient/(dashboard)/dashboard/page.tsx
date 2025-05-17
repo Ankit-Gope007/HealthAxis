@@ -3,8 +3,7 @@ import './page.css';
 
 const page = () => {
   return (
-   <div className=''>
-   </div>
+    <div>Dashboard Page</div>
   )
 }
 

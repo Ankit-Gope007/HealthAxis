@@ -10,39 +10,36 @@ import { FaUserDoctor } from "react-icons/fa6";
 import { GiMedicines } from "react-icons/gi";
 import { CiChat1 } from "react-icons/ci";
 import { IoBackspace, IoMenu } from "react-icons/io5";
+import { useRouter } from 'next/navigation';
 
-const sidebar = () => {
+const sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const router = useRouter();
 
 
   const navItems = [
-    { icon: <FaRegUser className="green" />, label: 'Dashboard' },
-    { icon: <MdDateRange className="green" />, label: 'Appointments' },
-    { icon: <FaUserDoctor className="green" />, label: 'Doctors' },
-    { icon: <GiMedicines className="green" />, label: 'Prescriptions' },
-    { icon: <CiChat1 className="green" />, label: 'Chat' },
+    { icon: <FaRegUser className="green" />, label: 'Dashboard', link: 'dashboard' },
+    { icon: <MdDateRange className="green" />, label: 'Appointments', link: 'appoinments' },
+    { icon: <FaUserDoctor className="green" />, label: 'Doctors', link: 'doctors' },
+    { icon: <GiMedicines className="green" />, label: 'Prescriptions', link: 'prescriptions' },
+    { icon: <CiChat1 className="green" />, label: 'Chat', link: 'chat' },
   ];
 
   const handleClick = (index: number) => {
     setActiveIndex(index);
     setIsSidebarOpen(!isSidebarOpen);
+    // Navigate to the corresponding page
+    const selectedItem = navItems[index];
+    if (selectedItem && selectedItem.link) {
+      router.push(`/patient/${selectedItem.link}`);
+    }
   };
 
   return (
     <>
-      <div className='heading'>
-        <div className="backLogo" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-          {isSidebarOpen ? <IoMdArrowBack /> : <IoMenu />}
-        </div>
-        <div className='logo'>
-          <FaHandHoldingMedical />
-        </div>
-        Health Axis
-      </div>
+      
+      <div className='divider'></div>
       <div className={`sidebar ${isSidebarOpen ? "visible" : "invisible"}`}>
-        <div className='divider'></div>
         <div className={` ${isSidebarOpen ? 'menu' : 'menu-hidden'}`}>
           {navItems.map((item, index) => (
             <div
