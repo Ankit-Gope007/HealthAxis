@@ -9,7 +9,7 @@ import { MdDateRange } from "react-icons/md";
 import { FaUserDoctor } from "react-icons/fa6";
 import { GiMedicines } from "react-icons/gi";
 import { CiChat1 } from "react-icons/ci";
-import { IoMenu } from "react-icons/io5";
+import { IoBackspace, IoMenu } from "react-icons/io5";
 
 const sidebar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -32,16 +32,16 @@ const sidebar = () => {
 
   return (
     <>
-      <div className='sidebar'>
-        <div className='heading'>
-          <div className="backLogo" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            {isSidebarOpen ? <IoMdArrowBack /> : <IoMenu />}
-          </div>
-          <div className='logo'>
-            <FaHandHoldingMedical />
-          </div>
-          Health Axis
+      <div className='heading'>
+        <div className="backLogo" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+          {isSidebarOpen ? <IoMdArrowBack /> : <IoMenu />}
         </div>
+        <div className='logo'>
+          <FaHandHoldingMedical />
+        </div>
+        Health Axis
+      </div>
+      <div className={`sidebar ${isSidebarOpen ? "visible" : "invisible"}`}>
         <div className='divider'></div>
         <div className={` ${isSidebarOpen ? 'menu' : 'menu-hidden'}`}>
           {navItems.map((item, index) => (
@@ -55,6 +55,7 @@ const sidebar = () => {
           ))}
 
         </div>
+
 
 
 
