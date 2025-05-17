@@ -1,7 +1,78 @@
-
-.demo{
-    background-color: rgb(245, 148, 148);
-    width: 100%;
+.patient-profile-container{
+    display: flex;
+    flex-direction: row;
     height: 100%;
-    border: 1px solid black;
+    width: 100%;
+    /* background-color: aquamarine; */
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+.profile-summary{
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+    margin-right: 0;
+    width: 30%;
+    height: 96%;
+    gap: 1rem;
+    border-radius: 0.5rem;
+    
+   
+    /* background-color: aqua; */
+}
+
+.profile-info{
+    height: 70%;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 3px solid #DBF4E3;
+    box-shadow: 0 6px 30px rgba(219, 244, 227, 1);
+}
+
+.profile-data{
+    height: 30%;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 3px solid #DBF4E3;
+    box-shadow: 0 6px 30px rgba(219, 244, 227, 1);
+}
+
+.profile-box{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    width: 70%;
+    height: 96%;
+    border: 3px solid #DBF4E3;
+    box-shadow: 0 6px 30px rgba(219, 244, 227, 1);
+   
+}
+
+.profile-box-header{
+    margin: 2.5rem;
+    margin-bottom: 1rem;
+  
+}
+.profile-box-header h2{
+    font-size: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+  }
+  
+  .profile-box-header p {
+    font-size: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    color: rgb(115, 115, 115);
+  }
+
+.seperator{
+    width: 100%;
+    height: 1px;
+    background-color: #DBF4E3;
+    margin: 0.5rem 0;
+    box-shadow: 0 6px 30px rgba(219, 244, 227, 1);
 }

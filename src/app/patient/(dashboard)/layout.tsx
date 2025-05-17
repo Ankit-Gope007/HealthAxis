@@ -10,12 +10,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className='container'>
             <div className='left-part'>
-                <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-                <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}
-                    className={` ${isSidebarOpen ? "visible":"invisible"}`}  
-                />
+                <div className="navbar">
+                    <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+                </div>
+                <div className={` ${isSidebarOpen ? "visible" : "invisible"}`} >
+                    <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+                </div>
             </div>
-            <div className={`right-part ${isSidebarOpen?"invisible":"visible"}`}>
+            <div className={`right-part ${isSidebarOpen ? "invisible" : "visible"}`}>
                 {children}
             </div>
         </div>
