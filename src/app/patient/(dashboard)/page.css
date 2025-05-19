@@ -74,10 +74,19 @@
     .right-part{
         width: 100%;
         height: 100vh;
+        
     }
     .navbar{
         width: 100%;
         top: 0;
         left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .right-part
+    {
+        overflow-y: scroll;
+        height: 100vh;
     }
 }

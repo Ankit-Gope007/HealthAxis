@@ -1,3 +1,7 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
 .patient-profile-container{
     display: flex;
     flex-direction: row;
@@ -51,9 +55,9 @@
    
 }
 
-.profile-box-header{
-    margin: 2.5rem;
-    margin-bottom: 1rem;
+.profile-box-header {
+    padding: 2.5rem;
+    padding-bottom: 2.5rem;
   
 }
 .profile-box-header h2{
@@ -76,3 +80,129 @@
     margin: 0.5rem 0;
     box-shadow: 0 6px 30px rgba(219, 244, 227, 1);
 }
+
+/* profile container */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* The Input feilds */
+.profile-box-content{
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.green{
+    color: #0fca51;
+}
+.info {
+    max-width: 900px;
+    padding: 0rem 2rem 2rem 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    
+    
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    
+   
+  }
+  
+  .form-group label {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    border: 3px solid #DBF4E3;
+  }
+  
+  textarea {
+    resize: vertical;
+  }
+  
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  
+  button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  button:hover {
+    background-color: #218838;
+  }
+
+
+
+  /* media qureies */
+
+  @media (max-width: 900px) {
+    .patient-profile-container {
+      flex-direction: column;
+      width: 100%;
+      overflow-y: auto; 
+      height: auto;    
+    }
+  
+    .profile-summary,
+    .profile-box {
+      width: 100%;       
+      height: 100vh;    
+      margin: 1rem 0;   
+    }
+  
+    .profile-box-content {
+      height: max-content; 
+        
+    }
+  
+    .info {
+      padding: 1rem; 
+      height: max-content;
+    }
+  }
+
+ 
