@@ -21,27 +21,27 @@ const page = () => {
           </div>
           <div
             onClick={() => fileInputRef.current?.click()}
-           className="profile-info-photo">
-              <IoMdAdd className='add-icon' />
-              <input 
-                ref={fileInputRef}
-               type="file"
-                id="file-upload"
-                 />
+            className="profile-info-photo">
+            <IoMdAdd className='add-icon' />
+            <input
+              ref={fileInputRef}
+              type="file"
+              id="file-upload"
+            />
           </div>
           <div className="profile-info-names">
-            <h2 className=''>John Doe</h2>
+            <h2 className=''>Ankit Gope</h2>
             <p>Patient ID: 123456HD-UKL</p>
           </div>
           <div className="profile-info-basicInfo">
-            <div className="profile-info-basicInfo-age">
-              <p>Age: 30 years</p>
+            <div className="profile-info-basicInfo-info">
+              <CiCalendarDate className='profile-info-basicInfo-logo' /> Age: 30 years
             </div>
-            <div className="profile-info-basicInfo-blood">
-
+            <div className="profile-info-basicInfo-info">
+              <MdOutlineWaterDrop className='profile-info-basicInfo-logo' />Blood Group: O+
             </div>
-            <div className="profile-info-basicInfo-contact">
-
+            <div className="profile-info-basicInfo-info">
+              <IoCallOutline className='profile-info-basicInfo-logo' />Phone: +1234567890
             </div>
           </div>
         </div>
@@ -49,7 +49,12 @@ const page = () => {
 
 
         <div className="profile-data">
-
+          <div className='profile-data-heading'>
+            <h2>Your Latest Appoinment</h2>
+          </div>
+          <div className='profile-data-appoinment-list'>
+              No Latest Appoinments
+          </div>
         </div>
       </div>
       <div className="profile-box">
@@ -65,15 +70,15 @@ const page = () => {
             <form action="" className='form-grid'>
               <div className="form-group">
                 <label><FaRegUser className='green' />  Full Name*</label>
-                <input type="text" placeholder="John Doe" />
+                <input type="text" placeholder="" />
               </div>
               <div className="form-group">
                 <label>Email*</label>
-                <input type="email" placeholder="john.doe@example.com" />
+                <input type="email" placeholder="" />
               </div>
               <div className="form-group">
                 <label>Phone Number*</label>
-                <input type="text" placeholder="123-456-7890" />
+                <input type="text" placeholder="" />
               </div>
               <div className="form-group">
                 <label>Gender*</label>
@@ -89,7 +94,7 @@ const page = () => {
               </div>
               <div className="form-group">
                 <label>Address</label>
-                <input type="text" placeholder="123 Health St, Medical City" />
+                <input type="text" placeholder="" />
               </div>
               <div className="form-group">
                 <label>Blood Group</label>
@@ -103,11 +108,11 @@ const page = () => {
               </div>
               <div className="form-group">
                 <label>Emergency Contact</label>
-                <input type="text" placeholder="Jane Doe (Wife) - 098-765-4321" />
+                <input type="text" placeholder="" />
               </div>
               <div className="form-group full-width">
                 <label>Medical History</label>
-                <textarea placeholder="No known allergies"></textarea>
+                <textarea placeholder=""></textarea>
               </div>
               <div className="form-group full-width">
                 <label>Current Medications</label>
