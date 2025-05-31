@@ -94,6 +94,12 @@ html, body {
     cursor: pointer;
     border-radius: 4px;
   }
+
+  .continue-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
   
   /* Divider */
   .divider {
@@ -146,6 +152,15 @@ html, body {
     transform: scale(0.95);
     transition: transform 0.1s ease-in-out;
 }
+
+/* form sign up */
+.form-signup {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
 
 /* Media Queries */
 @media (max-width: 900px) {

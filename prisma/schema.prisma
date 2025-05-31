@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  userId     String
+  user       Patient  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+}
+
+model Patient {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  password      String?
+  authProvider  String?// e.g., "credentials","google","both"
+  profileSetup  Boolean  @default(false)
+  sessions  Session[]  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  profile       Profile?
+}
+
+model Profile {
+  id                     String   @id @default(cuid())
+  gender        Gender   @default(Male)
+  phone         String   @unique
+  imageUrl               String?
+  address                String?
+  dob                    DateTime?
+  bloodGroup             String?
+  emergencyContactNumber String?
+  medicalHistory         String?
+  currentMedications     String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  patientId   String   @unique
+}
