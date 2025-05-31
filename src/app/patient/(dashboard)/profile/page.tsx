@@ -6,10 +6,12 @@ import { IoMdAdd } from "react-icons/io";
 import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineWaterDrop } from "react-icons/md";
 import { IoCallOutline } from "react-icons/io5";
-
+import { RiLogoutCircleLine } from "react-icons/ri";
+import { signOut } from 'next-auth/react';
 import './page.css';
 
 const page = () => {
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   return (
     <div className='patient-profile-container'>
@@ -44,6 +46,15 @@ const page = () => {
               <IoCallOutline className='profile-info-basicInfo-logo' />Phone: +1234567890
             </div>
           </div>
+          <div
+            onClick={() => {
+              signOut({ callbackUrl: "/patient/login" }); // 👈 Client-side logout and redirect
+            }}
+            className="logOut-btn">
+            <RiLogoutCircleLine className='logOut-icon' />
+            Log Out
+          </div>
+
         </div>
 
 
@@ -53,7 +64,7 @@ const page = () => {
             <h2>Your Latest Appoinment</h2>
           </div>
           <div className='profile-data-appoinment-list'>
-              No Latest Appoinments
+            No Latest Appoinments
           </div>
         </div>
       </div>

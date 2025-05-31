@@ -1,10 +1,8 @@
-import React from 'react'
-import './page.css';
+import { isUserAuth } from "@/src/lib/isUserAuth";
+import Dashboard from "./Dashboard";
 
-const page = () => {
-  return (
-    <div>Dashboard Page</div>
-  )
+export default async function Page() {
+  const session = await isUserAuth();
+
+  return <Dashboard session={session} />;
 }
-
-export default page
