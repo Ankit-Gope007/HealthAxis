@@ -1,10 +1,14 @@
-import Image from "next/image";
+"use client"
+import React from 'react'
+import Navbar from './components/Navbar/Navbar'
 
-export default function Home() {
+const page = () => {
   return (
-    <div className="">
-      Landing page
-      <a href="http://localhost:3000/patient/login"> Patient Login</a>
-    </div>
-  );
+   <div>
+    <Navbar />
+    
+   </div>
+  )
 }
+
+export default page

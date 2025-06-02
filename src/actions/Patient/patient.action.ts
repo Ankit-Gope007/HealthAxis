@@ -11,7 +11,6 @@ import { redirect } from "next/navigation"
 
 // registering th patient
 export async function registerPatient(formdata: FormData) {
-  "use server"
   const email = formdata.get("email") as string
   const password = formdata.get("password") as string
 

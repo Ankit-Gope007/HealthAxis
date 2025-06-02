@@ -51,12 +51,12 @@ const sidebar = ({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean, 
             </div>
           ))}
         </div>
-        <div 
-        className='profile'
-        onClick={() => {
-          setIsSidebarOpen(!isSidebarOpen);
-          router.push('/patient/profile');
-        }}
+        <div
+          className='profile'
+          onClick={() => {
+            setIsSidebarOpen(!isSidebarOpen);
+            router.push('/patient/profile');
+          }}
         >
           <div className='profile-icon'>
             <FaRegUser />
