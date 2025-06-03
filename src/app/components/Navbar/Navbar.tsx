@@ -20,11 +20,11 @@ const Navbar = () => {
 
     {/* Navigation Options */}
     
-      <div className='gap-4 text-[#585858]  h-full w-[400px] hidden md:flex md:justify-center md:items-center'>
-        <div onClick={()=>{router.push("/")}} className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>Home</div>
-        <div onClick={()=>{router.push("/about")}} className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>About</div>
-        <div onClick={()=>{router.push("/services")}} className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>Services</div>
-        <div onClick={()=>{router.push("/contact")}} className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>Contact</div>
+      <div className='gap-4 text-[#585858]  h-full w-[450px] hidden md:flex md:justify-center md:items-center'>
+        <div className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>Features</div>
+        <div className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>For Doctor</div>
+        <div className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>Review</div>
+        <div className='text-lg Poppins font-semibold cursor-pointer hover:text-[#0eac16]'>Contact</div>
       </div>
 
     </div>
