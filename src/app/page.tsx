@@ -1,26 +1,43 @@
-"use client"
+'use client'
 import React from 'react'
 import Navbar from './components/Navbar/Navbar'
 import Hero from './components/Hero/Hero'
+import Mini_hero from './components/mini_hero_1/Mini_hero'
+import Features from './components/Features/Features'
+import PatientLogin from './components/PatientLogin/PatientLogin'
+import Testimonial from './components/Testimonial/Testimonial'
+import DoctorLogin from './components/DoctorLogin/DoctorLogin'
+import Footer from './components/Footer/Footer'
+import { useRef } from 'react'
 
-const Page = () => {
+
+const page = () => {
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const doctorRef = useRef<HTMLDivElement>(null);
+  const reviewRef = useRef<HTMLDivElement>(null);
+  const contactRef = useRef<HTMLDivElement>(null);
   return (
-    <div className="relative min-h-screen">
-      
-      {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <Navbar />
-      </div>
+    <div className='overflow-y-scroll h-screen scrollbar-hide'>
+      <Navbar
+        sections={{
+          featuresRef,
+          doctorRef,
+          reviewRef,
+          contactRef,
+        }} />
 
-      {/* Page Content with top padding to prevent overlap */}
-      <div className="pt-20"> {/* Adjust padding-top based on Navbar height */}
-        <Hero />
-        <Hero />
-        <Hero />
-        <Hero />
-      </div>
+      <Hero />
+      <Mini_hero />
+      <div ref={featuresRef}><Features /></div>
+      <PatientLogin />
+      <div ref={reviewRef}><Testimonial /></div>
+      <div ref={doctorRef}><DoctorLogin /></div>
+      <div ref={contactRef}><Footer /></div>
+
     </div>
-  );
+
+
+  )
 }
 
-export default Page;
+export default page

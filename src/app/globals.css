@@ -1,11 +1,10 @@
 @import "tailwindcss";
 
 * {
-  margin: 0;
-  padding: 0;
+
   box-sizing: border-box;
   font-family: 'Poppins';
-
+  overflow-x: none;
 }
 
 html, body {
@@ -34,11 +33,14 @@ html, body {
   font-style: normal;
 }
 
-.center{
+/* .center{
   display: flex;
   justify-content: center;
   align-items: center;
 
+} */
+ .center {
+  @apply flex justify-center items-center;
 }
 
 .Poppins {
