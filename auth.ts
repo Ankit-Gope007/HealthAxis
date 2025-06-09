@@ -23,7 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {
           label: "Password",
           type: "password",
-          
+
         },
       },
       async authorize(credentials) {
@@ -55,53 +55,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt", // or "database" for stateful sessions
   },
   callbacks: {
-  async jwt({ token, user, account }) {
-    // If signing in via Google
-    if (account?.provider === "google" && token?.email) {
-      // Check if user already exists
-      const existingUser = await prisma.user.findUnique({
-        where: { email: token.email },
-      });
-      // if user exists, set the token with user id and role
-      if (existingUser) {
-        token.id = existingUser.id;
-        token.role = existingUser.role;
-      } 
-
-      if (!existingUser) {
-        // Extract role from account.params passed in signIn() URL
-        const role = (account as any)?.params?.role; // default to PATIENT
-
-        // Create the new user with role
-        const newUser = await prisma.user.create({
-          data: {
-            email: token.email,
-            role: role === "DOCTOR" ? "DOCTOR" : "PATIENT", // fallback to PATIENT if anything invalid
-          },
+    async jwt({ token, user, account, profile }) {
+      // First time login with Google or Credentials
+      if (user) {
+        // Try to find user in DB
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email! },
         });
 
-        token.id = newUser.id;
-        token.role = newUser.role;
-      } else {
-        token.id = existingUser.id;
-        token.role = existingUser.role;
+        if (!existingUser) {
+          // Use default or extract from signIn() params if needed
+          const role = (account as any)?.params?.role ?? "PATIENT";
+
+          // Create user
+          const newUser = await prisma.user.create({
+            data: {
+              email: user.email!,
+              role: role,
+            },
+          });
+
+          token.id = newUser.id;
+          token.email = newUser.email;
+          token.role = newUser.role;
+        } else {
+          token.id = existingUser.id;
+          token.email = existingUser.email;
+          token.role = existingUser.role;
+        }
       }
-    }
 
-    // When user is set (initial login)
-    if (user) {
-      token.id = (user as any).id;
-      token.email = user.email;
-      token.role = (user as any).role;
-    }
-
-    return token;
-  },
+      return token;
+    },
 
   async session({ session, token }) {
-    (session.user as any).id = token.id;
-    (session.user as any).role = token.role;
-    return session;
+      (session.user as any).id = token.id;
+      (session.user as any).role = token.role;
+      return session;
+    }
   },
-},
 });

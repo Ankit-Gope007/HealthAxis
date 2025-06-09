@@ -1,6 +1,7 @@
 import { prisma } from "@/src/lib/prisma";
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { verifyJwt } from "@/src/helper/verifyJwt";
 
 // Function to register a new patient with email and password
 export const registerPatientCredential = async (data: { email: string, password: string }) => {
@@ -67,4 +68,28 @@ export const registerPatientGoogle = async (data: { email: string }) => {
         newPatient,
         { status: 201 }
     );
+}
+
+// Function to get Pateint by ID
+export const getPatientById = async(id: string) => {
+   
+
+    // Fetch the patient by ID
+    const patient = await prisma.user.findUnique({
+        where: { id : id },
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            profileSetup: true,
+        }
+    });
+
+    // If patient not found, return an error response
+    if (!patient) {
+        return NextResponse.json({ error: "Patient not found" }, { status: 404 });
+    }
+
+    // Return the patient data
+    return NextResponse.json(patient, { status: 200 });
 }

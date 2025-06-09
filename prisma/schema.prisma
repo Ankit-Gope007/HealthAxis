@@ -26,8 +26,10 @@ model User {
   email    String   @unique
   password String?
   role     Role     @default(PATIENT)
+  profileSetup Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 
   // Relations
   doctorProfile   DoctorProfile? @relation("DoctorToDoctorProfile")

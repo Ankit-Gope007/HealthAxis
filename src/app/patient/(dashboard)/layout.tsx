@@ -4,6 +4,7 @@ import Sidebar from './components/sidebar/sidebar'
 import './page.css'
 import { useState } from 'react'
 import Navbar from './components/navbar/navbar'
+import { SessionProvider } from 'next-auth/react'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -18,7 +19,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </div>
             </div>
             <div className={`right-part ${isSidebarOpen ? "invisible" : "visible"}`}>
+                <SessionProvider>
                 {children}
+                </SessionProvider>
             </div>
         </div>
     )

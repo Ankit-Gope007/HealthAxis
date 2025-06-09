@@ -7,12 +7,24 @@ import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineWaterDrop } from "react-icons/md";
 import { IoCallOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
-// import { signOut } from 'next-auth/react';
+import { signOut } from "next-auth/react";
 import './page.css';
+import { useUserStore } from '@/src/store/useUserStore';
 
 const page = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { clearUser } = useUserStore();
+
+  // Function to handle logout
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/patient/login" }); // Redirect to login page after logout
+    clearUser(); // Clear user data from the store
+  }
+
+
+
+
   return (
     <div className='patient-profile-container'>
       <div className="profile-summary">
@@ -47,9 +59,7 @@ const page = () => {
             </div>
           </div>
           <div
-            // onClick={() => {
-            //   signOut({ callbackUrl: "/patient/login" }); // 👈 Client-side logout and redirect
-            // }}
+            onClick={handleLogout}
             className="logOut-btn">
             <RiLogoutCircleLine className='logOut-icon' />
             Log Out

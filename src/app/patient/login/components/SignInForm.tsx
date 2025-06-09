@@ -68,6 +68,7 @@ const SignInForm = () => {
                     email,
                     password,
                     callbackUrl: "/patient/dashboard",
+                    role: "PATIENT" ,
                 })
             } else {
                 toast.error("Sign up failed. Please try again.");
