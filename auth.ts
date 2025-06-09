@@ -1,72 +1,107 @@
-import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@/src/generated/prisma";
-import bcrypt from "bcryptjs";
-import { signInSchema } from "./src/lib/zod";
+import NextAuth from "next-auth"
+import Google from "next-auth/providers/google"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { prisma } from "@/src/lib/prisma"
+import bcrypt from "bcryptjs"
 
-const prisma = new PrismaClient();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
-    GoogleProvider,
+    // google provider
+    Google,
+    // credentials provider
     CredentialsProvider({
-      name: "Credentials",
+      // name of the provider
+      name: "credentials",
+      // credentials to be used for login
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        email: {
+          label: "Email",
+          type: "email"
+
+        },
+        password: {
+          label: "Password",
+          type: "password",
+          
+        },
       },
       async authorize(credentials) {
-        const email = credentials?.email as string;
-        const password = credentials?.password as string;
-        // const { email, password } = await signInSchema.parseAsync(credentials)
-        if (!email || !password) {
-          throw new Error("Please provide both email and password.");
-        }
-
-        const user = await prisma.patient.findUnique({
+        // type assertion for credentials
+        const { email, password } = credentials as {
+          email: string;
+          password: string;
+        };
+        // checking if email is already registered
+        const user = await prisma.user.findUnique({
           where: { email },
         });
 
-        if (!user) {
-          throw new Error("No user found with this email.");
-        }
+        // if user is not found, throw an error
+        if (!user) throw new Error("User not found");
 
-        if (user.authProvider === "google") {
-          throw new Error("You signed up with Google. Please use Google login.");
-        }
+        // if user is found, check the password
+        const isCorrect = bcrypt.compare(password, user.password!);
 
-        const isValid = await bcrypt.compare(password, user.password || "");
+        // if password is incorrect, throw an error
+        if (!isCorrect) throw new Error("Invalid password");
 
-        if (!isValid) {
-          throw new Error("Incorrect password.");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-        };
-      }
-    })
+        // if everything is correct, return the user
+        return user;
+      },
+    }),
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt", // or "database" for stateful sessions
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+  async jwt({ token, user, account }) {
+    // If signing in via Google
+    if (account?.provider === "google" && token?.email) {
+      // Check if user already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email: token.email },
+      });
+      // if user exists, set the token with user id and role
+      if (existingUser) {
+        token.id = existingUser.id;
+        token.role = existingUser.role;
+      } 
+
+      if (!existingUser) {
+        // Extract role from account.params passed in signIn() URL
+        const role = (account as any)?.params?.role; // default to PATIENT
+
+        // Create the new user with role
+        const newUser = await prisma.user.create({
+          data: {
+            email: token.email,
+            role: role === "DOCTOR" ? "DOCTOR" : "PATIENT", // fallback to PATIENT if anything invalid
+          },
+        });
+
+        token.id = newUser.id;
+        token.role = newUser.role;
+      } else {
+        token.id = existingUser.id;
+        token.role = existingUser.role;
       }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token?.id) {
-        session.user.id = token.id as string;
-      }
-      return session;
     }
+
+    // When user is set (initial login)
+    if (user) {
+      token.id = (user as any).id;
+      token.email = user.email;
+      token.role = (user as any).role;
+    }
+
+    return token;
   },
-  pages: {
-    signIn: "/patient/login" // optional: custom login page
-  }
+
+  async session({ session, token }) {
+    (session.user as any).id = token.id;
+    (session.user as any).role = token.role;
+    return session;
+  },
+},
 });

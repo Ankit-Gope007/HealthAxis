@@ -7,7 +7,7 @@ import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineWaterDrop } from "react-icons/md";
 import { IoCallOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { signOut } from 'next-auth/react';
+// import { signOut } from 'next-auth/react';
 import './page.css';
 
 const page = () => {
@@ -47,9 +47,9 @@ const page = () => {
             </div>
           </div>
           <div
-            onClick={() => {
-              signOut({ callbackUrl: "/patient/login" }); // 👈 Client-side logout and redirect
-            }}
+            // onClick={() => {
+            //   signOut({ callbackUrl: "/patient/login" }); // 👈 Client-side logout and redirect
+            // }}
             className="logOut-btn">
             <RiLogoutCircleLine className='logOut-icon' />
             Log Out

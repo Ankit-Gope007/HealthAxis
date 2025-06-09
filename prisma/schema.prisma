@@ -19,33 +19,30 @@ enum Gender {
   Female
   Other
 }
+// This model represents a patient in the healthcare system.
+// It includes fields for authentication and a one-to-one relationship with the PatientProfile model.
+model User {
+  id       String   @id @default(cuid())
+  email    String   @unique
+  password String?
+  role     Role     @default(PATIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model Session {
-  id         String   @id @default(cuid())
-  token      String   @unique
-  userId     String
-  user       Patient  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime
+  // Relations
+  doctorProfile   DoctorProfile? @relation("DoctorToDoctorProfile")
+  patientProfile  PatientProfile? @relation("PatientToPatientProfile")
 }
 
-model Patient {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String   @unique
-  password      String?
-  authProvider  String?// e.g., "credentials","google","both"
-  profileSetup  Boolean  @default(false)
-  sessions  Session[]  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  profile       Profile?
+enum Role {
+  PATIENT
+  DOCTOR
 }
 
-model Profile {
-  id                     String   @id @default(cuid())
-  gender        Gender   @default(Male)
-  phone         String   @unique
+model PatientProfile {
+  id                     String    @id @default(cuid())
+  gender                 Gender    @default(Male)
+  phone                  String    @unique
   imageUrl               String?
   address                String?
   dob                    DateTime?
@@ -53,8 +50,23 @@ model Profile {
   emergencyContactNumber String?
   medicalHistory         String?
   currentMedications     String?
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  patient     Patient  @relation(fields: [patientId], references: [id])
-  patientId   String   @unique
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  patientId String  @unique
+  patient   User    @relation("PatientToPatientProfile", fields: [patientId], references: [id])
+}
+
+model DoctorProfile {
+  id             String    @id @default(cuid())
+  phone          String    @unique
+  imageUrl       String?
+  address        String?
+  specialization String?
+  experience     Int?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  doctorId String  @unique
+  doctor   User    @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
 }

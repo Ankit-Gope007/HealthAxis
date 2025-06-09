@@ -14,7 +14,7 @@ import { useSessionStore } from "@/src/store/useSessionStore";
 import { useSession } from "next-auth/react";
 
 const page = () => {
-  const { setSessionStore,sessionStore } = useSessionStore();
+  const { setSessionStore, sessionStore } = useSessionStore();
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const page = () => {
     const hasShown = sessionStorage.getItem("dashboardToastShown");
 
     if (!hasShown) {
-      toast.success(`Welcome back, ${sessionStore?.email }! 🎉`);
+      toast.success(`Welcome back, ${sessionStore?.email}! 🎉`);
       sessionStorage.setItem("dashboardToastShown", "true");
     }
   }, []);
