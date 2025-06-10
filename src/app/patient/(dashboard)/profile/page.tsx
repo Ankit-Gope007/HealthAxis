@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useRef } from 'react';
 import { FaRegUser } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io";
@@ -8,10 +8,17 @@ import { MdOutlineWaterDrop } from "react-icons/md";
 import { IoCallOutline } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { signOut } from "next-auth/react";
-import './page.css';
+// import './page.css';
 import { useUserStore } from '@/src/store/useUserStore';
+import { useSidebarStore } from '@/src/store/useSidebarStore';
 
 const page = () => {
+  const { setActiveItem } = useSidebarStore();
+  // Set the active item to "profile" when this page is accessed
+  useEffect(()=>{
+    setActiveItem("profile");
+  },[])
+  
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { clearUser } = useUserStore();

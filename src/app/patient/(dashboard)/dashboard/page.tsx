@@ -4,11 +4,14 @@ import { toast, Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/src/store/useUserStore";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useSidebarStore } from  '@/src/store/useSidebarStore';
 
 const page = () => {
   const { data: session, status } = useSession();
   const { user, setUser } = useUserStore();
-  
+  const router = useRouter();
+  const { setActiveItem } = useSidebarStore();
 
 
   useEffect(() => {
@@ -28,6 +31,13 @@ const page = () => {
       if (res.data) {
         setUser(res.data);
       }
+
+      if(!user?.profileSetup){
+        toast("Please complete your profile setup to access all features.");
+        setActiveItem("profile");
+        router.push("/patient/profile");
+      }
+
     };
     fetchUser();
   }, [session]);

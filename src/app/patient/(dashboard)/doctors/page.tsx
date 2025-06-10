@@ -3,7 +3,7 @@ import './page.css';
 
 const page = () => {
   return (
-    <div>Doctors Page</div>
+    <div className='w-full h-[100vh] bg-amber-200'>Doctors Page</div>
   )
 }
 
