@@ -54,7 +54,7 @@ const page = () => {
     }
   }, []);
   return (
-    <div>
+    <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-fuchsia-400'>
       <Toaster />
       <div className="dashboard-container">
         <h1>Welcome to Your Dashboard {user?.email} </h1>

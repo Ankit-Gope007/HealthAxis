@@ -49,7 +49,7 @@ const sidebar = () => {
   ];
 
   return (
-    <Sidebar className="bg-white shadow-md border-r w-[27vw] lg:w-40">
+    <Sidebar className="bg-white shadow-md border-r w-30 lg:w-[25vw] ">
       <SidebarContent className="">
         <SidebarGroup>
           <SidebarHeader className='border-b  flex items-center justify-between'>
@@ -86,7 +86,7 @@ const sidebar = () => {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="flex items-center justify-between w-full text-sm font-medium text-gray-700 hover:bg-[#f6fff8] px-2 py-2 rounded-lg transition-colors">
+                <SidebarMenuButton className="flex items-center justify-between w-full text-sm font-medium text-gray-700  px-2 py-2 rounded-lg transition-colors">
                   <div className="flex items-center space-x-2">
                     <User2 className="h-4 w-4 text-[#28A745]" />
                     <span>Username</span>

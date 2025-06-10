@@ -24,12 +24,12 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, label, link }) => {
     return (
         <Button
             variant="ghost"
-            className={`w-full justify-start text-sm font-medium hover:bg-[#f6fff8] px-2 py-1.5 rounded-lg transition-colors ${activeItem === label ? 'bg-[#28A745] text-white' : ' text-gray-700'}`}
+            className={`w-full justify-start text-sm font-medium cursor-pointer  px-2 py-1.5 rounded-lg transition-colors ${activeItem === label ? 'bg-[#28A745] text-white' : ' text-gray-700'}`}
             onClick={() => handleNavigation(label, link)}
         >
             <Link
                 href={`/patient/${link}`}
-                className="flex items-center space-x-3 text-sm hover:text-[#28A745] transition-colors font-medium px-2 py-1.5 rounded-lg hover:bg-[#f6fff8]"
+                className="flex items-center space-x-3 text-sm  transition-colors font-medium px-2 py-1.5 rounded-lg "
             >
                 <div className={`${activeItem === label ? 'text-white' : 'text-[#28A745]'} text-lg`}>
                     {icon}

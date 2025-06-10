@@ -33,16 +33,16 @@ import { User2 } from "lucide-react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <main className="flex h-screen bg-gray-50 overflow-hidden"> {/* Added overflow-hidden to main */}
+        <main className="flex h-screen bg-gray-50 overflow-y-scroll"> {/* Added overflow-hidden to main */}
             <SessionProvider>
                 <SidebarProvider>
                     {/* Sidebar will hide on small screens due to its internal logic or responsive classes */}
-                    <div className='w-[30%]'>
+                  
                         <Sidebar />
-                    </div>
+                    
                     
 
-                    <div className="flex-1 flex w-full md:w-[60vw] flex-col h-full overflow-y-auto"> {/* Main content wrapper */}
+                    <div className="flex-1 flex w-full md:w-[60vw] flex-col h-full overflow-y-auto overflow-x-hidden"> {/* Main content wrapper */}
                         {/* Header for small screens to house the SidebarTrigger and potentially a logo */}
                         <div className="md:hidden flex items-center justify-between p-0 bg-white shadow-sm border-b">
                             <SidebarTrigger className="text-2xl text-gray-700" /> {/* Hamburger icon */}
@@ -58,10 +58,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             </div>
                         </div>
 
-                        <div className="flex-1 p-1 flex flex-col items-center bg-gray-100 overflow-y-auto">
-                            <div className=" m-2 ">
+                        <div className="flex-1 min-h-[240vh] sm:min-h-[210vh] lg:min-h-screen p-1  flex flex-col items-center overflow-x-hidden  overflow-y-auto ">
                                 {children}
-                            </div>
                         </div>
                     </div>
                 </SidebarProvider>

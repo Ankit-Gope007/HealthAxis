@@ -5,6 +5,7 @@
   box-sizing: border-box;
   font-family: 'Poppins';
   overflow-x: none;
+  scrollbar-width: none; /* Firefox */
 }
 
 html, body {
