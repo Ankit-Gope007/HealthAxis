@@ -2,6 +2,7 @@ import { prisma } from "@/src/lib/prisma";
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { verifyJwt } from "@/src/helper/verifyJwt";
+import { EnumValues } from "zod";
 
 // Function to register a new patient with email and password
 export const registerPatientCredential = async (data: { email: string, password: string }) => {
@@ -27,9 +28,9 @@ export const registerPatientCredential = async (data: { email: string, password:
     const newPatient = await prisma.user.create({
         data: {
             email: email,
-            password: hashedPassword, 
+            password: hashedPassword,
             role: 'PATIENT', // Assuming 'PATIENT' is the role for patients
-        }   
+        }
     })
 
     // Return the newly created patient
@@ -60,7 +61,7 @@ export const registerPatientGoogle = async (data: { email: string }) => {
         data: {
             email: email,
             role: 'PATIENT', // Assuming 'PATIENT' is the role for patients
-        }   
+        }
     })
 
     // Return the newly created patient
@@ -71,17 +72,22 @@ export const registerPatientGoogle = async (data: { email: string }) => {
 }
 
 // Function to get Pateint by ID
-export const getPatientById = async(id: string) => {
-   
+export const getPatientById = async (id: string) => {
+
 
     // Fetch the patient by ID
     const patient = await prisma.user.findUnique({
-        where: { id : id },
+        where: { id: id },
         select: {
             id: true,
             email: true,
             role: true,
             profileSetup: true,
+            patientProfile:{
+                select:{
+                    id: true,
+                }
+            }
         }
     });
 
@@ -93,3 +99,92 @@ export const getPatientById = async(id: string) => {
     // Return the patient data
     return NextResponse.json(patient, { status: 200 });
 }
+
+// Create or update patient profile
+export const upsertPatientProfile = async (data: {
+    patientId: string;
+    fullName: string;
+    gender: string;
+    phone: string;
+    imageUrl?: string;
+    address?: string;
+    dob: string;
+    bloodGroup?: string;
+    emergencyContactNumber?: string;
+    medicalHistory?: string;
+    currentMedications?: string;
+}) => {
+    const {
+        fullName,
+        patientId,
+        gender,
+        phone,
+        imageUrl,
+        address,
+        dob,
+        bloodGroup,
+        emergencyContactNumber,
+        medicalHistory,
+        currentMedications,
+    } = data;
+
+    
+
+    try {
+        const profile = await prisma.patientProfile.upsert({
+            where: { patientId },
+            update: {
+                fullName,
+                gender,
+                phone,
+                imageUrl,
+                address,
+                dob:new Date(dob),
+                bloodGroup,
+                emergencyContactNumber,
+                medicalHistory,
+                currentMedications,
+            },
+            create: {
+                patientId,
+                fullName,
+                gender: gender ?? "Male",
+                phone,
+                imageUrl,
+                address,
+                dob:new Date(dob) ,
+                bloodGroup,
+                emergencyContactNumber,
+                medicalHistory,
+                currentMedications,
+            },
+        });
+
+        await prisma.user.update({
+            where: { id: patientId }, // Assuming patientId is also the User's ID
+            data: { profileSetup: true },
+        });
+
+        return NextResponse.json(profile, { status: 200 });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+};
+
+// Get patient profile by patientId
+export const getPatientProfile = async (patientId: string) => {
+    try {
+        const profile = await prisma.patientProfile.findUnique({
+            where: { patientId:patientId },
+
+        });
+
+        if (!profile) {
+            return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+        }
+
+        return profile
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+};

@@ -1,4 +1,3 @@
-
 import React from 'react'
 import {
   Sidebar,
@@ -12,29 +11,24 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-
-import { Button } from "@/components/ui/button";
 import SidebarButton from './components/SidebarButton';
-
-
 import { FaHandHoldingMedical } from "react-icons/fa";
-import { IoMdArrowBack } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa6";
 import { MdDateRange } from "react-icons/md";
 import { FaUserDoctor } from "react-icons/fa6";
 import { GiMedicines } from "react-icons/gi";
 import { CiChat1 } from "react-icons/ci";
-import { IoBackspace, IoMenu } from "react-icons/io5";
 import { User2 } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import Link from 'next/link';
+import SignOutButton from './components/SignOutButton';
+import Username from './components/Username';
 
 
 
@@ -89,18 +83,18 @@ const sidebar = () => {
                 <SidebarMenuButton className="flex items-center justify-between w-full text-sm font-medium text-gray-700  px-2 py-2 rounded-lg transition-colors">
                   <div className="flex items-center space-x-2">
                     <User2 className="h-4 w-4 text-[#28A745]" />
-                    <span>Username</span>
+                    <Username  />
                   </div>
                   <ChevronUp className="h-4 w-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width] shadow-lg border rounded-md">
-                <DropdownMenuItem className="px-3 py-2 text-sm text-gray-700 hover:bg-[#f6fff8]">
-                  <span><Link href={"/patient/profile"} >Profile</Link></span>
+              <DropdownMenuContent side="top" className="flex-col  shadow-lg border rounded-md">
+                <DropdownMenuItem className="p-0 text-sm text-gray-700 hover:bg-[#f6fff8]">
+                  <span className='w-full py-1 px-2'><Link href={"/patient/profile"} >Profile</Link></span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="px-3 py-2 text-sm text-gray-700 hover:bg-[#f6fff8]">
-                  <span>Sign out</span>
+                <DropdownMenuItem className="p-0 cursor-pointer text-sm text-gray-700 hover:bg-[#f6fff8]">
+                  <SignOutButton />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

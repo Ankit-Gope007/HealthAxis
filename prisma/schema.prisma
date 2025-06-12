@@ -19,21 +19,21 @@ enum Gender {
   Female
   Other
 }
+
 // This model represents a patient in the healthcare system.
 // It includes fields for authentication and a one-to-one relationship with the PatientProfile model.
 model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
-  password String?
-  role     Role     @default(PATIENT)
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String?
+  role         Role     @default(PATIENT)
   profileSetup Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
-  doctorProfile   DoctorProfile? @relation("DoctorToDoctorProfile")
-  patientProfile  PatientProfile? @relation("PatientToPatientProfile")
+  doctorProfile  DoctorProfile?  @relation("DoctorToDoctorProfile")
+  patientProfile PatientProfile? @relation("PatientToPatientProfile")
 }
 
 enum Role {
@@ -42,33 +42,34 @@ enum Role {
 }
 
 model PatientProfile {
-  id                     String    @id @default(cuid())
-  gender                 Gender    @default(Male)
-  phone                  String    @unique
+  id                     String   @id @default(cuid())
+  fullName               String
+  gender                 String   @default("Male") 
+  phone                  String   @unique
+  dob                    DateTime
   imageUrl               String?
   address                String?
-  dob                    DateTime?
   bloodGroup             String?
   emergencyContactNumber String?
   medicalHistory         String?
   currentMedications     String?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  patientId String  @unique
-  patient   User    @relation("PatientToPatientProfile", fields: [patientId], references: [id])
+  patientId String @unique
+  patient   User   @relation("PatientToPatientProfile", fields: [patientId], references: [id])
 }
 
 model DoctorProfile {
-  id             String    @id @default(cuid())
-  phone          String    @unique
+  id             String   @id @default(cuid())
+  phone          String   @unique
   imageUrl       String?
   address        String?
   specialization String?
   experience     Int?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  doctorId String  @unique
-  doctor   User    @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
+  doctorId String @unique
+  doctor   User   @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
 }

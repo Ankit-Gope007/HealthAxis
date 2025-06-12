@@ -6,65 +6,117 @@ import { useUserStore } from "@/src/store/useUserStore";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSidebarStore } from  '@/src/store/useSidebarStore';
+import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
+import AppointmentCards from "./components/AppointmentCards"; // Import your AppointmentCards component
 
-const page = () => {
+const Page = () => { 
   const { data: session, status } = useSession();
-  const { user, setUser } = useUserStore();
+  const { user, setUser } = useUserStore(); // Get user and setUser from your store
   const router = useRouter();
   const { setActiveItem } = useSidebarStore();
-
+  const { profile} = usePatientProfileStore(); // Assuming you have a store for patient profile
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!session?.user?.id) return;
-
-      console.log("Fetching user data for ID:", session.user.id);
-      console.log("Session user data:", session.user);
+      if (status === "loading" || !session?.user?.id) {
+        return; 
+      }
       
+      try {
+        const res = await axios.post(`/api/patient/getPatientById`, {
+          id: session.user.id,
+        });
 
-      const res = await axios.post(`/api/patient/getPatientById`, {
-        id: session.user.id,
-      })
+        console.log("Response from API:", res.data);
+        const fetchedUser = res.data; 
+        if (fetchedUser) {
+          setUser(fetchedUser); 
+        }
+        if (fetchedUser && !fetchedUser.profileSetup) {
+          toast("Please complete your profile setup to access all features.");
+          setActiveItem("profile");
+          router.push("/patient/profile");
+        }
 
-      console.log("Response from API:", res.data.user);
-
-      if (res.data) {
-        setUser(res.data);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        toast.error("Failed to load user data.");
       }
-
-      if(!user?.profileSetup){
-        toast("Please complete your profile setup to access all features.");
-        setActiveItem("profile");
-        router.push("/patient/profile");
-      }
-
     };
+
     fetchUser();
-  }, [session]);
-
-
+  }, [session, status, setUser, setActiveItem, router]); // Add all dependencies
 
   // Display a welcome toast message when the dashboard is accessed
+  // This useEffect should depend on 'user' to ensure it's available
   useEffect(() => {
-    const hasShown = sessionStorage.getItem("dashboardToastShown");
+    // Only show toast if user is available and toast hasn't been shown
+    if (user && user.email) { 
+      const hasShown = sessionStorage.getItem("dashboardToastShown");
 
-    if (!hasShown) {
-      toast.success(`Welcome back, ${user?.email}! 🎉`);
-      sessionStorage.setItem("dashboardToastShown", "true");
+      if (!hasShown) {
+        toast.success(`Welcome back, ${user.email}! 🎉`);
+        sessionStorage.setItem("dashboardToastShown", "true");
+      }
     }
-  }, []);
+  }, [user]); // Now depends on 'user' from Zustand
+
   return (
-    <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-fuchsia-400'>
+    <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#F9FAFC] '>
       <Toaster />
-      <div className="dashboard-container">
-        <h1>Welcome to Your Dashboard {user?.email} </h1>
+
+      {/* Heading and Tagline  + book appoinment button*/}
+      <div className=" flex justify-between">
+        {/* heading */}
+        <div className="flex flex-col justify-between items-start p-2">
+        <h1 className="text-xl font-semibold">Welcome to Your Dashboard , {profile?.fullName.split(" ")[0]|| "Guest"}! </h1> 
         <p>
-          Here you can manage your health records, appointments, and more.
+          Here's an overview of your health records, appointments, and more.
         </p>
-        {/* Add more dashboard content here */}
+        </div>
+      {/* Book  Appoinment Button */}
+        <div className="flex justify-end p-2">
+          <button
+            onClick={() => {
+              setActiveItem("Appointments");
+              router.push("/patient/appointments");
+            }}
+            className="bg-[#28A745] cursor-pointer  text-white px-4 py-2 rounded-lg hover:bg-[#28a746] transition duration-200"
+          >
+            Book Appointment
+          </button>
+        </div>
       </div>
+
+      {/* Divider */}
+      <hr className="my-2 border-gray-300" />
+
+      {/* Your Health Records */}
+
+      {/* Your Upcoming Appointments */}
+      <div className=" h-[300px] p-2">
+        <h2 className="text-lg font-semibold mt-4 ">Your Upcoming Appointments</h2>
+        <p>Manage your appointments and health records here.</p>
+        
+        {/* Appointment Cards */}
+        <div className="mt-4 flex justify-start gap-3 h-[250px] overflow-x-auto p-1">
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+          <AppointmentCards /> 
+        </div>
+      </div>
+
     </div>
   )
 }
 
-export default page
+export default Page
