@@ -1,5 +1,4 @@
 
-
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Form from "./components/Form";

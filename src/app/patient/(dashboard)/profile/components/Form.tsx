@@ -18,6 +18,8 @@ const Form = () => {
 
         const formData = new FormData(event.currentTarget);
 
+        console.log("sendind data to user with id:", user?.id);
+
         const data = {
             fullName: formData.get("fullName"),
             phone: formData.get("phone"),
@@ -28,7 +30,7 @@ const Form = () => {
             address: formData.get("address"),
             medicalHistory: formData.get("medicalHistory"),
             currentMedications: formData.get("currentMedications"),
-            patientId: user?.id, // you must fetch this from session/auth
+            patientId: user?.id, 
         };
 
         try {

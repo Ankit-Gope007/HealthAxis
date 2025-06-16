@@ -66,10 +66,10 @@ const Page = () => {
       <Toaster />
 
       {/* Heading and Tagline  + book appoinment button*/}
-      <div className=" flex justify-between">
+      <div className=" flex justify-between flex-col md:flex-row">
         {/* heading */}
         <div className="flex flex-col justify-between items-start p-2">
-        <h1 className="text-xl font-semibold">Welcome to Your Dashboard , {profile?.fullName.split(" ")[0]|| "Guest"}! </h1> 
+        <h1 className="text-xl font-semibold">Welcome to Your Dashboard , {profile ? profile.fullName:"Guest"}! </h1> 
         <p>
           Here's an overview of your health records, appointments, and more.
         </p>
@@ -81,7 +81,7 @@ const Page = () => {
               setActiveItem("Appointments");
               router.push("/patient/appointments");
             }}
-            className="bg-[#28A745] cursor-pointer  text-white px-4 py-2 rounded-lg hover:bg-[#28a746] transition duration-200"
+            className="bg-[#28A745] w-full cursor-pointer  text-white px-4 py-2 rounded-lg hover:bg-[#28a746] transition duration-200"
           >
             Book Appointment
           </button>
