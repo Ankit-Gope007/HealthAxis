@@ -12,8 +12,8 @@ export async function POST(request: Request) {
 
         // Return the response from the upsertPatientProfile function
         return NextResponse.json(response, { status: 200 });
-    } catch (error) {
+    } catch (error:any) {
         // Handle any errors that occur during profile update
-        return NextResponse.json({ error: "An error occurred while updating the profile" }, { status: 500 });
+        return NextResponse.json({ error: error.message || "Something went Wrong!!" }, { status: error.status || 500 });
     }
 }

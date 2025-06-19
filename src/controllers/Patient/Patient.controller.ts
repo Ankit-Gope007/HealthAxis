@@ -83,8 +83,8 @@ export const getPatientById = async (id: string) => {
             email: true,
             role: true,
             profileSetup: true,
-            patientProfile:{
-                select:{
+            patientProfile: {
+                select: {
                     id: true,
                 }
             }
@@ -128,7 +128,7 @@ export const upsertPatientProfile = async (data: {
         currentMedications,
     } = data;
 
-    
+
 
     try {
         const profile = await prisma.patientProfile.upsert({
@@ -160,14 +160,16 @@ export const upsertPatientProfile = async (data: {
             },
         });
 
+     
+
         await prisma.user.update({
             where: { id: patientId }, // Assuming patientId is also the User's ID
             data: { profileSetup: true },
         });
 
-        return NextResponse.json(profile, { status: 200 });
+        return profile;
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(`Failed to upsert patient profile: ${error.message}`);
     }
 };
 
@@ -175,7 +177,7 @@ export const upsertPatientProfile = async (data: {
 export const getPatientProfile = async (patientId: string) => {
     try {
         const profile = await prisma.patientProfile.findUnique({
-            where: { patientId:patientId },
+            where: { patientId: patientId },
 
         });
 
@@ -186,5 +188,19 @@ export const getPatientProfile = async (patientId: string) => {
         return profile
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+};
+
+// Add image to patient profile
+export const addImageToPatientProfile = async (patientId: string, imageUrl: string) => {
+    try {
+        const updatedProfile = await prisma.patientProfile.update({
+            where: { patientId },
+            data: { imageUrl:imageUrl },
+        });
+
+        return updatedProfile;
+    } catch (error: any) {
+        throw new Error(`Failed to add image to patient profile: ${error.message}`);
     }
 };

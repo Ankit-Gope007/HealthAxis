@@ -1,9 +1,12 @@
+"use client";
 import React from 'react'
-import { useUserStore } from '@/src/store/useUserStore'
+
+import { usePatientProfileStore } from '@/src/store/usePatientProfileStore'
 
 const Username = () => {
+  const {profile} = usePatientProfileStore();
   return (
-    <span>Username</span>
+    <span>{profile?.fullName}</span>
   )
 }
 

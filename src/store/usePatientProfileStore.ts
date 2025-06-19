@@ -4,8 +4,8 @@ import { persist } from 'zustand/middleware';
 type PatientProfile = {
     id: string;
     fullName: string;
-    age: number;
     bloodGroup: string;
+    gender: string;
     phone: string;
     imageUrl?: string;
     address?: string;
