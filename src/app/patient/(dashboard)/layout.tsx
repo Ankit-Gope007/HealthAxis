@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SessionProvider } from 'next-auth/react'
 import { FaHandHoldingMedical } from "react-icons/fa";
 import { User2 } from "lucide-react";
+import UserImage from './components/UserImage';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -22,7 +23,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             </div>
                             {/* User Profile picture */}
                             <div className="w-6 h-6 m-1 rounded-full bg-gray-200 flex items-center justify-center">
-                                <User2 className="w-4 h-4  text-gray-500" /> 
+                                {/* <User2 className="w-4 h-4  text-gray-500" />  */}
+                                <UserImage />
                             </div>
                         </div>
                         {/* Main Page content area */}
