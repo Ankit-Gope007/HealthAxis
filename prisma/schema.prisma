@@ -44,7 +44,7 @@ enum Role {
 model PatientProfile {
   id                     String   @id @default(cuid())
   fullName               String
-  gender                 String   @default("Male") 
+  gender                 String   @default("Male")
   phone                  String   @unique
   dob                    DateTime
   imageUrl               String?
@@ -61,15 +61,19 @@ model PatientProfile {
 }
 
 model DoctorProfile {
-  id             String   @id @default(cuid())
-  phone          String   @unique
-  imageUrl       String?
-  address        String?
-  specialization String?
-  experience     Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
+  id              String   @id @default(cuid())
+  phone           String   @unique
+  fullName        String
+  imageUrl        String?
+  address         String?
+  specialization  String?
+  experience      Int?
+  consultationFee  Float?
+  licenseNumber   String   @unique
+  licenseDocument String // URL/path to PDF/Image
+  verified        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   doctorId String @unique
   doctor   User   @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
 }
