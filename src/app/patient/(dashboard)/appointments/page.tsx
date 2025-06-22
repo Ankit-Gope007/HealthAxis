@@ -10,7 +10,7 @@ import PastAppointments from './components/PastAppointments';
 const page = () => {
   const { setActiveItem } = useSidebarStore();
   useEffect(() => {
-    setActiveItem('appointments');
+    setActiveItem('Appointments');
   }, [setActiveItem]);
   return (
     <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh]'>
@@ -37,12 +37,16 @@ const page = () => {
             <TabsTrigger  className='cursor-pointer'  value="upcomingAppointments">Upcoming (2)</TabsTrigger>
             <TabsTrigger className='cursor-pointer' value="pastAppointments">Past (3)</TabsTrigger>
           </TabsList>
+
+
+
+          {/* Upcoming Appointments */}
           <TabsContent value="upcomingAppointments">
             <div className=' overflow-y-auto gap-3 h-full w-full items-center justify-start px-2 flex flex-col '>
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -52,7 +56,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -62,7 +66,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -72,7 +76,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -82,7 +86,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -92,7 +96,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -102,7 +106,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -112,7 +116,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -122,7 +126,7 @@ const page = () => {
               <UpcomingAppointments
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+SJ" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="May 18, 2025"
                 time="10:30 AM"
                 location="Downtown Medical Center"
@@ -132,12 +136,17 @@ const page = () => {
 
             </div>
           </TabsContent>
+
+
+
+
+          {/* Past Appointments */}
           <TabsContent value="pastAppointments">
             <div className=' overflow-y-auto gap-3 h-full w-full items-center justify-start px-2 flex flex-col '>
               <PastAppointments
                 doctorName="Dr. Jane Smith"
                 specialty="Dermatologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+JS" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="April 10, 2025"
                 time="2:00 PM"
                 location="City Hospital"
@@ -147,7 +156,7 @@ const page = () => {
               <PastAppointments
                 doctorName="Dr. Jane Smith"
                 specialty="Dermatologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+JS" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="April 10, 2025"
                 time="2:00 PM"
                 location="City Hospital"
@@ -157,7 +166,7 @@ const page = () => {
               <PastAppointments
                 doctorName="Dr. Jane Smith"
                 specialty="Dermatologist"
-                imageUrl="https://placehold.co/100x100/A0A0A0/FFFFFF?text=Dr+JS" // Placeholder image
+                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
                 date="April 10, 2025"
                 time="2:00 PM"
                 location="City Hospital"
