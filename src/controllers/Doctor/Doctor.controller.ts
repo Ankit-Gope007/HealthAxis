@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { uploadToCloudinary } from "@/src/helper/uploadToCloudinary";
-
+import { transporter } from "@/src/lib/mail";
 
 
 // Doctor Registration controller:
@@ -141,4 +141,139 @@ export async function loginDoctor(data: {
         doctorProfile: existingUser.doctorProfile,
         token: token,
     };
+}
+
+// Doctor Logout controller:
+export async function logoutDoctor() {
+    // Clear the doctor token from cookies
+    const cookieStore = await cookies();
+    cookieStore.set('doctorToken', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: -1, // Set maxAge to -1 to delete the cookie
+    });
+
+    return {
+        success: true,
+        message: "Doctor logged out successfully",
+    };
+}
+
+
+
+// Get All Doctors controller:
+export async function getAllDoctors() {
+    // Fetch all doctors from the database
+    const doctors = await prisma.user.findMany({
+        where: { role: 'DOCTOR' },
+        include: {
+            doctorProfile: true, // Include doctor profile details
+        }
+    });
+
+    // Return the list of doctors
+    return {
+        success: true,
+        message: "Doctors fetched successfully",
+        data: doctors,
+    };
+}
+
+
+// Get Doctor by ID controller:
+export async function getDoctorById(doctorId: string) {
+    // Fetch the doctor by ID from the database
+    const doctor = await prisma.user.findUnique({
+        where: { id: doctorId },
+        include: {
+            doctorProfile: true, // Include doctor profile details
+        }
+    });
+
+    // If doctor is not found, return an error response
+    if (!doctor || doctor.role !== 'DOCTOR') {
+        throw new Error("Doctor not found");
+    }
+
+    // Return the doctor details
+    return {
+        success: true,
+        message: "Doctor fetched successfully",
+        data: doctor,
+    };
+}
+
+
+/// Delete Doctor Controller
+export const deleteDoctor = async (id: string) => {
+    try {
+        // First, delete the doctorProfile associated with the user
+        await prisma.doctorProfile.delete({
+            where: {
+                doctorId: id,
+            },
+        });
+
+        // Then, delete the user
+        await prisma.user.delete({
+            where: {
+                id,
+            },
+        });
+
+        return {
+            success: true,
+            message: "Doctor deleted successfully",
+        };
+    } catch (error) {
+        console.error("Error deleting doctor:", error);
+        throw new Error("Failed to delete doctor");
+    }
+};
+
+
+
+// Verify Doctor controller:
+export async function verifyDoctor(id: string) {
+    const doctor = await prisma.user.update({
+        where: { id },
+        data: {
+            doctorProfile: {
+                update: {
+                    verified: true,
+                },
+            },
+        },
+        include: { doctorProfile: true },
+    });
+
+    await transporter.sendMail({
+        from: '"Health Axis Admin" <no-reply@healthaxis.com>',
+        to: doctor.email,
+        subject: "Doctor Verification Success",
+        html: `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f7f9fc; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <h2 style="color: #28A745;">Health Axis</h2>
+  </div>
+  <h3 style="color: #333;">Hello Dr. ${doctor.doctorProfile?.fullName},</h3>
+  <p style="font-size: 15px; color: #444; line-height: 1.6;">
+    We’re pleased to inform you that your profile has been successfully <strong style="color: #28A745;">verified</strong> by our team.
+    You now have full access to your doctor dashboard, where you can manage appointments, update your profile, and connect with patients.
+  </p>
+  <p style="font-size: 15px; color: #444; line-height: 1.6;">
+    Thank you for choosing <strong>Health Axis</strong>. We're excited to have you on board!
+  </p>
+  <div style="margin-top: 30px; text-align: center;">
+    <a href="http://localhost:3000/doctor/login" target="_blank" style="background-color: #28A745; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Go to Dashboard</a>
+  </div>
+  <p style="margin-top: 30px; font-size: 12px; color: #888; text-align: center;">
+    If you have any questions or issues, feel free to reply to this email or contact our support team.
+  </p>
+</div>
+    `,
+    });
+
+    return doctor;
 }
