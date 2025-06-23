@@ -41,7 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user) throw new Error("User not found");
 
         // if user is found, check the password
-        const isCorrect = bcrypt.compare(password, user.password!);
+        const isCorrect = await bcrypt.compare(password, user.password!);
 
         // if password is incorrect, throw an error
         if (!isCorrect) throw new Error("Invalid password");
