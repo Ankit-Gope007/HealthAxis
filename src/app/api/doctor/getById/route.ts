@@ -3,10 +3,20 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
     try {
-        const url = new URL(req.url);
-        const id = url.searchParams.get("id")!;
-        const doctor = await getDoctorById(id);
-        return NextResponse.json({ doctor });
+        const { searchParams } = new URL(req.url);
+        const doctorId = searchParams.get("id");
+
+        if (!doctorId) {
+            return NextResponse.json({ error: "Doctor ID is required" }, { status: 400 });
+        }
+
+        const doctor = await getDoctorById(doctorId);
+
+        if (!doctor) {
+            return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+        }
+
+        return NextResponse.json(doctor, { status: 200 });
     } catch (error) {
         console.error("Error fetching doctor by ID:", error);
         return NextResponse.json({ error: "Failed to fetch doctor" }, { status: 500 });

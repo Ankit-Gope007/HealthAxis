@@ -1,81 +1,102 @@
 "use client"
 import React from 'react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DoctorsInfoCard from './components/DoctorsInfoCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CiSearch } from "react-icons/ci";
+import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Search } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+
+
+type DoctorInfo = {
+  id: string;
+  email: string;
+  password: string;
+  role: "DOCTOR";
+  profileSetup: boolean;
+  createdAt: string;
+  updatedAt: string;
+  doctorProfile: {
+    id: string;
+    fullName: string;
+    phone: string;
+    imageUrl: string | null;
+    address: string | null;
+    specialization: string
+    experience: number | null;
+    licenseNumber: string;
+    licenseDocument: string;
+    verified: boolean;
+    consultationFee: number | null;
+    createdAt: string;
+    updatedAt: string;
+    doctorId: string;
+  };
+};
+
 
 
 const page = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
+  const [filterSpecialization, setFilterSpecialization] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [doctorsData, setDoctorsData] = useState<DoctorInfo[]>([]);
 
-  // Mock doctors data
-  const doctors = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      specialty: "Cardiologist",
-      rating: 4.9,
-      reviews: 124,
-      location: "Downtown Medical Center",
-      availability: "Available Today",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=200&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      name: "Dr. Michael Chen",
-      specialty: "Dermatologist",
-      rating: 4.7,
-      reviews: 98,
-      location: "Westside Health Clinic",
-      availability: "Available Tomorrow",
-      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop"
-    },
-    {
-      id: 3,
-      name: "Dr. Emily Rodriguez",
-      specialty: "Pediatrician",
-      rating: 4.8,
-      reviews: 156,
-      location: "Children's Medical Group",
-      availability: "Available Today",
-      image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=200&auto=format&fit=crop"
-    },
-    {
-      id: 4,
-      name: "Dr. James Wilson",
-      specialty: "Neurologist",
-      rating: 4.6,
-      reviews: 87,
-      location: "Central Neurology Center",
-      availability: "Next Week",
-      image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=200&auto=format&fit=crop"
-    },
-    {
-      id: 5,
-      name: "Dr. Lisa Patel",
-      specialty: "Psychiatrist",
-      rating: 4.9,
-      reviews: 112,
-      location: "Mind & Wellness Clinic",
-      availability: "Available Today",
-      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=200&auto=format&fit=crop"
+  useEffect(() => {
+    // Fetch doctor data when the component mounts
+    handleDoctorData();
+
+  }, [])
+
+  const handleDoctorData = async () => {
+    try {
+      const response = await axios.get('/api/doctor/getAll');
+      if (response.status === 200) {
+        console.log("Doctors data fetched successfully:", response.data.doctors.data);
+        setDoctorsData(response.data.doctors.data);
+        console.log("Doctors data:", doctorsData);
+
+        // You can set the fetched data to state or handle it as needed
+      } else {
+        console.error("Failed to fetch doctors data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching doctors data:", error);
+      toast.error("Failed to fetch doctors data", {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "#DC3545",
+          color: "#fff",
+        },
+      });
+
     }
-  ];
+  }
 
-  // Filter doctors based on search and specialty
-  const filteredDoctors = doctors.filter((doctor) => {
-    const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSpecialty = selectedSpecialty === "all" || doctor.specialty.toLowerCase() === selectedSpecialty.toLowerCase();
-    return matchesSearch && matchesSpecialty;
+
+  const specializations = [ "General Medicine", "Cardiology", "Dermatology", "Endocrinology",
+        "Gastroenterology", "Neurology", "Oncology", "Orthopedics",
+        "Pediatrics", "Psychiatry", "Radiology", "Surgery"];
+
+  const filteredDoctors = doctorsData.filter(doctor => {
+    const matchesSearch = doctor.doctorProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesSpecialization = filterSpecialization === "all" ||
+      doctor.doctorProfile.specialization === filterSpecialization;
+
+    return matchesSearch && matchesSpecialization;
   });
 
-  // Specialties list
-  const specialties = ["all", "cardiologist", "dermatologist", "pediatrician", "neurologist", "psychiatrist"];
+
+
 
   return (
     <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
@@ -86,44 +107,62 @@ const page = () => {
         </header>
 
         {/* Search and filters */}
-        
-        <div className="bg-white  rounded-lg shadow-sm border  p-4 mb-4">
-          <div className="flex flex-col md:flex-row  gap-2 md:items-center mb-2">
-            <div className="relative  flex-1">
-              {/* <Search className="absolute left-3 top-2.5 h-3 w-3 text-muted-foreground" /> */}
-              <Input
-                placeholder="Search by doctor name or specialty..."
-                className=" h-5"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button className="bg-green-600 hover:bg-green-700 h-5">
-              <CiSearch className=" text-[10px] text-white" />
-              Search Doctors
-            </Button>
-          </div>
 
-          <Tabs defaultValue="all" value={selectedSpecialty} onValueChange={setSelectedSpecialty} className="w-full">
-            <TabsList className="w-full  h-6 scroll-smooth overflow-x-scroll  flex justify-center flex-wrap ">
-              {specialties.map((specialty) => (
-                <TabsTrigger
-                  key={specialty}
-                  value={specialty}
-                  className="capitalize w-auto"
-                >
-                  {specialty}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
+        <Card className='gap-0 py-1 mt-5 mb-5'>
+          <CardHeader className='pt-2'>
+            <CardTitle>Filters</CardTitle>
+          </CardHeader>
+          <CardContent className=''>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative w-full">
+                <Search className="absolute left-2 top-1 h-3 w-3 text-gray-400" />
+                <Input
+                  placeholder="Search doctors..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-6 h-5 w-full text-sm"
+                />
+              </div>
+
+
+
+              <div className="w-full mb-3">
+                <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
+                  <SelectTrigger className="w-full max-h-5 text-sm">
+                    <SelectValue placeholder="All Specializations" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Specializations</SelectItem>
+                    {specializations.map((spec) => (
+                      <SelectItem key={spec} value={spec}>
+                        {spec}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
 
         {/* Doctors List */}
         <div className="space-y-3">
           {filteredDoctors.length > 0 ? (
             filteredDoctors.map((doctor) => (
-              <DoctorsInfoCard key={doctor.id} doctor={doctor} />
+              <DoctorsInfoCard key={doctor.id}
+                doctor={
+                  {
+                    id: doctor.id,
+                    name: doctor.doctorProfile.fullName,
+                    specialty: doctor.doctorProfile.specialization,
+                    image: doctor.doctorProfile.imageUrl || "https://via.placeholder.com/150",
+                    rating: 4.5, // Placeholder rating
+                    reviews: 100, // Placeholder reviews count
+                    location: doctor.doctorProfile.address || "Unknown Location",
+                    availability: "Available Now" // Placeholder availability
+                  }
+                } />
             ))
           ) : (
             <div className="bg-gray-50 border border-gray-100 rounded-lg p-8 text-center">

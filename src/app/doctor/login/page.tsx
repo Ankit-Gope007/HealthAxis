@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Loader2, Stethoscope } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
 import axios from "axios";
+import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 
 const page = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ const page = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { setProfile } = useDoctorProfileStore();
 
   const router = useRouter();
 
@@ -49,15 +51,40 @@ const page = () => {
        email: formData.email,
        password: formData.password
      });
- 
+
      if (result.status === 200) {
+      const doctor = result.data.data.doctorProfile;
+      const doctorProfile = result.data.data.doctorProfile.doctorProfile;
+      // console.log("Doctor Profile:", doctorProfile);
+      // console.log("Doctor:", doctor);
+      // Set the doctor profile in the store
+      setProfile(
+        {
+          id: doctor.id,
+          fullName: doctorProfile.fullName,
+          specialization: doctorProfile.specialization,
+          licenseNumber: doctorProfile.licenseNumber,
+          email: doctor.email,
+          phone: doctorProfile.phone,
+          imageUrl: doctorProfile.imageUrl,
+          clinicAddress: doctorProfile.clinicAddress,
+          address: doctorProfile.address,
+          dob: doctorProfile.dob,
+          experience: doctorProfile.experience,
+          consultationFee: doctorProfile.consultationFee
+        }
+      );
        setIsLoading(false);
        setFormData({ email: "", password: "", rememberMe: false });
        toast.success("Login successful!");
-       // Store token in localStorage or cookies if needed
-       localStorage.setItem("doctorToken", result.data.token);
        // Redirect to the dashboard or home page
-       router.push("/doctor/dashboard");
+       if (result.data.data.doctorProfile.profileSetup) {
+         router.push("/doctor/dashboard");
+       } else {
+         router.push("/doctor/profile");
+         toast.success("Please complete your profile setup.");
+       }
+      
      }
    } catch (error) {
       setIsLoading(false);

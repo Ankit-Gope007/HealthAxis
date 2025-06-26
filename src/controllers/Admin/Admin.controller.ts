@@ -50,3 +50,17 @@ export async function loginAdmin(data: {
 
     return existingAdmin;
 }
+
+// Admin Logout controller:
+export async function logoutAdmin() {
+    // Clear the admin token from cookies
+    const cookieStore = await cookies();
+    cookieStore.set('adminToken', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 0 // Expire the cookie immediately
+    });
+
+    return { message: "Logout successful" };
+}

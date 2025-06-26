@@ -2,24 +2,20 @@
 import React from 'react'
 import { signOut } from "next-auth/react";
 import { useUserStore } from "@/src/store/useUserStore";
+import { useDoctorProfileStore } from '@/src/store/useDoctorProfileStore';
 import axios from 'axios';
-
 
 const SignOutButton = () => {
     const { clearUser } = useUserStore();
-   
+    const { clearProfile } = useDoctorProfileStore();
     const handleLogout = async () => {
-        try {
-            const response = await axios.post("/api/admin/logout");
-            if (response.status === 200) {
-                clearUser();
-                localStorage.removeItem("adminProfile");
-                signOut({ callbackUrl: "/admin/login" });
-            }
-        } catch (error) {
-            console.error("Logout failed:", error);
+        const response = await axios.post("/api/doctor/logout");
+        if (response.status === 200) {
+        clearUser();
+        clearProfile();
+        localStorage.removeItem("doctorProfile");
+        signOut({ callbackUrl: "/doctor/login" });
         }
-       
     };
 
     return (

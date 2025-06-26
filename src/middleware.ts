@@ -10,8 +10,8 @@ export function middleware(request: NextRequest) {
   const isAdminPath = path.startsWith("/admin");
 
   // Identify login pages
-  const isPatientLogin = path === "/patient/login";
-  const isDoctorLogin = path === "/doctor/login";
+  const isPatientLogin = path === "/patient/login" || path === "/patient/signup";
+  const isDoctorLogin = path === "/doctor/login"|| path === "/doctor/register";
   const isAdminLogin = path === "/admin/login";
 
   // Get tokens from cookies

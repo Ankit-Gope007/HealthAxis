@@ -26,7 +26,7 @@ export async function POST(request: Request) {
             fullName: formData.get("fullName") as string,
             phone: formData.get("phoneNumber") as string,
             specialization: formData.get("specialization") as string,
-            experience: parseInt(formData.get("experience") as string, 10),
+            experience: parseInt(formData.get("yearsOfExperience") as string, 10),
             licenseNumber: formData.get("licenseNumber") as string,
             address: formData.get("address") as string || undefined, // Optional field
             licenseDocument: licenseUrl // Store the URL of the uploaded document

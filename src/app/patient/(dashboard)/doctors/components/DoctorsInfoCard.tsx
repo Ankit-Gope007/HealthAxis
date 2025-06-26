@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 type DoctorsInfoCardProps = {
     doctor: {
-        id: number;
+        id: string;
         name: string;
         specialty: string;
         image: string;

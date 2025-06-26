@@ -128,17 +128,19 @@ export async function loginDoctor(data: {
     cookieStore.set({
         name: 'doctorToken',
         value: token,
-        httpOnly: true,
+        httpOnly: true, 
         secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         sameSite: 'strict', // Prevent CSRF attacks
+        maxAge: 60 * 60 * 24 * 7, // 1 week
     });
+
+  
 
     // Return the doctor details and token
     return {
         success: true,
         message: "Doctor logged in successfully",
-        userId: existingUser.id,
-        doctorProfile: existingUser.doctorProfile,
+        doctorProfile: existingUser,
         token: token,
     };
 }
@@ -147,6 +149,7 @@ export async function loginDoctor(data: {
 export async function logoutDoctor() {
     // Clear the doctor token from cookies
     const cookieStore = await cookies();
+    
     cookieStore.set('doctorToken', '', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -193,7 +196,10 @@ export async function getDoctorById(doctorId: string) {
 
     // If doctor is not found, return an error response
     if (!doctor || doctor.role !== 'DOCTOR') {
+        console.error("Doctor not found with ID:", doctorId);
+        console.error("Doctor data:", doctor);
         throw new Error("Doctor not found");
+        
     }
 
     // Return the doctor details
@@ -276,4 +282,48 @@ export async function verifyDoctor(id: string) {
     });
 
     return doctor;
+}
+
+// Update Doctor Profile controller:
+export async function updateDoctorProfile(doctorId: string, data: {
+    fullName?: string;
+    phone?: string;
+    specialization?: string;
+    experience?: number;
+    licenseNumber?: string;
+    address?: string;
+    dob?: Date;
+    consultationFee?: number;
+    imageUrl?: string; // Optional field for profile picture
+}) {
+    // Update the doctor profile in the database
+    const updatedDoctor = await prisma.doctorProfile.update({
+        where: { doctorId: doctorId },
+        data: {
+            ...data,
+            // If imageUrl is provided, update it
+            ...(data.imageUrl && { imageUrl: data.imageUrl }),
+        },
+        include: {
+            doctor: true, // Include user details
+        }
+    });
+
+    const user = await prisma.user.findUnique({
+        where: { id: doctorId },
+    });
+    // set ProfileSetup to true if not already set
+    if (!user?.profileSetup) {
+        await prisma.user.update({
+            where: { id: doctorId },
+            data: { profileSetup: true },
+        });
+    }
+
+    // Return the updated doctor profile
+    return {
+        success: true,
+        message: "Doctor profile updated successfully",
+        data: updatedDoctor,
+    };
 }

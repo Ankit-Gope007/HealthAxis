@@ -131,7 +131,9 @@ const page = () => {
         }
     ];
 
-    const specializations = ["Cardiology", "Neurology", "Pediatrics", "Orthopedics", "Dermatology"];
+    const specializations = [ "General Medicine", "Cardiology", "Dermatology", "Endocrinology",
+        "Gastroenterology", "Neurology", "Oncology", "Orthopedics",
+        "Pediatrics", "Psychiatry", "Radiology", "Surgery"];
 
     const filteredDoctors = doctorsData.filter(doctor => {
         const matchesSearch = doctor.doctorProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -418,110 +420,8 @@ const page = () => {
                     <CardTitle>Doctors ({filteredDoctors.length})</CardTitle>
                 </CardHeader>
                 <CardContent className='pt-2'>
-                    {/* <div className="rounded-md border overflow-y-scroll"> */}
-                    {/* <Table>
-                            <TableHeader>
-                                <TableRow className='max-h-5'>
-                                    <TableHead>Doctor</TableHead>
-                                    <TableHead>Contact</TableHead>
-                                    <TableHead>Specialization</TableHead>
-                                    <TableHead>Experience</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>License</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredDoctors.map((doctor) => (
-                                    <TableRow className='max-h-1border-2 p-0' key={doctor.id}>
-                                        <TableCell className='border-2 py-0'>
-                                            <div className='border-4 p-0'>
-                                                <div className="font-medium">{doctor.name}</div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    Joined: {new Date(doctor.joinedDate).toLocaleDateString()}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <div className="text-sm">{doctor.email}</div>
-                                                <div className="text-sm text-muted-foreground">{doctor.phone}</div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{doctor.specialization}</TableCell>
-                                        <TableCell>{doctor.experience} years</TableCell>
-                                        <TableCell>
-                                            <Badge variant={doctor.verified ? "default" : "secondary"}>
-                                                {doctor.verified ? "Verified" : "Pending"}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline" size="sm">
-                                                        <Eye className="h-4 w-4 mr-1" />
-                                                        View
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <DialogContent className="max-w-2xl">
-                                                    <DialogHeader>
-                                                        <DialogTitle>License Document - {doctor.name}</DialogTitle>
-                                                    </DialogHeader>
-                                                    <div className="flex items-center justify-center h-96 bg-gray-100 rounded-lg">
-                                                        <div className="text-center">
-                                                            <FileText className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                                                            <p className="text-gray-600">License document preview</p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                In a real app, this would show the actual PDF/image
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </DialogContent>
-                                            </Dialog>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex space-x-2">
-                                                <Link href={`/admin/doctor/${doctor.id}`}>
-                                                    <Button variant="outline" size="sm">
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
 
-                                                {!doctor.verified && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="text-green-600 hover:text-green-700"
-                                                        onClick={() => handleVerify(doctor.id, doctor.name)}
-                                                    >
-                                                        <Check className="h-4 w-4" />
-                                                    </Button>
-                                                )}
-
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="text-red-600 hover:text-red-700"
-                                                    onClick={() => handleReject(doctor.id, doctor.name)}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleSendEmail(doctor.email, doctor.name)}
-                                                >
-                                                    <Mail className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table> */}
-
-                    {/* </div> */}
+                {/* Table Review of Doctor */}
                     <div className="overflow-x-auto border rounded-lg">
                         <Table className="min-w-full text-xs">
                             <TableHeader>

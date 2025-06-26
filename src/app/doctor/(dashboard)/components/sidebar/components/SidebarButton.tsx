@@ -19,7 +19,7 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, label, link }) => {
     const handleNavigation = (label: String, link: String) => {
         if (activeItem === label) return; // Prevent navigation if the item is already active
         setActiveItem(label); // Update the active item in the store
-        router.push(`/admin/${link}`); // Navigate to the new link
+        router.push(`/doctor/${link}`); // Navigate to the new link
     }
     return (
         <Button
@@ -28,7 +28,7 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, label, link }) => {
             onClick={() => handleNavigation(label, link)}
         >
             <Link
-                href={`/admin/${link}`}
+                href={`/doctor/${link}`}
                 className="flex items-center space-x-3 text-sm  transition-colors font-medium px-2 py-1.5 rounded-lg "
             >
                 <div className={`${activeItem === label ? 'text-white' : 'text-[#28A745]'} text-lg`}>

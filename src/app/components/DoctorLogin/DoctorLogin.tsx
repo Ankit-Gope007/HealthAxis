@@ -57,7 +57,7 @@ const DoctorLogin = () => {
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-1 text-lg font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
               >
                 <Stethoscope className="mr-2 h-5 w-5" />
-                <Link href="/doctor/signup" className="text-white">Join as Doctor</Link>
+                <Link href="/doctor/login" className="text-white">Join as Doctor</Link>
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </motion.div>
