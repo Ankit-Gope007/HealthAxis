@@ -13,6 +13,7 @@ type PatientProfile = {
     emergencyContactNumber?: string;
     medicalHistory?: string;
     currentMedications?: string;
+    patientId: string;
 }
 
 type PatientProfileStore = {

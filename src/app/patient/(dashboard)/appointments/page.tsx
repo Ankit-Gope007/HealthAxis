@@ -1,15 +1,41 @@
 "use client";
-import React, { useEffect } from 'react'
+import React, { useEffect,useState} from 'react'
 import { useSidebarStore } from '@/src/store/useSidebarStore';
 import { Button } from '@/components/ui/button';
 import { IoAdd } from 'react-icons/io5';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import UpcomingAppointments from './components/UpcomingAppointments';
 import PastAppointments from './components/PastAppointments';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { usePatientProfileStore } from '@/src/store/usePatientProfileStore';
+
+
 
 const page = () => {
   const { setActiveItem } = useSidebarStore();
+  const { profile } = usePatientProfileStore();
+  
+  const router = useRouter();
+  const [appointmentsData, setAppointmentsData] = useState([]);
+
+  const fetchAppointments = async () => {
+    try {
+      console.log('Fetching appointments for patient ID:', profile);
+      const response = await axios.get(`/api/appointment/getAllForPatient?patientId=${profile?.patientId}`);
+      if (response.status === 200) {
+        console.log('Appointments fetched successfully:', response.data);
+        setAppointmentsData(response.data);
+      } else {
+        console.error('Failed to fetch appointments:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+    }
+  };
+  
   useEffect(() => {
+    fetchAppointments();
     setActiveItem('Appointments');
   }, [setActiveItem]);
   return (
@@ -23,7 +49,9 @@ const page = () => {
         </div>
         {/* Button */}
         <div className='p-2'>
-          <Button className='h-[50px] bg-[#28A745] hover:bg-[#2ea728] cursor-pointer active:shadow-lg'> <IoAdd /> New Appointment</Button>
+          <Button
+            onClick={()=> router.push('/patient/appointments/book')}
+           className='h-[50px] bg-[#28A745] hover:bg-[#2ea728] cursor-pointer active:shadow-lg'> <IoAdd /> New Appointment</Button>
         </div>
       </div>
       {/* divider */}
@@ -47,92 +75,13 @@ const page = () => {
                 doctorName="Dr. John Doe"
                 specialty="Cardiologist"
                 imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
+                date="April 15, 2025"
+                time="10:00 AM"
+                location="City Hospital"
+                notes="Follow-up on heart condition"
+                status="Approved" // Example status 
               />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
-              <UpcomingAppointments
-                doctorName="Dr. John Doe"
-                specialty="Cardiologist"
-                imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                date="May 18, 2025"
-                time="10:30 AM"
-                location="Downtown Medical Center"
-                notes="Annual heart checkup"
-                status="Approved" // Example status
-              />
+
 
             </div>
           </TabsContent>

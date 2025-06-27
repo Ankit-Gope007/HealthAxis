@@ -64,8 +64,10 @@ const DoctorsInfoCard = ({ doctor }: {
                             <Badge className="w-fit bg-health-100 text-health-800 hover:bg-health-200 border-0">
                                 {doctor.availability}
                             </Badge>
-                            <Button asChild className="bg-health-600 hover:bg-health-700">
-                                <Link href={`/appointments/book?doctor=${doctor.id}`}>Book Appointment</Link>
+                            <Button asChild className="bg-[#28A745] h-5 hover:bg-[#28A745] text-white">
+                                <Link href={`/patient/appointments/book/${doctor.id}`}>
+                                    Book Appointment
+                                </Link>
                             </Button>
                         </div>
                     </div>
