@@ -440,7 +440,7 @@ const page = () => {
                                 {filteredDoctors.map((doctor) => (
                                     <TableRow key={doctor.id} className="h-5">
                                         <TableCell className="px-2 py-1">
-                                            <div className="font-semibold leading-none">{doctor.doctorProfile.fullName}</div>
+                                            <div className="font-semibold leading-none">Dr. {doctor.doctorProfile.fullName}</div>
                                             <div className="text-[10px] text-gray-500 leading-none">
                                                 {new Date(doctor.doctorProfile.createdAt).toLocaleDateString()}
                                             </div>
@@ -480,7 +480,7 @@ const page = () => {
                                         </TableCell>
                                         <TableCell className="px-2 py-1">
                                             <div className="flex gap-1">
-                                                <Link href={`/admin/doctor/${doctor.id}`}>
+                                                <Link href={`/admin/doctors/${doctor.id}`}>
                                                     <Button variant="outline" size="icon" className="h-5 w-5 p-0">
                                                         <Eye className="h-3 w-3" />
                                                     </Button>
