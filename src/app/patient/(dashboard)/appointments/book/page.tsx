@@ -173,7 +173,7 @@ const page = () => {
                 doctorId: selectedDoctor || "",
                 date: selectedDate || new Date(),
                 timeSlot: selectedTimeSlot || "",
-                reason: appointmentReason
+                reason: appointmentReason|| "No reason provided"
             };
 
             const response = await axios.post('/api/appointment/create', appointmentData);
@@ -215,7 +215,7 @@ const page = () => {
 
         <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh]'>
             <Toaster />
-            <header className="mb-6">
+            <header className="mb-6 mt-2">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">Book an Appointment</h1>
                 <div className="flex flex-wrap items-center text-sm text-gray-500 mt-2">
                     {["select-doctor", "select-time", "confirm"].map((step, i) => (
@@ -238,7 +238,7 @@ const page = () => {
             </header>
 
             {/* Steps */}
-            <div className="space-y-6">
+            <div className="space-y-3">
                 {/* Step 1 */}
                 {currentStep === 'select-doctor' && (
                     <Card>
@@ -248,10 +248,10 @@ const page = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="relative mb-4">
-                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Search className="absolute left-3 top-1 h-3 w-3 text-muted-foreground" />
                                 <Input
                                     placeholder="Search by name or specialty"
-                                    className="pl-10 h-8 text-sm"
+                                    className="pl-10 h-5 text-sm"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -294,21 +294,25 @@ const page = () => {
                                 <p className="text-center text-sm py-6">No doctors found.</p>
                             )}
                             <Pagination>
-                                <PaginationContent>
+                                <PaginationContent className="mt-2 h-5 ">
                                     <PaginationItem>
                                         <PaginationPrevious
                                             href="#"
                                             onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                                             aria-disabled={currentPage === 1}
+                                            className="h-5 w-fit"
                                         />
                                     </PaginationItem>
 
                                     {Array.from({ length: totalPages }).map((_, index) => (
-                                        <PaginationItem key={index}>
+                                        <PaginationItem
+
+                                            key={index}>
                                             <PaginationLink
                                                 href="#"
                                                 isActive={currentPage === index + 1}
                                                 onClick={() => setCurrentPage(index + 1)}
+                                                className="h-5 w-5"
                                             >
                                                 {index + 1}
                                             </PaginationLink>
@@ -326,6 +330,7 @@ const page = () => {
                                             href="#"
                                             onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
                                             aria-disabled={currentPage === totalPages}
+                                            className="h-5 w-fit"
                                         />
                                     </PaginationItem>
                                 </PaginationContent>
@@ -333,7 +338,7 @@ const page = () => {
 
                         </CardContent>
                         <CardFooter className="flex justify-end">
-                            <Button size="sm" className="bg-[#28A745] hover:bg-[#218838] text-white" onClick={handleContinue} disabled={!selectedDoctor}>
+                            <Button size="sm" className="bg-[#28A745] h-5 hover:bg-[#218838] text-white" onClick={handleContinue} disabled={!selectedDoctor}>
                                 Continue <ArrowRight className="ml-2 h-3 w-3" />
                             </Button>
                         </CardFooter>
@@ -342,41 +347,75 @@ const page = () => {
 
                 {/* Step 2 */}
                 {currentStep === 'select-time' && selectedDoctorDetails && (
-                    <Card>
-                        <CardHeader>
+                  
+                    <Card className="p-0">
+                        <CardHeader className="pt-2">
                             <div className="flex items-center">
-                                <Avatar className="h-8 w-8 mr-3">
+                                <Avatar className="h-8 w-8 mr-2">
                                     <AvatarImage src={selectedDoctorDetails.doctorProfile.imageUrl || ""} />
-                                    <AvatarFallback className="bg-[#DFF5E1] text-[#166534]">{selectedDoctorDetails.doctorProfile.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                    <AvatarFallback className="bg-[#DFF5E1] text-[#166534]">
+                                        {selectedDoctorDetails.doctorProfile.fullName
+                                            .split(" ")
+                                            .map((n) => n[0])
+                                            .join("")}
+                                    </AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <CardTitle className="text-sm">{selectedDoctorDetails.doctorProfile.fullName}</CardTitle>
-                                    <CardDescription className="text-xs">{selectedDoctorDetails.doctorProfile.specialization}</CardDescription>
+                                <div className="flex flex-col">
+                                    <CardTitle className="text-sm leading-tight">
+                                        {selectedDoctorDetails.doctorProfile.fullName}
+                                    </CardTitle>
+                                    <CardDescription className="text-xs text-muted-foreground">
+                                        {selectedDoctorDetails.doctorProfile.specialization}
+                                    </CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h3 className="text-sm font-medium mb-2">Select Date</h3>
-                                    <Calendar
-                                        mode="single"
-                                        selected={selectedDate}
-                                        onSelect={setSelectedDate}
-                                        className="rounded border"
-                                        disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
-                                    />
+
+                        <CardContent className="flex flex-col gap-4 p-4 pt-0">
+                            <div className="flex flex-col md:flex-row md:gap-6 gap-4">
+                                <div className="w-fit">
+                                    <h3 className="text-xs font-semibold mb-2">Select Date</h3>
+                                    <div className="scale-90 origin-top-left rounded ">
+                                        <Calendar
+                                            mode="single"
+                                            selected={selectedDate}
+                                            onSelect={setSelectedDate}
+                                            className="rounded border"
+                                            
+                                            disabled={(date) =>
+                                                date < new Date() ||
+                                                date.getDay() === 0 ||
+                                                date.getDay() === 6
+                                            }
+                                            classNames={{
+                                                table: "w-full text-xs",
+                                                cell: "w-8 h-8 text-xs",
+                                                head_row: "text-xs",
+                                                row: "text-xs",
+                                                day_selected: "bg-[#28A745] text-white hover:bg-[#218838]"
+                                            }}
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-sm font-medium mb-2">{selectedDate ? `Available Time (${format(selectedDate, 'MMM d')})` : 'Select a Date First'}</h3>
+
+                                <div className="flex-1">
+                                    <h3 className="text-xs font-medium mb-2">
+                                        {selectedDate
+                                            ? `Available Time (${format(selectedDate, "MMM d")})`
+                                            : "Select a Date First"}
+                                    </h3>
                                     {selectedDate ? (
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                             {availableTimeSlots.map((time) => (
                                                 <Button
                                                     key={time}
                                                     size="sm"
-                                                    variant={selectedTimeSlot === time ? 'default' : 'outline'}
-                                                    className={selectedTimeSlot === time ? 'bg-[#28A745] hover:bg-[#218838] text-white text-white' : ''}
+                                                    variant={selectedTimeSlot === time ? "default" : "outline"}
+                                                    className={
+                                                        selectedTimeSlot === time
+                                                            ? "bg-[#28A745] hover:bg-[#218838] text-white"
+                                                            : ""
+                                                    }
                                                     onClick={() => setSelectedTimeSlot(time)}
                                                 >
                                                     {time}
@@ -384,26 +423,42 @@ const page = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="p-4 text-center text-xs text-muted-foreground border rounded bg-gray-50">
-                                            <CalendarIcon className="h-4 w-4 mx-auto mb-1" />Select a date first
+                                        <div className="p-3 text-center text-xs text-muted-foreground border rounded bg-gray-50">
+                                            <CalendarIcon className="h-4 w-4 mx-auto mb-1" /> Select a date first
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className="mt-4">
-                                <Label htmlFor="reason" className="text-sm">Reason for Visit</Label>
+
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="reason" className="text-xs font-medium">
+                                    Reason for Visit
+                                </Label>
                                 <Textarea
                                     id="reason"
                                     placeholder="Brief reason..."
-                                    className="mt-1 h-20 text-sm"
+                                    className="h-20 text-xs"
                                     value={appointmentReason}
                                     onChange={(e) => setAppointmentReason(e.target.value)}
                                 />
                             </div>
                         </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button size="sm" variant="outline" onClick={handleBack}>Back</Button>
-                            <Button size="sm" className="bg-[#28A745] hover:bg-[#218838] text-white" onClick={handleContinue} disabled={!selectedDate || !selectedTimeSlot}>
+
+                        <CardFooter className="flex justify-between px-4 py-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleBack}
+                                className="text-xs"
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                size="sm"
+                                className="bg-[#28A745] hover:bg-[#218838] text-white text-xs"
+                                onClick={handleContinue}
+                                disabled={!selectedDate || !selectedTimeSlot}
+                            >
                                 Continue <ArrowRight className="ml-2 h-3 w-3" />
                             </Button>
                         </CardFooter>
@@ -460,7 +515,7 @@ const page = () => {
 
                 {/* View all doctors */}
                 <div className="text-center pt-4">
-                    <Link href="/doctors" className="text-[#28A745] hover:text-[#166534] text-sm inline-flex items-center">
+                    <Link href="/" className="text-[#28A745] hover:text-[#166534] text-sm inline-flex items-center">
                         View all doctors <ArrowRight className="ml-1 h-3 w-3" />
                     </Link>
                 </div>

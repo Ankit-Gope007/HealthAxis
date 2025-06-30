@@ -71,7 +71,8 @@ const page = () => {
           address: doctorProfile.address,
           dob: doctorProfile.dob,
           experience: doctorProfile.experience,
-          consultationFee: doctorProfile.consultationFee
+          consultationFee: doctorProfile.consultationFee,
+          doctorId: doctor.id
         }
       );
        setIsLoading(false);

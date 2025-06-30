@@ -74,6 +74,8 @@ const Page = () => {
   // Display a welcome toast message when the dashboard is accessed
   // This useEffect should depend on 'user' to ensure it's available
   useEffect(() => {
+    // set the active sidebar item to "Dashboard"
+    setActiveItem("Dashboard");
     // Only show toast if user is available and toast hasn't been shown
     if (user && user.email) {
       const hasShown = sessionStorage.getItem("dashboardToastShown");

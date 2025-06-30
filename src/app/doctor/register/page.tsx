@@ -99,7 +99,7 @@ const page = () => {
         setIsLoading(true);
         try {
             const formDataToSend = new FormData();
-            formDataToSend.append("fullName", formData.fullName);
+            formDataToSend.append("fullName", `Dr. ${formData.fullName}`);
             formDataToSend.append("email", formData.email);
             formDataToSend.append("password", formData.password);
             formDataToSend.append("confirmPassword", formData.confirmPassword);

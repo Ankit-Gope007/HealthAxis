@@ -114,6 +114,8 @@ const Page = () => {
           duration: 3000,
           style: { background: "#28A745", color: "#fff" },
         });
+        // refresh the profile data
+        getCurrentDoctorData();
       } else {
         throw new Error("Update failed");
       }
@@ -194,14 +196,14 @@ const Page = () => {
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     readOnly
-                    value={doctorProfile?.fullName?.split(" ")[0] || ""}
+                    value={doctorProfile?.fullName?.split(" ")[1] || ""}
                     id="firstName" className="h-5 mt-1 text-sm" />
                 </div>
                 <div>
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     readOnly
-                    value={doctorProfile?.fullName?.split(" ")[1] || ""}
+                    value={doctorProfile?.fullName?.split(" ")[2] || ""}
                     id="lastName"
                     className="h-5 mt-1 text-sm" />
                 </div>

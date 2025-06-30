@@ -1,10 +1,337 @@
-import React from 'react'
+"use client";
+import React, { useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Calendar, Clock, User, MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
+import { useSidebarStore } from "@/src/store/useSidebarStore";
+import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
+type AppointmentWithPatient = {
+  id: string;
+  patientId: string;
+  doctorId: string;
+  date: string;
+  timeSlot: string;
+  reason: string | "No reason provided";
+  status: string
+  location: string
+
+  // Relations
+  patient: {
+    id: string;
+    email: string;
+    patientProfile: {
+      fullName: string;
+      imageUrl?: string | null;
+      dob: string;
+      bloodGroup: string;
+      gender: string;
+      medicalHistory?: string;
+      currentMedications?: string;
+    }
+  }
+  // Optional if you include patient relation too
+  doctor?: {
+    id: string;
+    email: string;
+  };
+};
 
 const page = () => {
-  return (
-    <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-emerald-500'>Appointment Page</div>
-  )
-}
+  const { profile } = useDoctorProfileStore();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [appointmentData, setAppointmentData] = useState<AppointmentWithPatient[]>([]);
+  const { setActiveItem } = useSidebarStore();
+  const [hasFetched, setHasFetched] = useState(false); // New state to track if fetch has occurred
 
-export default page
+  useEffect(() => {
+    setActiveItem("Appointments");
+  }, [setActiveItem]);
+
+  useEffect(() => {
+    console.log("Doctor Profile:", profile);
+    if (profile && profile.doctorId && !hasFetched) {
+      fetchAppointments(profile.doctorId);
+      setHasFetched(true);
+    } else if (!profile?.doctorId) {
+      setHasFetched(false);
+    }
+  }, [profile, hasFetched]); // Depend on profile and hasFetched
+
+
+
+
+  const fetchAppointments = async (id: string) => {
+    try {
+      console.log("Fetching appointments for patient ID:", id);
+      const response = await axios.get(`/api/appointment/getAllForDoctor?doctorId=${id}`);
+      if (response.status === 200) {
+        console.log("Appointments fetched successfully:", response.data);
+        setAppointmentData(response.data);
+      } else {
+        console.error("Failed to fetch appointments:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
+
+
+
+
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'CONFIRMED':
+        return 'bg-green-100 text-green-700';
+      case 'PENDING':
+        return 'bg-orange-100 text-orange-700';
+      case 'COMPLETED':
+        return 'bg-blue-100 text-blue-700';
+      case 'cancelled':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const filteredAppointments = appointmentData.filter(appointment => {
+    const matchesSearch = appointment.patient.patientProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.reason.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleConfirmAppointment = async (appointmentId: string, patientName: string) => {
+    toast((t) => (
+      <div className="text-sm p-3">
+        <p className="font-semibold">✅ Confirm appointment for {patientName}?</p>
+        <p className="text-xs text-gray-600 mt-1">
+          This will mark the appointment as CONFIRMED and notify the patient.
+        </p>
+        <div className="mt-3 flex justify-end gap-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                //  sending the appointmentId and status to the API to confirm the appointment
+                const res = await axios.post("/api/appointment/updateStatus", { appointmentId: appointmentId, status: "CONFIRMED" });
+                if (res.status !== 200) {
+                  throw new Error("Failed to confirm appointment");
+                }
+                toast.success(`✅ Appointment for ${patientName} CONFIRMED!`, {
+                  duration: 3000,
+                  position: "top-right",
+                  style: {
+                    background: "#28A745",
+                    color: "#fff",
+                  },
+                });
+
+                // Optional: Refresh data after confirm
+                // await refetchAppointments();
+              } catch (error) {
+                toast.error(`❌ Could not confirm appointment for ${patientName}`, {
+                  duration: 3000,
+                  position: "top-right",
+                  style: {
+                    background: "#DC3545",
+                    color: "#fff",
+                  },
+                });
+              }
+            }}
+            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    ), { duration: 10000 });
+  };
+
+  return (
+
+    <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh]">
+      <Toaster position="top-right" reverseOrder={false} />
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Appointments</h1>
+        <p className="text-muted-foreground">Manage your patient appointments</p>
+      </header>
+
+      {/* Filters */}
+      <Card className="health-card mb-3">
+        <CardContent className="py-0">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search by patient name or reason..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-5"
+              />
+            </div>
+            <div className="flex gap-2">
+              <div className="flex gap-2">
+                <Button
+                  variant={statusFilter === "all" ? "default" : "outline"}
+                  onClick={() => setStatusFilter("all")}
+                  size="sm"
+                  className={
+                    statusFilter === "all"
+                      ? "bg-[#28A745] hover:bg-[#218838] text-white h-5"
+                      : "hover:bg-[#F0FFF5] hover:text-[#28A745] border-[#28A745] text-[#28A745] h-5"
+                  }
+                >
+                  All
+                </Button>
+
+                <Button
+                  variant={statusFilter === "CONFIRMED" ? "default" : "outline"}
+                  onClick={() => setStatusFilter("CONFIRMED")}
+                  size="sm"
+                  className={
+                    statusFilter === "CONFIRMED"
+                      ? "bg-[#28A745] hover:bg-[#218838] text-white h-5"
+                      : "hover:bg-[#F0FFF5] hover:text-[#28A745] border-[#28A745] text-[#28A745] h-5"
+                  }
+                >
+                  Confirmed
+                </Button>
+
+                <Button
+                  variant={statusFilter === "PENDING" ? "default" : "outline"}
+                  onClick={() => setStatusFilter("PENDING")}
+                  size="sm"
+                  className={
+                    statusFilter === "PENDING"
+                      ? "bg-[#28A745] hover:bg-[#218838] text-white h-5"
+                      : "hover:bg-[#F0FFF5] hover:text-[#28A745] border-[#28A745] text-[#28A745] h-5"
+                  }
+                >
+                  Pending
+                </Button>
+
+                <Button
+                  variant={statusFilter === "COMPLETED" ? "default" : "outline"}
+                  onClick={() => setStatusFilter("COMPLETED")}
+                  size="sm"
+                  className={
+                    statusFilter === "COMPLETED"
+                      ? "bg-[#28A745] hover:bg-[#218838] text-white h-5"
+                      : "hover:bg-[#F0FFF5] hover:text-[#28A745] border-[#28A745] text-[#28A745] h-5"
+                  }
+                >
+                  COMPLETED
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Appointments Table */}
+      <Card className="health-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-3 w-3 text-health-600" />
+            All Appointments ({filteredAppointments.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Patient</TableHead>
+                <TableHead>Date & Time</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody >
+              {filteredAppointments.map((appointment) => (
+                <TableRow
+                className='overflow-y-scroll max-h-[200px]'
+                 key={appointment.id}>
+                  <TableCell className=''>
+                    <div className="flex items-center gap-3">
+                      <div className="h-6 w-6 bg-health-100 rounded-full flex items-center justify-center">
+                        {appointment.patient.patientProfile.imageUrl ? (
+                          <img
+                            src={appointment.patient.patientProfile.imageUrl}
+                            alt={appointment.patient.patientProfile.fullName}
+                            className="h-full w-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-4 w-4 text-health-600" />
+                        )}
+                      </div>
+                      <span className="font-medium">{appointment.patient.patientProfile.fullName}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">
+                          {new Date(appointment.date).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {appointment.timeSlot}
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <p className="max-w-xs truncate">{appointment.reason}</p>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(appointment.status)}`}>
+                      {appointment.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        View Patient
+                      </Button>
+                      {appointment.status === 'CONFIRMED' && (
+                        <Button variant="outline" size="sm" className="bg-[#28A745] text-white">
+                          Start Consultation
+                        </Button>
+                      )}
+                      {appointment.status === 'PENDING' && (
+                        <Button
+                          onClick={() => handleConfirmAppointment(appointment.id, appointment.patient.patientProfile.fullName)}
+                          className='bg-[#28A745] text-white' size="sm" variant="outline">
+                          Confirm
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+
+  );
+};
+
+export default page;

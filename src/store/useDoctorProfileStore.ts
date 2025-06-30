@@ -14,6 +14,7 @@ type DoctorProfile = {
     dob: string;
     experience?: number; // in years
     consultationFee?: number;
+    doctorId: string;
 }
 
 type DoctorProfileStore = {

@@ -56,7 +56,7 @@ const page = () => {
 
   const handleDoctorData = async () => {
     try {
-      const response = await axios.get('/api/doctor/getAll');
+      const response = await axios.get('/api/doctor/getAllForPatient');
       if (response.status === 200) {
         console.log("Doctors data fetched successfully:", response.data.doctors.data);
         setDoctorsData(response.data.doctors.data);

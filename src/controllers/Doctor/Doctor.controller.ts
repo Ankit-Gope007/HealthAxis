@@ -183,6 +183,29 @@ export async function getAllDoctors() {
     };
 }
 
+// Get all doctors for patient
+export async function getAllDoctorsForPatient() {
+      // Fetch all doctors from the database that are verified in there doctor profile.
+    const doctors = await prisma.user.findMany({
+        where: {
+            role: 'DOCTOR',
+            doctorProfile: {
+                verified: true, // Only fetch verified doctors
+            }
+        },
+        include: {
+            doctorProfile: true, // Include doctor profile details
+        }
+    });
+
+    // Return the list of doctors
+    return {
+        success: true,
+        message: "Doctors fetched successfully",
+        data: doctors,
+    };
+}
+
 
 // Get Doctor by ID controller:
 export async function getDoctorById(doctorId: string) {

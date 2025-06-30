@@ -440,7 +440,7 @@ const page = () => {
                                 {filteredDoctors.map((doctor) => (
                                     <TableRow key={doctor.id} className="h-5">
                                         <TableCell className="px-2 py-1">
-                                            <div className="font-semibold leading-none">Dr. {doctor.doctorProfile.fullName}</div>
+                                            <div className="font-semibold leading-none">{doctor.doctorProfile.fullName}</div>
                                             <div className="text-[10px] text-gray-500 leading-none">
                                                 {new Date(doctor.doctorProfile.createdAt).toLocaleDateString()}
                                             </div>
