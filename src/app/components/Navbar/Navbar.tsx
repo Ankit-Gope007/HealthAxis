@@ -6,16 +6,16 @@ import { motion } from 'framer-motion';
 
 type NavbarProps = {
   sections: {
-    featuresRef: React.RefObject<HTMLDivElement>;
-    doctorRef: React.RefObject<HTMLDivElement>;
-    reviewRef: React.RefObject<HTMLDivElement>;
-    contactRef: React.RefObject<HTMLDivElement>;
+    featuresRef: React.RefObject<HTMLDivElement>|null;
+    doctorRef: React.RefObject<HTMLDivElement>|null;
+    reviewRef: React.RefObject<HTMLDivElement>|null;
+    contactRef: React.RefObject<HTMLDivElement>|null;
   };
 };
 
 const Navbar = ({ sections }: NavbarProps) => {
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>|null) => {
+    ref?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
