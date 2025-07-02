@@ -180,3 +180,22 @@ html, body {
   scrollbar-color: var(--color-ring) transparent;
   scrollbar-width: thin;
 }
+
+
+/* Loading animation */
+@keyframes loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.loading-animation {
+  
+  border: 5px solid rgb(6, 159, 6);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: loading 1s linear infinite;
+  
+}

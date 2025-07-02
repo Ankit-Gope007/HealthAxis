@@ -9,6 +9,7 @@ import Testimonial from './components/Testimonial/Testimonial'
 import DoctorLogin from './components/DoctorLogin/DoctorLogin'
 import Footer from './components/Footer/Footer'
 import { useRef } from 'react'
+import PageLoader from "../app/components/PageLoader/PageLoader"
 
 
 const page = () => {
@@ -17,6 +18,7 @@ const page = () => {
   const reviewRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
   return (
+
     <div className='overflow-y-scroll h-screen scrollbar-hide'>
       <Navbar
         sections={{
@@ -35,6 +37,7 @@ const page = () => {
       <div ref={contactRef}><Footer /></div>
 
     </div>
+
 
 
   )

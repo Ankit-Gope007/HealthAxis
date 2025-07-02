@@ -56,18 +56,22 @@ const page = () => {
 
   const handleDoctorData = async () => {
     try {
+      setLoading(true);
       const response = await axios.get('/api/doctor/getAllForPatient');
       if (response.status === 200) {
         console.log("Doctors data fetched successfully:", response.data.doctors.data);
         setDoctorsData(response.data.doctors.data);
         console.log("Doctors data:", doctorsData);
+        setLoading(false);
 
         // You can set the fetched data to state or handle it as needed
       } else {
         console.error("Failed to fetch doctors data:", response.statusText);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching doctors data:", error);
+      setLoading(false);
       toast.error("Failed to fetch doctors data", {
         duration: 3000,
         position: "top-right",
@@ -81,9 +85,9 @@ const page = () => {
   }
 
 
-  const specializations = [ "General Medicine", "Cardiology", "Dermatology", "Endocrinology",
-        "Gastroenterology", "Neurology", "Oncology", "Orthopedics",
-        "Pediatrics", "Psychiatry", "Radiology", "Surgery"];
+  const specializations = ["General Medicine", "Cardiology", "Dermatology", "Endocrinology",
+    "Gastroenterology", "Neurology", "Oncology", "Orthopedics",
+    "Pediatrics", "Psychiatry", "Radiology", "Surgery"];
 
   const filteredDoctors = doctorsData.filter(doctor => {
     const matchesSearch = doctor.doctorProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,81 +103,93 @@ const page = () => {
 
 
   return (
-    <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
-      <div className="p-6 md:p-8 max-w-7xl mx-auto">
-        <header className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Find a Doctor</h1>
-          <p className="text-muted-foreground">Browse our network of qualified healthcare professionals</p>
-        </header>
+    <>
+    {  loading ? (
+      <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center'>
+        <div className="loading-animation h-16 w-16 border-b-2 border-green-500"></div>
+      </div>
+      ):(
+      <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
+        <div className="p-6 md:p-8 max-w-7xl mx-auto">
+          <header className="mb-4">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Find a Doctor</h1>
+            <p className="text-muted-foreground">Browse our network of qualified healthcare professionals</p>
+          </header>
 
-        {/* Search and filters */}
+          {/* Search and filters */}
 
-        <Card className='gap-0 py-1 mt-5 mb-5'>
-          <CardHeader className='pt-2'>
-            <CardTitle>Filters</CardTitle>
-          </CardHeader>
-          <CardContent className=''>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative w-full">
-                <Search className="absolute left-2 top-1 h-3 w-3 text-gray-400" />
-                <Input
-                  placeholder="Search doctors..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-6 h-5 w-full text-sm"
-                />
+          <Card className='gap-0 py-1 mt-5 mb-5'>
+            <CardHeader className='pt-2'>
+              <CardTitle>Filters</CardTitle>
+            </CardHeader>
+            <CardContent className=''>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative w-full">
+                  <Search className="absolute left-2 top-1 h-3 w-3 text-gray-400" />
+                  <Input
+                    placeholder="Search doctors..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-6 h-5 w-full text-sm"
+                  />
+                </div>
+
+
+
+                <div className="w-full mb-3">
+                  <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
+                    <SelectTrigger className="w-full max-h-5 text-sm">
+                      <SelectValue placeholder="All Specializations" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Specializations</SelectItem>
+                      {specializations.map((spec) => (
+                        <SelectItem key={spec} value={spec}>
+                          {spec}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+            </CardContent>
+          </Card>
 
 
-
-              <div className="w-full mb-3">
-                <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
-                  <SelectTrigger className="w-full max-h-5 text-sm">
-                    <SelectValue placeholder="All Specializations" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Specializations</SelectItem>
-                    {specializations.map((spec) => (
-                      <SelectItem key={spec} value={spec}>
-                        {spec}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {/* Doctors List */}
+          <div className="space-y-3">
+            {filteredDoctors.length > 0 ? (
+              filteredDoctors.map((doctor) => (
+                <DoctorsInfoCard key={doctor.id}
+                  doctor={
+                    {
+                      id: doctor.id,
+                      name: doctor.doctorProfile.fullName,
+                      specialty: doctor.doctorProfile.specialization,
+                      image: doctor.doctorProfile.imageUrl || "https://via.placeholder.com/150",
+                      rating: 4.5, // Placeholder rating
+                      reviews: 100, // Placeholder reviews count
+                      location: doctor.doctorProfile.address || "Not provided",
+                      availability: "Available Now" // Placeholder availability
+                    }
+                  } />
+              ))
+            ) : (
+              <div className="bg-gray-50 border border-gray-100 rounded-lg p-8 text-center">
+                <h3 className="text-lg font-medium mb-1">No doctors found</h3>
+                <p className="text-muted-foreground mb-4">Try adjusting your search or filters</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-
-        {/* Doctors List */}
-        <div className="space-y-3">
-          {filteredDoctors.length > 0 ? (
-            filteredDoctors.map((doctor) => (
-              <DoctorsInfoCard key={doctor.id}
-                doctor={
-                  {
-                    id: doctor.id,
-                    name: doctor.doctorProfile.fullName,
-                    specialty: doctor.doctorProfile.specialization,
-                    image: doctor.doctorProfile.imageUrl || "https://via.placeholder.com/150",
-                    rating: 4.5, // Placeholder rating
-                    reviews: 100, // Placeholder reviews count
-                    location: doctor.doctorProfile.address || "Unknown Location",
-                    availability: "Available Now" // Placeholder availability
-                  }
-                } />
-            ))
-          ) : (
-            <div className="bg-gray-50 border border-gray-100 rounded-lg p-8 text-center">
-              <h3 className="text-lg font-medium mb-1">No doctors found</h3>
-              <p className="text-muted-foreground mb-4">Try adjusting your search or filters</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
       </div>
 
-    </div>
+      )}
+    </>
+
+
+
   )
 }
 

@@ -4,6 +4,7 @@ import { CiCalendar } from "react-icons/ci";
 import { CiClock2 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { GoArrowRight } from "react-icons/go";
+import Link from "next/link";
 
 interface UpcomingAppProps {
   id: string;
@@ -173,7 +174,9 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
             )
           }
           <Button className=" py-1 h-[50px] border-1  bg-gray-100 text-gray-700 rounded-sm hover:bg-gray-200 transition-colors duration-200 active:shadow-sm flex items-center justify-center text-sm font-medium">
-            View Details
+           <Link href= {`/patient/appointments/details/${id}`} className="flex items-center">
+              View Details
+           </Link>
             {/* Right Arrow Icon */}
             <GoArrowRight className="ml- text-sm" />
           </Button>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import PageLoader from "../app/components/PageLoader/PageLoader"
+import { Suspense } from "react";
 // import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
@@ -34,9 +36,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
        
-          {/* Wrap children with SessionProvider to provide session context */}
           {children}
-     
+       
       </body>
     </html>
   );

@@ -10,6 +10,7 @@ import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { useSidebarStore } from "@/src/store/useSidebarStore";
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import Link from 'next/link';
 
 type AppointmentWithPatient = {
   id: string;
@@ -139,6 +140,8 @@ const page = () => {
                     color: "#fff",
                   },
                 });
+                // Optionally, you can refresh the appointments data here
+                window.location.reload(); // Reload the page to reflect changes
 
                 // Optional: Refresh data after confirm
                 // await refetchAppointments();
@@ -307,7 +310,10 @@ const page = () => {
                   <TableCell>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline">
+                        <Link href={`/doctor/appointments/details/${appointment.id}`} className="flex items-center gap-1">
                         View Patient
+                        </Link>
+                        
                       </Button>
                       {appointment.status === 'CONFIRMED' && (
                         <Button variant="outline" size="sm" className="bg-[#28A745] text-white">

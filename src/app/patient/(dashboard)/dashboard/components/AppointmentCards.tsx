@@ -1,35 +1,36 @@
 import React from 'react'
 import Link from 'next/link';
 
-type Status = {
+
+type AppointmentDetailProps = {
+    fullName: string;
+    specialization: string;
+    imageUrl?: string | "";
+    appointmentDate: string;
+    appointmentTime: string;
     status: string;
-    bgColor: string;
-    textColor: string;
 }
 
-const AppointmentCards = () => {
-    const appointmentStatus: Status[] = [
-        { status: 'Pending', bgColor: 'bg-yellow-300', textColor: 'text-yellow-800' },
-        { status: 'Confirmed', bgColor: 'bg-green-300', textColor: 'text-green-800' },
-        { status: 'Cancelled', bgColor: 'bg-red-300', textColor: 'text-red-800' },
-    ];
+const AppointmentCards: React.FC<AppointmentDetailProps> = ({ fullName, specialization, imageUrl, appointmentDate, appointmentTime, status }) => {
+
     return (
         <div className='bg-white h-[180px] rounded-2xl shadow-lg'>
             <div className='w-[350px]'>
-                {/* Image + doctor names */} 
+                {/* Image + doctor names */}
                 <div className='flex items-center justify-between p-4'>
                     {/* Image */}
                     <div>
-                        <img src="https://via.placeholder.com/150" alt="Doctor" className="w-6 h-6 border-2 rounded-full" />
+                        <img src={imageUrl} alt="Doctor" className="w-6 h-6 border-2 rounded-full" />
                     </div>
                     {/* Name + Type of Doctor */}
                     <div className=''>
-                        <h3 className='text-lg font-semibold'>Dr. John Doe</h3>
-                        <p className='text-sm'>Cardiologist</p>
+                        <h3 className='text-lg font-semibold'>{fullName}</h3>
+                        <p className='text-sm'>{specialization}</p>
                     </div>
                     {/* Appoinment Status */}
-                    <div className={`px-2  rounded-full text-sm shadow-sm ${appointmentStatus[0].bgColor} ${appointmentStatus[0].textColor}`}>
-                            {appointmentStatus[0].status}
+                    <div className={`text-xs font-semibold ${status === 'CONFIRMED' ? 'text-green-700 bg-green-300 border-2 border-green-500 rounded-2xl p-1' : status === 'PENDING' ? 'text-yellow-500 bg-yellow-300 border-2 border-yellow-500 rounded-2xl p-1' : 'text-red-500  bg-red-300 border-2 border-red-500 rounded-2xl p-1'}`}>
+                        {/* Conditional rendering based on status */}   
+                        {status === 'CONFIRMED' ? 'Confirmed' : status === 'PENDING' ? 'Pending' : 'Cancelled'}
                     </div>
                 </div>
                 {/* Divider */}
@@ -37,9 +38,9 @@ const AppointmentCards = () => {
 
                 {/* date of Appoinments + view details */}
                 <div className='center mt-1 gap-1 text-gray-600  '>
-                    <p className='text-[12px] '>Date: 2023-10-01</p>
+                    <p className='text-[10px] '>Date: {appointmentDate}</p>
                     <p>|</p>
-                    <p className='text-[12px]'>Time: 10:00 AM</p>
+                    <p className='text-[10px]'>Time: {appointmentTime}</p>
                     <Link
                         href="/patient/appointments"
                         className='text-blue-500 hover:underline text-sm ml-3'

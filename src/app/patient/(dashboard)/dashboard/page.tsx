@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/src/store/useUserStore";
@@ -9,12 +9,42 @@ import { useSidebarStore } from '@/src/store/useSidebarStore';
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
 import AppointmentCards from "./components/AppointmentCards"; // Import your AppointmentCards component
 
+
+type AppointmentWithDoctor = {
+  id: string;
+  patientId: string;
+  doctorId: string;
+  date: string;
+  timeSlot: string;
+  reason?: string ;
+  status: string
+  location: string
+
+  // Relations
+  doctor: {
+    id: string;
+    doctorProfile: {
+      fullName: string;
+      specialization: string;
+      imageUrl?: string | null;
+    }
+  }
+
+  patient?: {
+    id: string;
+    name: string;
+  };
+};
+
+
 const Page = () => {
   const { data: session, status } = useSession();
   const { user, setUser } = useUserStore(); // Get user and setUser from your store
   const router = useRouter();
   const { setActiveItem } = useSidebarStore();
   const { profile,setProfile } = usePatientProfileStore(); // Assuming you have a store for patient profile
+  const [appointmentsData, setAppointmentsData] = useState<AppointmentWithDoctor[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchPatientProfile = async () => {
     try {
@@ -87,6 +117,38 @@ const Page = () => {
     }
   }, [user]); // Now depends on 'user' from Zustand
 
+  // Fetch appointments when the profile is available
+  useEffect(() => {
+    if (profile && profile.patientId) {
+      console.log("Profile is available, fetching appointments for patientId:", profile.patientId);
+      fetchAppointments(profile.patientId);
+    } else {
+      console.warn("Profile or patientId not available yet");
+    }
+  }, [profile]);
+
+  const fetchAppointments = async (id: string) => {
+    setLoading(true);
+    try {
+      console.log("Fetching appointments for patient ID:", id);
+      const response = await axios.get(`/api/appointment/getAllForPatient?patientId=${id}`);
+      if (response.status === 200) {
+        console.log("Appointments fetched successfully:", response.data);
+        setAppointmentsData(response.data);
+        setLoading(false);
+      } else {
+        console.error("Failed to fetch appointments:", response.statusText);
+        toast.error("Failed to fetch appointments");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      toast.error("Error fetching appointments");
+      setLoading(false);
+    }
+  };
+
+
   return (
     <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#F9FAFC] '>
       <Toaster />
@@ -126,18 +188,30 @@ const Page = () => {
 
         {/* Appointment Cards */}
         <div className="mt-4 flex justify-start gap-3 h-[250px] overflow-x-auto p-1">
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
-          <AppointmentCards />
+          {loading ? (
+            <div className="h-full w-full center">
+            <div className="loading-animation h-10 w-10">
+            </div>
+            </div>
+            
+          ) : appointmentsData.length > 0 ? (
+            appointmentsData.map((appointment) => (
+              <AppointmentCards
+                key={appointment.id}
+                fullName={appointment.doctor.doctorProfile.fullName}
+                specialization={appointment.doctor.doctorProfile.specialization}
+                imageUrl={appointment.doctor.doctorProfile.imageUrl || ""}
+                appointmentDate={new Date(appointment.date).toLocaleDateString()}
+                appointmentTime={appointment.timeSlot}
+                status={appointment.status}
+              />
+            ))
+          ) : (
+            <div>
+              <p className="text-gray-500">You Have no Upcoming Appointments.</p>
+              <p className="text-gray-500">Please book an appointment to see it here.</p>
+            </div>
+          )}
         </div>
       </div>
 
