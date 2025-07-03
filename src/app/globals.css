@@ -199,3 +199,17 @@ html, body {
   animation: loading 1s linear infinite;
   
 }
+
+/* className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center" */
+.health-green{
+  background-color: #28A745;
+  color: white;
+  &:hover {
+    background-color: #2ea728;
+  }
+  &:active {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  display: flex;
+  align-items: center;
+}

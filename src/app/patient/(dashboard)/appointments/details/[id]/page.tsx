@@ -50,7 +50,8 @@ type AppointmentData = {
 }
 
 const page = () => {
-    const { id } = useParams();
+    const params = useParams<{ id: string }>();
+    const id = params?.id;
     const router = useRouter();
     const [appointmentData, setAppointmentData] = useState<AppointmentData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
