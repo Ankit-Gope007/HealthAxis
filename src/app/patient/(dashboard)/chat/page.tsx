@@ -344,7 +344,7 @@ const Chat = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
-                        {filteredConversations.map((conversation) => (
+                        {filteredConversations.filter((conversation)=>conversation.status=="CONFIRMED").map((conversation) => (
                             <div
                                 key={conversation.id}
                                 onClick={() => setSelectedChat(conversation.id)}

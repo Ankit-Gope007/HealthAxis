@@ -32,12 +32,12 @@ model User {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  doctorProfile  DoctorProfile?  @relation("DoctorToDoctorProfile")
-  patientProfile PatientProfile? @relation("PatientToPatientProfile")
-  doctorAppointments  Appointment[] @relation("DoctorAppointments")
-  patientAppointments Appointment[] @relation("PatientAppointments")
-  sentMessages     Message[] @relation("MessageSender")
-  receivedMessages Message[] @relation("MessageReceiver")
+  doctorProfile       DoctorProfile?  @relation("DoctorToDoctorProfile")
+  patientProfile      PatientProfile? @relation("PatientToPatientProfile")
+  doctorAppointments  Appointment[]   @relation("DoctorAppointments")
+  patientAppointments Appointment[]   @relation("PatientAppointments")
+  sentMessages        Message[]       @relation("MessageSender")
+  receivedMessages    Message[]       @relation("MessageReceiver")
 }
 
 enum Role {
@@ -73,46 +73,70 @@ model DoctorProfile {
   address         String?
   specialization  String?
   experience      Int?
-  consultationFee  Float?
+  consultationFee Float?
   licenseNumber   String   @unique
   licenseDocument String // URL/path to PDF/Image
   verified        Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  doctorId String @unique
-  doctor   User   @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
+  doctorId        String   @unique
+  doctor          User     @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
 }
 
-
 model Appointment {
-  id             String   @id @default(cuid())
-  patientId      String
-  doctorId       String
-  date           DateTime
-  timeSlot       String
-  reason         String?
-  status         String @default("PENDING")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(cuid())
+  patientId String
+  doctorId  String
+  date      DateTime
+  timeSlot  String
+  reason    String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  patient        User     @relation("PatientAppointments", fields: [patientId], references: [id])
-  doctor         User     @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  patient      User          @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor       User          @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  prescription Prescription?
 
-  messages   Message[]
+  messages Message[]
 }
 
 model Message {
-  id          String   @id @default(cuid())
-  content     String
-  senderId    String
-  receiverId  String
-  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  id            String      @id @default(cuid())
+  content       String
+  senderId      String
+  receiverId    String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
   appointmentId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   sender   User @relation("MessageSender", fields: [senderId], references: [id])
   receiver User @relation("MessageReceiver", fields: [receiverId], references: [id])
 }
 
+model Prescription {
+  id             String       @id @default(cuid())
+  appointment    Appointment  @relation(fields: [appointmentId], references: [id])
+  appointmentId  String @unique
+
+  medicines      Medicine[]   // One prescription → many medicines
+  publicNotes    String?
+  privateNotes   String?
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Medicine {
+  id              String        @id @default(cuid())
+  prescription    Prescription  @relation(fields: [prescriptionId], references: [id])
+  prescriptionId  String
+
+  name            String
+  dosage          String
+  instructions    String?
+
+  createdAt       DateTime      @default(now())
+}

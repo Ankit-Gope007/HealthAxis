@@ -79,12 +79,14 @@ export async function getAppointmentsByDoctor(doctorId: string) {
         const appointments = await prisma.appointment.findMany({
             where: { doctorId },
             include: {
+                
                 patient: {
                     include: {
                         patientProfile: true
                     }
                 },
-                doctor: true
+                doctor: true,
+                
             },
             orderBy: [
                 { date: 'asc' },
