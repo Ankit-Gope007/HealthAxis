@@ -32,6 +32,15 @@ type AppointmentWithDoctor = {
     }
   }
 
+  prescription?: {
+    medicines: {
+      name: string;
+      dosage: string;
+      instructions: string;
+    }[];
+    publicNotes: string;
+  };
+
   patient?: {
     id: string;
     name: string;
@@ -76,12 +85,29 @@ const page = () => {
       setLoading(false);
     }
   };
+
+  const upcomingAppointmentData = appointmentsData.filter(appointment => {
+    const appointmentDate = new Date(appointment.date);
+    const today = new Date();
+    return appointmentDate >= today && appointment.status !== 'COMPLETED';
+  }
+  )
+
+  const pastAppointmentData = appointmentsData.filter(appointment => {
+    const appointmentDate = new Date(appointment.date);
+    const today = new Date();
+    return appointmentDate < today || appointment.status === 'COMPLETED';
+  });
+
+
+
   return (
     <>
       {
         loading ? (
-          <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center'>
+          <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center flex-col gap-2'>
             <div className="loading-animation h-16 w-16 border-b-2 border-green-500"></div>
+            <div className='text-gray-400'>Loading your Appointments...</div>
           </div>
         ) : (
           <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh]'>
@@ -107,8 +133,8 @@ const page = () => {
 
               <Tabs defaultValue="upcomingAppointments" className="w-full h-full">
                 <TabsList className='h-[40px] ml-2 '>
-                  <TabsTrigger className='cursor-pointer' value="upcomingAppointments">Upcoming (2)</TabsTrigger>
-                  <TabsTrigger className='cursor-pointer' value="pastAppointments">Past (3)</TabsTrigger>
+                  <TabsTrigger className='cursor-pointer' value="upcomingAppointments">Upcoming ({upcomingAppointmentData.length})</TabsTrigger>
+                  <TabsTrigger className='cursor-pointer' value="pastAppointments">Past ({pastAppointmentData.length})</TabsTrigger>
                 </TabsList>
 
 
@@ -116,8 +142,8 @@ const page = () => {
                 {/* Upcoming Appointments */}
                 <TabsContent value="upcomingAppointments">
                   <div className=' overflow-y-auto gap-3 h-full w-full items-center justify-start px-2 flex flex-col '>
-                    {appointmentsData.length > 0 ? (
-                      appointmentsData.map(appointment => (
+                    {upcomingAppointmentData.length > 0 ? (
+                      upcomingAppointmentData.map(appointment => (
                         console.log("Appointment data:", appointment),
                         <UpcomingAppointments
                           key={appointment.id}
@@ -133,7 +159,11 @@ const page = () => {
                         />
                       ))
                     ) : (
-                      <p>No appointments found</p>
+                      <div>
+                        <p>You have no Upcoming appointments found</p>
+                        <br />
+                        <p className='text-gray-500'>You can book a new appointment by clicking the button above.</p>
+                      </div>
                     )}
 
                   </div>
@@ -145,36 +175,30 @@ const page = () => {
                 {/* Past Appointments */}
                 <TabsContent value="pastAppointments">
                   <div className=' overflow-y-auto gap-3 h-full w-full items-center justify-start px-2 flex flex-col '>
-                    <PastAppointments
-                      doctorName="Dr. Jane Smith"
-                      specialty="Dermatologist"
-                      imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                      date="April 10, 2025"
-                      time="2:00 PM"
-                      location="City Hospital"
-                      notes="Skin allergy consultation"
-                      status="Completed" // Example status
-                    />
-                    <PastAppointments
-                      doctorName="Dr. Jane Smith"
-                      specialty="Dermatologist"
-                      imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                      date="April 10, 2025"
-                      time="2:00 PM"
-                      location="City Hospital"
-                      notes="Skin allergy consultation"
-                      status="Completed" // Example status
-                    />
-                    <PastAppointments
-                      doctorName="Dr. Jane Smith"
-                      specialty="Dermatologist"
-                      imageUrl="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop" // Placeholder image
-                      date="April 10, 2025"
-                      time="2:00 PM"
-                      location="City Hospital"
-                      notes="Skin allergy consultation"
-                      status="Completed" // Example status
-                    />
+                    {pastAppointmentData.length > 0 ? (
+                      pastAppointmentData.map(appointment => (
+                        console.log("Past Appointment data:", appointment),
+                        <PastAppointments
+                          key={appointment.id}
+                          id={appointment.id}
+                          doctorName={`${appointment.doctor?.doctorProfile?.fullName}`}
+                          specialty={appointment.doctor?.doctorProfile?.specialization}
+                          imageUrl={appointment.doctor.doctorProfile.imageUrl || ""} // Placeholder image
+                          date={new Date(appointment.date).toLocaleDateString()}
+                          time={appointment.timeSlot}
+                          location={appointment.doctor.doctorProfile.address || "Not provided"} // Assuming address is optional
+                          reason={appointment.reason}
+                          status={appointment.status} // Example status
+                          notes={appointment.prescription?.publicNotes}
+                        />
+                      ))
+                    ) : (
+                      <div>
+                        <p>You have no Past appointments found</p>
+                        <br />
+                        <p className='text-gray-500'>You can book a new appointment by clicking the button above.</p>
+                      </div>
+                    )}
 
 
                   </div>

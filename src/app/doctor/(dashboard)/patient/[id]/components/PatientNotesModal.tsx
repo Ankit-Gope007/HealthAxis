@@ -15,7 +15,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Lock, Eye, Save } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { stat } from "fs";
 
 interface PatientNotesModalProps {
   children: React.ReactNode;
@@ -23,7 +22,6 @@ interface PatientNotesModalProps {
   publicNotes?: string;
   privateNotes?: string;
   appointmentId?: string;
-  status?: string; // Optional, can be used for conditional rendering
 }
 
 const PatientNotesModal = ({
@@ -32,7 +30,6 @@ const PatientNotesModal = ({
   publicNotes,
   privateNotes,
   appointmentId,
-  status,
 }: PatientNotesModalProps) => {
   const [tempPublicNotes, setTempPublicNotes] = useState(publicNotes || "");
   const [tempPrivateNotes, setTempPrivateNotes] = useState(privateNotes || "");
@@ -118,7 +115,6 @@ const PatientNotesModal = ({
                   value={tempPublicNotes}
                   onChange={(e) => setTempPublicNotes(e.target.value)}
                   className="min-h-[150px] mt-2"
-                  disabled={status ==="COMPLETED"}
                 />
               </CardContent>
             </Card>
@@ -142,46 +138,40 @@ const PatientNotesModal = ({
                   value={tempPrivateNotes}
                   onChange={(e) => setTempPrivateNotes(e.target.value)}
                   className="min-h-[150px] mt-2"
-                  disabled={status ==="COMPLETED"} // Disable if not confirmed
                 />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
 
-        {
-          status === "CONFIRMED" &&
-          (
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-              <Button variant="outline" onClick={handleCancel} disabled={loading}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveNotes}
-                className="health-green"
-                disabled={loading}
-              >
-
-                {loading ?
-                  (
-                    <div className="flex items-center gap-2">
-                      <div className="loading-animation h-3 w-3">
-                      </div>
-                      Saving..
+        <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+          <Button variant="outline" onClick={handleCancel} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveNotes}
+            className="health-green"
+            disabled={loading}
+          >
+           
+            {loading ? 
+            (
+                <div className="flex items-center gap-2">
+                    <div className="loading-animation h-3 w-3">
                     </div>
-                  )
-                  :
-                  (
-                    <div className="flex items-center gap-2">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Notes
-                    </div>
-                  )
-                }
-              </Button>
-            </div>
-          )
-        }
+                    Saving..
+                </div>
+            )
+             : 
+            (
+                <div className="flex items-center gap-2">
+                   <Save className="h-4 w-4 mr-2" />    
+                     Save Notes
+                  </div>
+            )
+             }
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

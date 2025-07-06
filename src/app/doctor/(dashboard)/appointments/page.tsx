@@ -50,6 +50,7 @@ const page = () => {
   const [appointmentData, setAppointmentData] = useState<AppointmentWithPatient[]>([]);
   const { setActiveItem } = useSidebarStore();
   const [hasFetched, setHasFetched] = useState(false); // New state to track if fetch has occurred
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setActiveItem("Appointments");
@@ -70,15 +71,19 @@ const page = () => {
 
   const fetchAppointments = async (id: string) => {
     try {
+      setLoading(true);
       console.log("Fetching appointments for patient ID:", id);
       const response = await axios.get(`/api/appointment/getAllForDoctor?doctorId=${id}`);
       if (response.status === 200) {
+        setLoading(false);
         console.log("Appointments fetched successfully:", response.data);
         setAppointmentData(response.data);
       } else {
+        setLoading(false);
         console.error("Failed to fetch appointments:", response.statusText);
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error fetching appointments:", error);
     }
   };
@@ -108,6 +113,14 @@ const page = () => {
     const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const inCompletedAppointments = appointmentData.filter(appointment => {
+    const appointmentDate = new Date(appointment.date);
+    const currentDate = new Date();
+    return appointmentDate >= currentDate && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
+  }
+  );
+
 
   const handleConfirmAppointment = async (appointmentId: string, patientName: string) => {
     toast((t) => (
@@ -165,6 +178,67 @@ const page = () => {
     ), { duration: 10000 });
   };
 
+  const handleCompleteAppointment = async (appointmentId:string,patientName:string) => {
+     toast((t) => (
+      <div className="text-sm p-3">
+        <p className="font-semibold">✅ Complete the appointment for {patientName}?</p>
+        <p className="text-xs text-gray-600 mt-1">
+          This will mark the appointment as Completed and notify the patient.
+          And the precription will get expired  , and you will not be able to prescribe any medicines for this appointment.
+          To be still in contact with the patient, you can use the chat feature.
+        </p>
+        <div className="mt-3 flex justify-end gap-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                //  sending the appointmentId and status to the API to confirm the appointment
+                const res = await axios.post("/api/appointment/completeAppointment", { appointmentId: appointmentId });
+                if (res.status !== 200) {
+                  throw new Error("Failed to confirm appointment");
+                }
+                toast.success(`✅ Appointment for ${patientName} is Completed! \n
+                    you will no longer be able to access ${patientName}'s prescription / notes from the appointment page\n
+                    To access the data of the past patient check the Patient tab on the Sidebar. 
+                  `, {
+                  duration: 3000,
+                  position: "top-right",
+                  style: {
+                    background: "#28A745",
+                    color: "#fff",
+                  },
+                });
+                // Optionally, you can refresh the appointments data here
+                window.location.reload(); // Reload the page to reflect changes
+
+                // Optional: Refresh data after confirm
+                // await refetchAppointments();
+              } catch (error) {
+                toast.error(`❌ Could not confirm appointment for ${patientName}`, {
+                  duration: 3000,
+                  position: "top-right",
+                  style: {
+                    background: "#DC3545",
+                    color: "#fff",
+                  },
+                });
+              }
+            }}
+            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    ), { duration: 10000 });
+  }
+
   return (
 
     <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh]">
@@ -187,7 +261,7 @@ const page = () => {
               />
             </div>
             <div className="flex gap-2">
-              <div className="flex gap-2">
+              <div className="flex gap-2 ">
                 <Button
                   variant={statusFilter === "all" ? "default" : "outline"}
                   onClick={() => setStatusFilter("all")}
@@ -227,7 +301,7 @@ const page = () => {
                   Pending
                 </Button>
 
-                <Button
+                {/* <Button
                   variant={statusFilter === "COMPLETED" ? "default" : "outline"}
                   onClick={() => setStatusFilter("COMPLETED")}
                   size="sm"
@@ -237,8 +311,8 @@ const page = () => {
                       : "hover:bg-[#F0FFF5] hover:text-[#28A745] border-[#28A745] text-[#28A745] h-5"
                   }
                 >
-                  COMPLETED
-                </Button>
+                  Completed
+                </Button> */}
               </div>
             </div>
           </div>
@@ -254,88 +328,112 @@ const page = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Patient</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody >
-              {filteredAppointments.map((appointment) => (
-                <TableRow
-                className='overflow-y-scroll max-h-[200px]'
-                 key={appointment.id}>
-                  <TableCell className=''>
-                    <div className="flex items-center gap-3">
-                      <div className="h-6 w-6 bg-health-100 rounded-full flex items-center justify-center">
-                        {appointment.patient.patientProfile.imageUrl ? (
-                          <img
-                            src={appointment.patient.patientProfile.imageUrl}
-                            alt={appointment.patient.patientProfile.fullName}
-                            className="h-full w-full rounded-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-4 w-4 text-health-600" />
-                        )}
-                      </div>
-                      <span className="font-medium">{appointment.patient.patientProfile.fullName}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">
-                          {new Date(appointment.date).toLocaleDateString()}
-                        </p>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {appointment.timeSlot}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <p className="max-w-xs truncate">{appointment.reason}</p>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(appointment.status)}`}>
-                      {appointment.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <Link href={`/doctor/appointments/details/${appointment.id}`} className="flex items-center gap-1">
-                        View Patient
-                        </Link>
-                        
-                      </Button>
-                      {appointment.status === 'CONFIRMED' && (
-                        <Button variant="outline" size="sm" className="bg-[#28A745] text-white">
-                          Start Consultation
-                        </Button>
-                      )}
-                      {appointment.status === 'PENDING' && (
-                        <Button
-                          onClick={() => handleConfirmAppointment(appointment.id, appointment.patient.patientProfile.fullName)}
-                          className='bg-[#28A745] text-white' size="sm" variant="outline">
-                          Confirm
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+          {
+            loading ?
+              (
+                <div className="w-full h-[50%] flex items-center justify-center flex-col gap-2">
+                  <div className="loading-animation h-10 w-10"></div>
+                  <div className="text-gray-500">Loading Appointments...</div>
+                </div>
+              )
+              :
+              (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Patient</TableHead>
+                      <TableHead>Date & Time</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody >
+                    {
+                      inCompletedAppointments.length === 0 ?
+                        (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground">
+                              No appointments found.
+                            </TableCell>
+                          </TableRow>
+                        )
+                        :
+                        inCompletedAppointments.map((appointment) => (
+                          <TableRow
+                            className='overflow-y-scroll max-h-[200px]'
+                            key={appointment.id}>
+                            <TableCell className=''>
+                              <div className="flex items-center gap-3">
+                                <div className="h-6 w-6 bg-health-100 rounded-full flex items-center justify-center">
+                                  {appointment.patient.patientProfile.imageUrl ? (
+                                    <img
+                                      src={appointment.patient.patientProfile.imageUrl}
+                                      alt={appointment.patient.patientProfile.fullName}
+                                      className="h-full w-full rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <User className="h-4 w-4 text-health-600" />
+                                  )}
+                                </div>
+                                <span className="font-medium">{appointment.patient.patientProfile.fullName}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <p className="font-medium">
+                                    {new Date(appointment.date).toLocaleDateString()}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {appointment.timeSlot}
+                                  </p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <p className="max-w-xs truncate">{appointment.reason}</p>
+                            </TableCell>
+                            <TableCell>
+                              <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(appointment.status)}`}>
+                                {appointment.status}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline">
+                                  <Link href={`/doctor/appointments/details/${appointment.id}`} className="flex items-center gap-1">
+                                    View Patient
+                                  </Link>
+
+                                </Button>
+                                {appointment.status === 'CONFIRMED' && (
+                                  <Button
+                                    onClick={() => handleCompleteAppointment(appointment.id,appointment.patient.patientProfile.fullName)}
+                                    variant="outline" size="sm" className="bg-[#28A745] text-white">
+                                    Complete Appointment
+                                  </Button>
+                                )}
+                                {appointment.status === 'PENDING' && (
+                                  <Button
+                                    onClick={() => handleConfirmAppointment(appointment.id, appointment.patient.patientProfile.fullName)}
+                                    className='bg-[#28A745] text-white' size="sm" variant="outline">
+                                    Confirm
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                  </TableBody>
+                </Table >
+              )
+          }
+        </CardContent >
+      </Card >
+    </div >
 
   );
 };

@@ -1,27 +1,22 @@
 import { NextResponse } from "next/server";
-import { getPrescriptionForPatient } from "@/src/controllers/Prescription/Prescription.controller";
+import { getAllPrescriptionsForPatient } from "@/src/controllers/Prescription/Prescription.controller";
+
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const appointmentId = searchParams.get("appointmentId");
+        const patientId = searchParams.get("patientId");
 
-        // Validate appointmentId
-        if (!appointmentId) {
-            return NextResponse.json({ error: "Appointment ID is required" }, { status: 400 });
+        if (!patientId) {
+            return NextResponse.json({ error: "Patient ID is required" }, { status: 400 });
         }
 
-        // Fetch the prescription for the patient
-        const prescription = await getPrescriptionForPatient(appointmentId);
+        // Fetch prescriptions for the patient
+        const prescriptions = await getAllPrescriptionsForPatient(patientId);
 
-        if (!prescription) {
-            return NextResponse.json({ error: "Prescription not found" }, { status: 404 });
-        }
-
-        return NextResponse.json(prescription, { status: 200 });
-
+        return NextResponse.json(prescriptions, { status: 200 });
     } catch (error) {
-        console.error("Error fetching prescription:", error);
-        return NextResponse.json({ error: "Failed to fetch prescription" }, { status: 500 });
+        console.error("Error fetching prescriptions:", error);
+        return NextResponse.json({ error: "Failed to fetch prescriptions" }, { status: 500 });
     }
 }

@@ -2,18 +2,19 @@
 import React from "react";
 import { CiCalendar } from "react-icons/ci";
 import { CiClock2 } from "react-icons/ci";
-import { Button } from "@/components/ui/button";
-import { GoArrowRight } from "react-icons/go";
+import { getStatusStyle } from "@/src/lib/statusStyle";
 
 interface PastAppProps {
+  id: string;
   doctorName: string;
   specialty: string;
   imageUrl: string;
   date: string;
   time: string;
   location: string;
-  notes: string;
-  status: 'Completed' | 'Canceled'; // Define possible statuses
+  notes?: string;
+  status: string;
+  reason?: string;
 }
 
 
@@ -26,6 +27,9 @@ const PastAppointments: React.FC<PastAppProps> = ({
   location,
   notes,
   status,
+  id,
+  reason = "No reason provided",
+
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-2 flex flex-col md:flex-row items-start md:items-center w-full   max-w-6xl">
@@ -58,9 +62,7 @@ const PastAppointments: React.FC<PastAppProps> = ({
           </div>
           {/* Status Tag */}
           <span
-            className={`px-3 py-1 text-center rounded-full text-xs font-semibold ${
-                status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}
+            className={`px-3 py-1 text-center rounded-full text-xs font-semibold ${getStatusStyle(status)}`}
           >
             {status}
           </span>
@@ -72,9 +74,14 @@ const PastAppointments: React.FC<PastAppProps> = ({
           <p className="text-base text-gray-800 font-medium">{location}</p>
         </div>
 
+        {/* Reason */}
+        <div className="mb-4">
+          <p className="text-sm text-gray-500 mb-1">Reason For the Visit</p>
+          <p className="text-base text-gray-800 font-medium">{reason}</p>
+        </div>
         {/* Notes */}
         <div className="mb-4">
-          <p className="text-sm text-gray-500 mb-1">Notes</p>
+          <p className="text-sm text-gray-500 mb-1">Doctor's Notes</p>
           <p className="text-base text-gray-800 font-medium">{notes}</p>
         </div>
 

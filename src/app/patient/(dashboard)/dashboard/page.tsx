@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/src/store/useUserStore";
@@ -16,7 +16,7 @@ type AppointmentWithDoctor = {
   doctorId: string;
   date: string;
   timeSlot: string;
-  reason?: string ;
+  reason?: string;
   status: string
   location: string
 
@@ -42,7 +42,7 @@ const Page = () => {
   const { user, setUser } = useUserStore(); // Get user and setUser from your store
   const router = useRouter();
   const { setActiveItem } = useSidebarStore();
-  const { profile,setProfile } = usePatientProfileStore(); // Assuming you have a store for patient profile
+  const { profile, setProfile } = usePatientProfileStore(); // Assuming you have a store for patient profile
   const [appointmentsData, setAppointmentsData] = useState<AppointmentWithDoctor[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -55,7 +55,7 @@ const Page = () => {
       if (response.status === 200) {
         console.log("Patient profile fetched successfully:", response.data);
         setProfile(response.data);
-        
+
 
       }
 
@@ -88,8 +88,8 @@ const Page = () => {
         }
         // Fetch patient profile after user data is set
 
-        if(user) {
-           fetchPatientProfile();
+        if (user) {
+          fetchPatientProfile();
         }
 
       } catch (error) {
@@ -148,6 +148,12 @@ const Page = () => {
     }
   };
 
+  const upcomingAppointments = appointmentsData.filter((app) => {
+    const appointmentDate = new Date(app.date);
+    const currentDate = new Date();
+    return appointmentDate >= currentDate && app.status === "CONFIRMED" || app.status === "PENDING";
+  })
+
 
   return (
     <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#F9FAFC] '>
@@ -190,28 +196,29 @@ const Page = () => {
         <div className="mt-4 flex justify-start gap-3 h-[250px] overflow-x-auto p-1">
           {loading ? (
             <div className="h-full w-full center">
-            <div className="loading-animation h-10 w-10">
+              <div className="loading-animation h-10 w-10">
+              </div>
             </div>
-            </div>
-            
-          ) : appointmentsData.length > 0 ? (
-            appointmentsData.map((appointment) => (
-              <AppointmentCards
-                key={appointment.id}
-                fullName={appointment.doctor.doctorProfile.fullName}
-                specialization={appointment.doctor.doctorProfile.specialization}
-                imageUrl={appointment.doctor.doctorProfile.imageUrl || ""}
-                appointmentDate={new Date(appointment.date).toLocaleDateString()}
-                appointmentTime={appointment.timeSlot}
-                status={appointment.status}
-              />
-            ))
-          ) : (
-            <div>
-              <p className="text-gray-500">You Have no Upcoming Appointments.</p>
-              <p className="text-gray-500">Please book an appointment to see it here.</p>
-            </div>
-          )}
+
+          ) : upcomingAppointments.length > 0
+            ? (
+              upcomingAppointments.map((appointment) => (
+                <AppointmentCards
+                  key={appointment.id}
+                  fullName={appointment.doctor.doctorProfile.fullName}
+                  specialization={appointment.doctor.doctorProfile.specialization}
+                  imageUrl={appointment.doctor.doctorProfile.imageUrl || ""}
+                  appointmentDate={new Date(appointment.date).toLocaleDateString()}
+                  appointmentTime={appointment.timeSlot}
+                  status={appointment.status}
+                />
+              ))
+            ) : (
+              <div>
+                <p className="text-gray-500">You Have no Upcoming Appointments.</p>
+                <p className="text-gray-500">Please book an appointment to see it here.</p>
+              </div>
+            )}
         </div>
       </div>
 

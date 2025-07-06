@@ -79,14 +79,14 @@ export async function getAppointmentsByDoctor(doctorId: string) {
         const appointments = await prisma.appointment.findMany({
             where: { doctorId },
             include: {
-                
+
                 patient: {
                     include: {
                         patientProfile: true
                     }
                 },
                 doctor: true,
-                
+
             },
             orderBy: [
                 { date: 'asc' },
@@ -123,7 +123,14 @@ export async function getAppointmentsByPatient(patientId: string) {
                     include: {
                         doctorProfile: true // Include doctor's profile details
                     }
+                },
+                prescription: {
+                    select: {
+                        medicines: true, // Include medicines in the prescription
+                        publicNotes: true // Include public notes in the prescription
+                    }
                 }
+
             },
             orderBy: [
                 { date: 'asc' },
@@ -290,6 +297,145 @@ export async function getAppointmentDetailsById(appointmentId: string) {
     } catch (error) {
         console.error("Error fetching appointment details:", error);
         throw new Error("Failed to fetch appointment details");
+
+    }
+}
+
+// Completing an appointment controller;
+export async function completeAppointment(appointmentId: string) {
+    try {
+        // 1. Check if appointment exist or not
+        const existingAppointment = await prisma.appointment.findUnique({
+            where: {
+                id: appointmentId
+            },
+        })
+
+        if (!existingAppointment) {
+            console.log("Error , the appointment doesnt exists")
+            throw new Error("No appointment with the given appointmentId is found")
+        }
+
+        // 2. set Appointment status to COMPLETED!!
+        const updatedAppointment = await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: {
+                status: "COMPLETED"
+            },
+            include: {
+                patient: {
+                    select: {
+                        email: true,
+                        patientProfile: true
+                    }
+                },
+                doctor: {
+                    include: {
+                        doctorProfile: true
+                    }
+                }
+            }
+        })
+
+
+        // 3. Send an email to the patient about the appointment completion
+        await transporter.sendMail({
+            from: "Health Axis <noReply> yourdomain.com",
+            to: updatedAppointment.patient.email,
+            subject: `Appointment Completed with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName}`,
+            text: `Dear ${updatedAppointment.patient.patientProfile?.fullName},\n\n
+Your appointment with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName} on ${updatedAppointment.date.toDateString()} at ${updatedAppointment.timeSlot} has been completed.\n\nThank you for choosing Health Axis!`,
+            html: `
+        <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <tr>
+              <td style="background-color: #28A745; padding: 20px; text-align: center;">
+                <h2 style="color: #ffffff; margin: 0 ;">Health Axis</h2>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 30px;">
+                <p style="font-size: 16px; color: #333333;">Dear ${updatedAppointment.patient.patientProfile?.fullName},</p>
+                <p style="font-size: 16px; color: #333333; line-height: 1.5;">
+                  Your appointment with <strong> ${updatedAppointment.doctor.doctorProfile?.fullName}</strong> on <strong>${updatedAppointment.date.toDateString()}</strong> at <strong>${updatedAppointment.timeSlot}</strong> has been completed.
+                </p>
+                <p style="font-size: 16px; color: #333333;">
+                  Thank you for choosing Health Axis! We hope you had a great experience.
+                </p>
+                <div style="margin: 30px 0; text-align: center;">
+                  <a href="http://localhost:3000/patient/login"
+                     style="background-color: #28A745; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: bold;">
+                    Go to Dashboard 
+                    </a>
+                </div>
+                <p style="font-size: 14px; color: #999999;">Thank you for choosing Health Axis!</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 12px; color: #777;">
+                    &copy; ${new Date().getFullYear()} Health Axis. All rights reserved.
+                </td>
+            </tr>
+            </table>
+        </div>
+        `
+        });
+
+        return updatedAppointment;
+
+    } catch (error) {
+        console.error("Error completing appointment:", error);
+        throw new Error("Failed to complete appointment");
+
+    }
+
+}
+
+// Get all the appointment of a particular patient with a particular doctor
+export async function getPatientAppointmentsWithDoctor(patientId: string, doctorId: string) {
+    try {
+        // Check if the patient exists
+        const patient = await prisma.user.findUnique({
+            where: { id: patientId }
+        });
+        if (!patient) {
+            throw new Error("Patient with that Id was not found in the DB");
+        }
+
+        // Check if the doctor exists
+        const doctor = await prisma.user.findUnique({
+            where: { id: doctorId }
+        });
+        if (!doctor) {
+            throw new Error("Doctor with that Id was not found in the DB");
+        }
+
+        // Fetch appointments for the patient with the specific doctor
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                patientId,
+                doctorId
+            },
+            include: {
+                patient: {
+                    select: {
+                        email: true,
+                        patientProfile: true,
+                        }
+                    }
+                },
+            
+            orderBy: [
+                { date: 'asc' },
+                { timeSlot: 'asc' }
+            ]
+        });
+
+        return appointments;
+
+    } catch (error) {
+        console.error("Error fetching appointments by patient and doctor:", error);
+        throw new Error("Failed to fetch appointments by patient and doctor");
 
     }
 }

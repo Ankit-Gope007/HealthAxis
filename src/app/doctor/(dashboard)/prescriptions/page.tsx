@@ -10,6 +10,7 @@ import PrescriptionCard from "./components/PrescriptionCard";
 import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { getStatusStyle } from "@/src/lib/statusStyle";
+import { useSidebarStore } from "@/src/store/useSidebarStore";
 
 type AppointmentPatientData = {
 
@@ -55,8 +56,11 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const {profile} = useDoctorProfileStore();
   const [recentPrescriptions, setRecentPrescriptions] = useState<any[]>([]);
+  const {setActiveItem} = useSidebarStore();
 
     useEffect(() => {
+    setActiveItem("Prescriptions");
+    
     if (profile && profile.doctorId) {
       fetchAppointments(profile.doctorId);
       fetchRecentPrescriptions(profile.doctorId)
@@ -130,7 +134,7 @@ const page = () => {
   );
 
   const activeCount = prescriptions.filter(p => p.status === 'CONFIRMED').length;
-  const completedCount = prescriptions.filter(p => p.status === 'COMPLETED').length;
+  const completedCount = appointmentsData.filter(p => p.status === 'COMPLETED').length;
 
   return (
 

@@ -204,3 +204,23 @@ export const addImageToPatientProfile = async (patientId: string, imageUrl: stri
         throw new Error(`Failed to add image to patient profile: ${error.message}`);
     }
 };
+
+// get All Patients Of a Doctor controller:
+// export const getAllPatientOfDoctor = async (doctorId:string) => {
+//     try {
+//         // validate doctor
+//         const doctor = await prisma.user.findUnique({
+//             where: { id: doctorId },
+//         });
+//         if (!doctor) {
+//             return new Error("Doctor not found.");
+//         }
+
+//         // Fetch all the appoiments of the doctor
+
+        
+//     } catch (error: any) {
+//         return new Error(`Failed to get all patients of doctor: ${error.message}`);
+        
+//     }
+// }

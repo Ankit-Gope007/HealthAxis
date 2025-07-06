@@ -350,3 +350,5 @@ export async function updateDoctorProfile(doctorId: string, data: {
         data: updatedDoctor,
     };
 }
+
+

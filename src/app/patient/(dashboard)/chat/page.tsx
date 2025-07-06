@@ -21,6 +21,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
 import { useSocket } from "@/src/lib/useSocket";
+import { useRef } from "react";
 
 
 type AppointmentDoctorData = {
@@ -80,7 +81,8 @@ const Chat = () => {
     const [loading, setLoading] = useState(false);
     const { profile } = usePatientProfileStore(); // Assuming you have a store for patient profile
     const [appointmentsData, setAppointmentsData] = useState<AppointmentDoctorData[]>([]);
-
+    const [appointmentLoading, setappointmentLoading] = useState(false);
+    const bottomRef = useRef<HTMLDivElement>(null);
 
     const { socket } = useSocket(); // Custom hook to manage socket connection
 
@@ -133,42 +135,13 @@ const Chat = () => {
 
     }, [profile]);
 
-    // useEffect(() => {
-    //     if (!socket || !selectedConversation) return;
 
-    //     // Join room when selected conversation changes
-    //     socket.emit("joinRoom", { appointmentId: selectedConversation.id });
-
-    //     // socket.on("newMessage", (msg) => {
-    //     //     setMessages((prev) => [...prev, msg]);
-    //     // });
-
-    //     // Fetch previous messages when a conversation is selected
-    //     fetchMessages(selectedConversation.id);
-
-    //     return () => {
-    //         socket.off("newMessage");
-    //     };
-    // }, [socket, selectedConversation]);
 
     useEffect(() => {
         if (!socket || !selectedConversation) return;
 
         socket.emit("joinRoom", { appointmentId: selectedConversation.id });
 
-        // socket.on("newMessage", (msg) => {
-        //     // Convert raw DB message to your frontend format
-        //     const newMsg = {
-        //         id: msg.id,
-        //         sender: msg.senderId === selectedConversation.patientId ? 'patient' : 'doctor',
-        //         content: msg.content,
-        //         time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        //         avatar: msg.senderId === selectedConversation.patientId
-        //             ? profile?.imageUrl
-        //             : selectedConversation.doctor.doctorProfile.imageUrl,
-        //     };
-        //     setMessages(prev => [...prev, newMsg]);
-        // });
 
         socket.on("newMessage", (msg) => {
             const timeString = msg.createdAt
@@ -197,22 +170,27 @@ const Chat = () => {
 
     const fetchAppointments = async (id: string) => {
         try {
-            setLoading(true);
+            setappointmentLoading(true);
             console.log("Fetching appointments for patient ID:", id);
             const response = await axios.get(`/api/appointment/getAllForPatient?patientId=${id}`);
             if (response.status === 200) {
                 console.log("Appointments fetched successfully:", response.data);
                 setAppointmentsData(response.data);
-                setLoading(false);
+                setappointmentLoading(false);
             } else {
                 console.error("Failed to fetch appointments:", response.statusText);
-                setLoading(false);
+               setappointmentLoading(false);
             }
         } catch (error) {
             console.error("Error fetching appointments:", error);
-            setLoading(false);
+            setappointmentLoading(false);
         }
     };
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
 
     // Get all the previous messages that are already stored in the database
     const fetchMessages = async (appointmentId: string) => {
@@ -244,34 +222,6 @@ const Chat = () => {
     }
 
 
-    // const handleSendMessage = () => {
-    //     if (!message.trim() || !socket || !selectedConversation) return;
-
-    //     const msgData = {
-    //         appointmentId: selectedConversation.id,
-    //         senderId: selectedConversation.patientId,
-    //         receiverId: selectedConversation.doctorId,
-    //         content: message.trim(),
-    //     };
-
-    //     // ✅ Emit to server
-    //     socket.emit("sendMessage", msgData);
-
-    //     // ✅ Locally add the message so it appears immediately
-    //     setMessages(prev => [
-    //         ...prev,
-    //         {
-    //             id: Date.now(), // temporary unique ID
-    //             sender: 'doctor',
-    //             content: message.trim(),
-    //             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    //             avatar: profile?.imageUrl,
-    //         }
-    //     ]);
-
-    //     // ✅ Clear input
-    //     setMessage("");
-    // };
 
     const handleSendMessage = () => {
         if (!message.trim() || !socket || !selectedConversation) return;
@@ -319,6 +269,8 @@ const Chat = () => {
         toast("To start a new chat, please have an conformed appointment \n with a doctor from the list.");
     };
 
+    const chatListData = filteredConversations.filter((conversation) => conversation.status === "CONFIRMED");
+
     return (
         <>
             <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#F9FAFC] md:flex'>
@@ -344,11 +296,19 @@ const Chat = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
-                        {filteredConversations.filter((conversation)=>conversation.status=="CONFIRMED").map((conversation) => (
+                        {   
+                        appointmentLoading ? (
+                            <div className="h-full w-full center">
+                                <div className="loading-animation h-10 w-10"></div>
+                            </div>
+                        )
+                        
+                        :
+                        chatListData.filter((conversation) => conversation.status == "CONFIRMED").map((conversation) => (
                             <div
                                 key={conversation.id}
                                 onClick={() => setSelectedChat(conversation.id)}
-                                className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-health-50 border-r-2 border-r-health-500' : ''
+                                className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-green-50 border-r-2 border-r-green-500' : ''
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
@@ -455,7 +415,9 @@ const Chat = () => {
                                                     </div>
                                                 </div>
                                             ))}
+                                            <div ref={bottomRef} />
                                         </div>
+
                                     )
                             }
 

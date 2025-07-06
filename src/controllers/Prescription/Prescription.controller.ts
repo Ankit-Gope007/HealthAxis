@@ -4,7 +4,7 @@ import { m } from "framer-motion";
 type medicineType = {
     name: string;
     dosage: string;
-    instruction: string;
+    instructions: string;
 };
 
 // Create a new prescription
@@ -35,7 +35,7 @@ export async function createPrescription(data:
                 create: data.medicines.map((medicine) => ({
                     name: medicine.name,
                     dosage: medicine.dosage,
-                    instructions: medicine.instruction,
+                    instructions: medicine.instructions,
                 })),
             },
         },
@@ -54,7 +54,7 @@ export async function getPrescriptionForPatient(appointmentId: string) {
         where: { id: appointmentId },
     });
 
-    if (!appointment || appointment.status !== "CONFIRMED") {
+    if (!appointment || appointment.status !== "CONFIRMED" ) {
         throw new Error("You cannot fetch prescription for this appointment.");
     }
 
@@ -81,6 +81,59 @@ export async function getPrescriptionForPatient(appointmentId: string) {
     return prescription;
 }
 
+// Fetch all prescriptions for a patient
+export async function getAllPrescriptionsForPatient(patientId: string) {
+    // Validate patients
+    const patient = await prisma.user.findUnique({
+        where:{id:patientId},
+    })
+    if (!patient) {
+        throw new Error("Patient not found.");
+    }
+    // Fetch all prescriptions for the patient
+    const prescriptions = await prisma.prescription.findMany({
+        where: {
+            appointment: {
+                patientId,
+                status: { in: ["CONFIRMED", "COMPLETED"] }, // Include both confirmed and completed appointments
+        },
+        },
+        select: {
+            appointment: {
+                select: {
+                    id: true,
+                    patientId: true,
+                    doctorId: true,
+                    createdAt: true,
+                    status: true,
+                    reason: true,
+                    doctor: {
+                        select: {
+                            id: true,
+                            doctorProfile: {
+                                select: {
+                                    fullName: true,
+                                    imageUrl: true,
+                                    specialization: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            medicines:true,
+            publicNotes: true,
+            privateNotes: false, // Exclude private notes
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+
+    return prescriptions;
+}
+
+
 // Fetching a prescription for the doctor
 export async function getPrescriptionForDoctor(appointmentId: string) {
     // Validate appointment
@@ -88,7 +141,7 @@ export async function getPrescriptionForDoctor(appointmentId: string) {
         where: { id: appointmentId },
     });
 
-    if (!appointment || appointment.status !== "CONFIRMED") {
+    if (!appointment || appointment.status === "PENDING") {
         throw new Error("You cannot fetch prescription for this appointment.");
     }
 
@@ -256,7 +309,7 @@ export async function updateMedicines(appointmentId: string, medicines: medicine
                 create: medicines.map((medicine) => ({
                     name: medicine.name,
                     dosage: medicine.dosage,
-                    instructions: medicine.instruction,
+                    instructions: medicine.instructions,
                 })),
             },
         },

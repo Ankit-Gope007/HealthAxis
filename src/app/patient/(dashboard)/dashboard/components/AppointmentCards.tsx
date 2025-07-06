@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link';
-
+import { getStatusStyle } from '@/src/lib/statusStyle';
 
 type AppointmentDetailProps = {
     fullName: string;
@@ -28,9 +28,9 @@ const AppointmentCards: React.FC<AppointmentDetailProps> = ({ fullName, speciali
                         <p className='text-sm'>{specialization}</p>
                     </div>
                     {/* Appoinment Status */}
-                    <div className={`text-xs font-semibold ${status === 'CONFIRMED' ? 'text-green-700 bg-green-300 border-2 border-green-500 rounded-2xl p-1' : status === 'PENDING' ? 'text-yellow-500 bg-yellow-300 border-2 border-yellow-500 rounded-2xl p-1' : 'text-red-500  bg-red-300 border-2 border-red-500 rounded-2xl p-1'}`}>
+                    <div className={`text-xs font-semibold p-1 rounded-2xl ${getStatusStyle(status)}`}>
                         {/* Conditional rendering based on status */}   
-                        {status === 'CONFIRMED' ? 'Confirmed' : status === 'PENDING' ? 'Pending' : 'Cancelled'}
+                        {status}
                     </div>
                 </div>
                 {/* Divider */}

@@ -28,7 +28,8 @@ import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { getStatusStyle } from "@/src/lib/statusStyle";
 import EditPrescription from "./components/EditPrescription";
-
+import toast from "react-hot-toast";
+import { useSidebarStore } from "@/src/store/useSidebarStore";
 
 type PresData = {
   id: string;
@@ -110,12 +111,14 @@ const page = () => {
       }
     }
   );
+  const { setActiveItem } = useSidebarStore();
 
   useEffect(() => {
     console.log("Updated prescription data:", presData);
   }, [presData]);
 
   useEffect(() => {
+    setActiveItem("Prescriptions");
     if (id) {
       fetchPrescriptionData(id);
     }
@@ -175,7 +178,7 @@ const page = () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/prescription/getForDoctor?appointmentId=${appointmentId}`);
-      if (response.status !== 200) {
+      if (response.status !== 200 && response.status !== 404) {
         throw new Error("Failed to fetch prescription data");
       }
       console.log("Prescription data fetched successfully:", response.data);
@@ -191,304 +194,237 @@ const page = () => {
         // You can also map/rename other keys if needed
       };
 
+      // if(response.status===404){
+      //   toast("Prescription not found. Please create a New Prescription First");
+      //   setLoading(false);
+      //   router.push('/doctor/prescriptions');
+      // }
+
       setPresData(mapped);
       setLoading(false);
 
     } catch (error) {
+      if (typeof error === "object" && error !== null && "status" in error && (error as any).status === 404) {
+        toast("Prescription not found. Please create a New Prescription First");
+        setLoading(false);
+        router.push('/doctor/prescriptions');
+      } else {
+        setLoading(false);
+        toast.error("Failed to fetch prescription data. Please try again later.");
+        // Log the error for debugging
+      }
       console.error("Error fetching prescription data:", error);
 
 
     }
   }
 
+
   return (
     <>
       {
         loading ?
           (
-            <div className = "w-full lg:w-[90%] lg:ml-14 h-[100vh] flex-col gap-5 center " >
+            <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh] flex-col gap-5 center " >
               <div className="loading-animation h-12 w-12">
               </div>
               <div>
-              <p className="text-muted-foreground">Loading prescription data...</p>
+                <p className="text-muted-foreground">Loading prescription data...</p>
               </div>
             </div>
           )
-            :
-            (
+          :
+          (
 
-              <div className = "w-full lg:w-[90%] lg:ml-14 h-[100vh]  " >
-      <div className = "flex items-center gap-4 mb-2">
-        <Button
-          variant = "ghost"
-          onClick = { () => router.push('/doctor/prescriptions') }
-          className = "text-muted-foreground hover:text-foreground"
-              >
-          <ArrowLeft className = "h-3 w-3 mr-2" />
-      Back to Prescriptions
-    </Button >
-      </div >
+            <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh]  " >
+              <div className="flex items-center gap-4 mb-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push('/doctor/prescriptions')}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowLeft className="h-3 w-3 mr-2" />
+                  Back to Prescriptions
+                </Button >
+              </div >
 
-  <header className="mb-3">
-    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-      <div className="flex items-center gap-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={prescriptionData.patient.avatar} />
-          <AvatarFallback className="bg-green-100 text-green-700">
-            {prescriptionData.patient.name.split(" ").map(n => n[0]).join("")}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{prescriptionData.patient.name}</h1>
-          <p className="text-muted-foreground">{prescriptionData.patient.age} years • {prescriptionData.patient.gender}</p>
-          <p className="text-sm text-muted-foreground">Prescription #{prescriptionData.prescription.id}</p>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <PatientNotesModal
-          patientName={prescriptionData.patient.name}
-          publicNotes={presData.publicNotes}
-          privateNotes={presData.privateNotes}
-          appointmentId={presData.appointmentId}
-        >
-          <Button variant="outline">
-            <StickyNote className="h-4 w-4 mr-2" />
-            Patient Notes
-          </Button>
-        </PatientNotesModal>
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Download PDF
-        </Button>
-        {/* <Button variant="outline">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Prescription
-            </Button>
-            <Button className="green-button">
-              <Plus className="h-4 w-4 mr-2" />
-              New Prescription
-            </Button> */}
-      </div>
-    </div>
-  </header>
-
-{/* Current Prescription Details */ }
-      <Card className="green-card mb-8 border-l-4 border-l-green-600" >
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-600" />
-              Current Prescription Details
-              <Badge className={getStatusStyle(prescriptionData.prescription.status)}>
-                {prescriptionData.prescription.status}
-              </Badge>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Date Issued</p>
-                <p className="font-medium">{prescriptionData.prescription.dateIssued}</p>
-              </div>
-            </div>
-
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-
-
-          <Separator className="my-2" />
-
-          <div>
-            <h4 className="font-medium text-lg mb-4">Prescribed Medications</h4>
-            <div className="space-y-4">
-              {prescriptionData.prescription.medications.map((medication) => (
-                <PrescribedMedcine key={medication.id} medication={medication} />
-              ))}
-            </div>
-          </div>
-
-          {prescriptionData.prescription.notes && (
-            <>
-              <Separator className="my-6" />
-              <div>
-                <h4 className="font-medium text-lg mb-2">Doctor's Notes</h4>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm">{prescriptionData.prescription.notes}</p>
-                </div>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card >
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Patient Information */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="green-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-green-600" />
-                Patient Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Phone</label>
-                <p className="flex items-center gap-2 mt-1">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  {prescriptionData.patient.phone}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Email</label>
-                <p className="flex items-center gap-2 mt-1">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  {prescriptionData.patient.email}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Blood Type</label>
-                <p className="mt-1 font-medium text-red-600">{prescriptionData.patient.bloodType}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="green-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
-                Medical Alerts
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Medical Conditions</label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {
-                    prescriptionData.patient.medicalHistory ? (prescriptionData.patient.medicalHistory.split(",").map((condition, index) => (
-                      <span key={index} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                        {condition.trim()}
-                      </span>
-                    )))
-                    :
-                    (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                        No medical history reported
-                      </span>
-                    )
-
-                  }
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Current Conditions</label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {
-                    prescriptionData.patient.currentConditions ?  (
-                      <span  className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                        {prescriptionData.patient.currentConditions}
-                      </span>
-                    )
-                    :
-                    (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                        No current conditions reported
-                      </span>
-                    )
-
-                  }
-
-                  {/* {prescriptionData.patient.currentConditions.map((condition, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                      {condition}
-                    </span>
-                  ))} */}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Previous Prescriptions */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="green-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                Previous Prescriptions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-2  bg-gray-200 text-center">
-                  <p className="text-gray-600">No previous Prescription found!</p>
-                </div>
-                {/* {previousPrescriptions.map((prescription) => (
-                  <div key={prescription.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <header className="mb-3">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={prescriptionData.patient.avatar} />
+                      <AvatarFallback className="bg-green-100 text-green-700">
+                        {prescriptionData.patient.name.split(" ").map(n => n[0]).join("")}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
-                      <p className="font-medium">{prescription.medications.join(", ")}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Prescribed on {prescription.date}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getStatusColor(prescription.status)}>
-                        {prescription.status}
-                      </Badge>
-                      <Button size="sm" variant="outline">
-                        View Details
-                      </Button>
+                      <h1 className="text-2xl font-bold text-gray-900 mb-1">{prescriptionData.patient.name}</h1>
+                      <p className="text-muted-foreground">{prescriptionData.patient.age} years • {prescriptionData.patient.gender}</p>
+                      <p className="text-sm text-muted-foreground">Prescription #{prescriptionData.prescription.id}</p>
                     </div>
                   </div>
-                ))} */}
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex gap-2">
+                    <PatientNotesModal
+                      patientName={prescriptionData.patient.name}
+                      publicNotes={presData.publicNotes}
+                      privateNotes={presData.privateNotes}
+                      appointmentId={presData.appointmentId}
+                      status={presData.status}
+                    >
+                      <Button variant="outline">
+                        <StickyNote className="h-4 w-4 mr-2" />
+                        Patient Notes
+                      </Button>
+                    </PatientNotesModal>
+                    <Button variant="outline">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </Button>
 
-          {/* Quick Actions */}
-          <Card className="green-card">
-            <CardHeader>
-              <CardTitle>Prescription Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  </div>
+                </div>
+              </header>
 
-                <EditPrescription
-                  prescriptionId={prescriptionData.prescription.id}
-                  medications={prescriptionData.prescription.medications}
-                  publicNotes={presData.publicNotes}
-                  appointmentId={presData.appointmentId}
-                >
-                <Button className="health-green">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Current Prescription
-                </Button>
-                </EditPrescription>
-               
-                <PatientNotesModal
-                  patientName={prescriptionData.patient.name}
-                  publicNotes={presData.publicNotes}
-                  privateNotes={presData.privateNotes}
-                >
-                  <Button variant="outline" className="w-full">
-                    <StickyNote className="h-4 w-4 mr-2" />
-                    Manage Notes
-                  </Button>
-                </PatientNotesModal>
-                <Button variant="outline">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Message Patient
-                </Button>
-               
+              {/* Current Prescription Details */}
+              <Card className="green-card mb-8 border-l-4 border-l-green-600" >
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-green-600" />
+                      Current Prescription Details
+                      <Badge className={getStatusStyle(prescriptionData.prescription.status)}>
+                        {prescriptionData.prescription.status}
+                      </Badge>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Date Issued</p>
+                        <p className="font-medium">{prescriptionData.prescription.dateIssued}</p>
+                      </div>
+                    </div>
+
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+
+
+                  <Separator className="my-2" />
+
+                  <div>
+                    <h4 className="font-medium text-lg mb-4">Prescribed Medications</h4>
+                    <div className="space-y-4">
+                      {prescriptionData.prescription.medications.map((medication) => (
+                        <PrescribedMedcine key={medication.id} medication={medication} />
+                      ))}
+                    </div>
+                  </div>
+
+                  {prescriptionData.prescription.notes && (
+                    <>
+                      <Separator className="my-6" />
+                      <div>
+                        <h4 className="font-medium text-lg mb-2">Doctor's Notes</h4>
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                          <p className="text-sm">{prescriptionData.prescription.notes}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card >
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                {/* Patient Information */}
+                {
+                  presData.status !== "COMPLETED" &&
+                  (
+                    <div className="lg:col-span-1 space-y-6">
+                      <Card className="green-card">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <User className="h-5 w-5 text-green-600" />
+                            Patient Information
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                            <p className="flex items-center gap-2 mt-1">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              {prescriptionData.patient.phone}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Email</label>
+                            <p className="flex items-center gap-2 mt-1">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              {prescriptionData.patient.email}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Blood Type</label>
+                            <p className="mt-1 font-medium text-red-600">{prescriptionData.patient.bloodType}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+
+                    </div>
+                  )
+                }
+
+
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Quick Actions */}
+                  {
+                    prescriptionData.prescription.status !== "COMPLETED" &&
+                    (
+                      <Card className="green-card">
+                        <CardHeader>
+                          <CardTitle>Prescription Actions</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                            <EditPrescription
+                              prescriptionId={prescriptionData.prescription.id}
+                              medications={prescriptionData.prescription.medications}
+                              publicNotes={presData.publicNotes}
+                              appointmentId={presData.appointmentId}
+                            >
+                              <Button className="health-green">
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit Current Prescription
+                              </Button>
+                            </EditPrescription>
+
+                            <PatientNotesModal
+                              patientName={prescriptionData.patient.name}
+                              publicNotes={presData.publicNotes}
+                              privateNotes={presData.privateNotes}
+                            >
+                              <Button variant="outline" className="w-full">
+                                <StickyNote className="h-4 w-4 mr-2" />
+                                Manage Notes
+                              </Button>
+                            </PatientNotesModal>
+                            <Button variant="outline">
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Message Patient
+                            </Button>
+
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  }
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div >
-      )
-    }
+            </div >
+          )
+      }
     </>
 
   );

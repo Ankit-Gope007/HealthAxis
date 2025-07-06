@@ -97,8 +97,9 @@ const NewPrescriptionDialog = ({ children }: NewPrescriptionDialogProps) => {
         }
     };
 
+    
 
-    const patients = appointmentsData.map(appointment => ({
+    const patients = appointmentsData.filter(appointment => appointment.status === "CONFIRMED").map(appointment => ({
         id: appointment.patientId,
         name: appointment.patient.patientProfile.fullName,
         age: new Date().getFullYear() - new Date(appointment.patient.patientProfile.dob).getFullYear(),

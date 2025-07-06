@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,6 +83,8 @@ const Chat = () => {
   const [loading, setLoading] = useState(false);
   const { profile } = useDoctorProfileStore() // Assuming you have a store for patient profile
   const [appointmentsData, setAppointmentsData] = useState<AppointmentPatientData[]>([]);
+   const bottomRef = useRef<HTMLDivElement>(null);
+  const [appointmentLoading, setAppointmentLoading] = useState(false);
 
 
   const { socket } = useSocket(); // Custom hook to manage socket connection
@@ -106,42 +108,15 @@ const Chat = () => {
 
   }, [profile]);
 
-  // useEffect(() => {
-  //   if (!socket || !selectedConversation) return;
-
-  //   // Join room when selected conversation changes
-  //   socket.emit("joinRoom", { appointmentId: selectedConversation.id });
-
-  //   socket.on("newMessage", (msg) => {
-  //     setMessages((prev) => [...prev, msg]);
-  //   });
-
-  //   // // Fetch previous messages when a conversation is selected
-  //   // fetchMessages(selectedConversation.id);
-
-  //   return () => {
-  //     socket.off("newMessage");
-  //   };
-  // }, [socket, selectedConversation]);
-
+   useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
   useEffect(() => {
     if (!socket || !selectedConversation) return;
 
     socket.emit("joinRoom", { appointmentId: selectedConversation.id });
 
-    // socket.on("newMessage", (msg) => {
-    //   // Convert raw DB message to your frontend format
-    //   const newMsg = {
-    //     id: msg.id,
-    //     sender: msg.senderId === selectedConversation.patientId ? 'patient' : 'doctor',
-    //     content: msg.content,
-    //     time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    //     avatar: msg.senderId === selectedConversation.patientId
-    //       ? selectedConversation?.patient?.patientProfile?.imageUrl || '' // for doctor side
-    //       : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl, // adjust based on which side
-    //   };
-    //   setMessages(prev => [...prev, newMsg]);
-    // });
+   
 
     socket.on("newMessage", (msg) => {
       const timeString = msg.createdAt
@@ -170,20 +145,20 @@ const Chat = () => {
 
   const fetchAppointments = async (id: string) => {
     try {
-      setLoading(true);
+      setAppointmentLoading(true);
       console.log("Fetching appointments for patient ID:", id);
       const response = await axios.get(`/api/appointment/getAllForDoctor?doctorId=${id}`);
       if (response.status === 200) {
         console.log("Appointments fetched successfully:", response.data);
         setAppointmentsData(response.data);
-        setLoading(false);
+        setAppointmentLoading(false);
       } else {
         console.error("Failed to fetch appointments:", response.statusText);
-        setLoading(false);
+        setAppointmentLoading(false);
       }
     } catch (error) {
       console.error("Error fetching appointments:", error);
-      setLoading(false);
+      setAppointmentLoading(false);
     }
   };
 
@@ -218,35 +193,13 @@ const Chat = () => {
     }
   }
 
+  const chatListData = filteredConversations.filter((conversation) =>{
+    return conversation.status === "CONFIRMED" 
+  })
 
-  // const handleSendMessage = () => {
-  //   if (!message.trim() || !socket || !selectedConversation) return;
 
-  //   const msgData = {
-  //     appointmentId: selectedConversation.id,
-  //     senderId: selectedConversation.doctorId,
-  //     receiverId: selectedConversation.patientId,
-  //     content: message.trim(),
-  //   };
 
-  //   // ✅ Emit to server
-  //   socket.emit("sendMessage", msgData);
 
-  //   // ✅ Locally add the message so it appears immediately
-  //   setMessages(prev => [
-  //     ...prev,
-  //     {
-  //       id: Date.now(), // temporary unique ID
-  //       sender: 'doctor',
-  //       content: message.trim(),
-  //       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  //       avatar: profile?.imageUrl,
-  //     }
-  //   ]);
-
-  //   // ✅ Clear input
-  //   setMessage("");
-  // };
 
   const handleSendMessage = () => {
     if (!message.trim() || !socket || !selectedConversation) return;
@@ -318,7 +271,14 @@ const Chat = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {filteredConversations.map((conversation) => (
+            {
+              appointmentLoading ? (
+                <div className="h-full w-full center">
+                  <div className="loading-animation h-10 w-10"></div>
+                </div>
+              )
+            :
+            chatListData.map((conversation) => (
               <div
                 key={conversation.id}
                 onClick={() => setSelectedChat(conversation.id)}
@@ -342,14 +302,9 @@ const Chat = () => {
                       {/* <span className="text-xs text-muted-foreground">{conversation.time}</span> */}
                     </div>
                     <p className="text-xs text-health-600 mb-1">{conversation.patient.patientProfile.phone}</p>
-                    {/* <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p> */}
+            
                   </div>
 
-                  {/* {conversation.unread > 0 && (
-                                        <Badge className="bg-health-500 text-white text-xs h-5 w-5 rounded-full flex items-center justify-center">
-                                            {conversation.unread}
-                                        </Badge>
-                                    )} */}
                 </div>
               </div>
             ))}
@@ -428,7 +383,9 @@ const Chat = () => {
                             </p>
                           </div>
                         </div>
+                        
                       ))}
+                      <div ref={bottomRef} />
                     </div>
                   )
               }

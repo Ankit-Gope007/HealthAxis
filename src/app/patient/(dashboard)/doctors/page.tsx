@@ -105,8 +105,9 @@ const page = () => {
   return (
     <>
     {  loading ? (
-      <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center'>
+      <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center flex-col gap-2'>
         <div className="loading-animation h-16 w-16 border-b-2 border-green-500"></div>
+        <div className="text-gray-500"> Loading Doctors ...</div>
       </div>
       ):(
       <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>

@@ -66,34 +66,7 @@ const DoctorAppointmentPatient = () => {
     const [appointmentData, setAppointmentData] = useState<AppointmentData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    // Mock data - in real app, fetch based on appointmentId
-    // const appointmentData = {
-    //     id: appointmentId,
-    //     patient: {
-    //         id: "1",
-    //         name: "Sarah Johnson",
-    //         age: 45,
-    //         gender: "Female",
-    //         phone: "+1 234-567-8901",
-    //         email: "sarah.johnson@email.com",
-    //         address: "123 Main St, City, State 12345",
-    //         emergencyContact: "John Johnson (Husband) - +1 234-567-8900",
-    //         bloodType: "O+",
-    //         allergies: ["Penicillin", "Shellfish"],
-    //         currentMedications: ["Lisinopril 10mg", "Metformin 500mg"],
-    //         avatar: "https://images.unsplash.com/photo-1494790108755-2616b332c0d3?q=80&w=200&auto=format&fit=crop"
-    //     },
-    //     appointment: {
-    //         date: "2024-01-15",
-    //         time: "10:00 AM",
-    //         reason: "Follow-up checkup for hypertension",
-    //         status: "confirmed",
-    //         type: "follow-up",
-    //         duration: "30 minutes",
-    //         location: "Room 201"
-    //     }
-    // };
-
+    
     const recentAppointments = [
         { date: "2024-01-10", time: "10:00 AM", reason: "Follow-up checkup", status: "completed" },
         { date: "2023-12-15", time: "11:00 AM", reason: "Routine examination", status: "completed" },
@@ -176,6 +149,67 @@ const DoctorAppointmentPatient = () => {
         ), { duration: 10000 });
     };
 
+    const handleCompleteAppointment = async (appointmentId = appointmentData?.id, patientName = appointmentData?.patient.patientProfile.fullName) => {
+        toast((t) => (
+            <div className="text-sm p-3">
+                <p className="font-semibold">✅ Complete the appointment for {patientName}?</p>
+                <p className="text-xs text-gray-600 mt-1">
+                    This will mark the appointment as Completed and notify the patient.
+                    And the precription will get expired  , and you will not be able to prescribe any medicines for this appointment.
+                    To be still in contact with the patient, you can use the chat feature.
+                </p>
+                <div className="mt-3 flex justify-end gap-2">
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            try {
+                                //  sending the appointmentId and status to the API to confirm the appointment
+                                const res = await axios.post("/api/appointment/completeAppointment", { appointmentId: appointmentId });
+                                if (res.status !== 200) {
+                                    throw new Error("Failed to confirm appointment");
+                                }
+                                toast.success(`✅ Appointment for ${patientName} is Completed! \n
+                    you will no longer be able to access ${patientName}'s prescription / notes from the appointment page\n
+                    To access the data of the past patient check the Patient tab on the Sidebar. 
+                  `, {
+                                    duration: 3000,
+                                    position: "top-right",
+                                    style: {
+                                        background: "#28A745",
+                                        color: "#fff",
+                                    },
+                                });
+                                // Optionally, you can refresh the appointments data here
+                                window.location.reload(); // Reload the page to reflect changes
+
+                                // Optional: Refresh data after confirm
+                                // await refetchAppointments();
+                            } catch (error) {
+                                toast.error(`❌ Could not confirm appointment for ${patientName}`, {
+                                    duration: 3000,
+                                    position: "top-right",
+                                    style: {
+                                        background: "#DC3545",
+                                        color: "#fff",
+                                    },
+                                });
+                            }
+                        }}
+                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        ), { duration: 10000 });
+    }
+
     useEffect(() => {
         if (id) {
             const appointmentId = id.toString();
@@ -185,11 +219,68 @@ const DoctorAppointmentPatient = () => {
         }
     }, [id]);
 
+    const handleConfirmAppointment = async (appointmentId = appointmentData?.id, patientName = appointmentData?.patient.patientProfile.fullName) => {
+        toast((t) => (
+            <div className="text-sm p-3">
+                <p className="font-semibold">✅ Confirm appointment for {patientName}?</p>
+                <p className="text-xs text-gray-600 mt-1">
+                    This will mark the appointment as CONFIRMED and notify the patient.
+                </p>
+                <div className="mt-3 flex justify-end gap-2">
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            try {
+                                //  sending the appointmentId and status to the API to confirm the appointment
+                                const res = await axios.post("/api/appointment/updateStatus", { appointmentId: appointmentId, status: "CONFIRMED" });
+                                if (res.status !== 200) {
+                                    throw new Error("Failed to confirm appointment");
+                                }
+                                toast.success(`✅ Appointment for ${patientName} CONFIRMED!`, {
+                                    duration: 3000,
+                                    position: "top-right",
+                                    style: {
+                                        background: "#28A745",
+                                        color: "#fff",
+                                    },
+                                });
+                                // Optionally, you can refresh the appointments data here
+                                window.location.reload(); // Reload the page to reflect changes
+
+                                // Optional: Refresh data after confirm
+                                // await refetchAppointments();
+                            } catch (error) {
+                                toast.error(`❌ Could not confirm appointment for ${patientName}`, {
+                                    duration: 3000,
+                                    position: "top-right",
+                                    style: {
+                                        background: "#DC3545",
+                                        color: "#fff",
+                                    },
+                                });
+                            }
+                        }}
+                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        ), { duration: 10000 });
+    };
+
     return (
         <>
             {loading ? (
-                <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center'>
+                <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center flex-col gap-2'>
                     <div className="loading-animation h-16 w-16 border-b-2 border-green-500"></div>
+                    <div className="text-gray-500"> Loading Appointment Details ...</div>
                 </div>
             ) : (
 
@@ -233,14 +324,34 @@ const DoctorAppointmentPatient = () => {
                                 </div>
                             </div>
                             <div className="flex gap-2">
-                                <Button variant="outline" className="">
-                                    <MessageSquare className="h-4 w-4 mr-2" />
-                                    Start Chat
-                                </Button>
-                                <Button className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center">
-                                    <FileText className="h-4 w-4 mr-2" />
-                                    Write Prescription
-                                </Button>
+                                {
+                                    appointmentData?.status === "PENDING" ? (
+                                        <Button
+                                            onClick={() => handleConfirmAppointment(appointmentData?.id || "", appointmentData?.patient
+                                                .patientProfile.fullName || "Patient")}
+                                            className="bg-[#28A745] text-white hover:bg-[#2ea728]
+                                            active:shadow-lg flex items-center"
+                                        >
+                                            <FileText className="h-4 w-4 mr-2" />
+                                            Confirm Appointment
+                                        </Button>
+                                    )
+                                        :
+                                        (
+                                            <>
+                                                <Button variant="outline" className="">
+                                                    <MessageSquare className="h-4 w-4 mr-2" />
+                                                    Start Chat
+                                                </Button>
+                                                <Button
+                                                    onClick={() => router.push(`/doctor/prescriptions/${appointmentData?.id}`)}
+                                                    className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center">
+                                                    <FileText className="h-4 w-4 mr-2" />
+                                                    Write Prescription
+                                                </Button>
+                                            </>
+                                        )
+                                }
                             </div>
                         </div>
                     </header>
@@ -344,90 +455,13 @@ const DoctorAppointmentPatient = () => {
                                 </CardContent>
                             </Card>
 
-                            <Card className="health-card">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <AlertTriangle className="h-5 w-5 text-orange-600" />
-                                        Medical Alerts
-                                    </CardTitle>
-                                </CardHeader>
-                                {/* <CardContent className="space-y-2">
-                            <div>
-                                <label className="text-sm font-medium text-muted-foreground">Allergies</label>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {appointmentData.patient.allergies.map((allergy, index) => (
-                                        <span key={index} className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
-                                            {allergy}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-muted-foreground">Current Medications</label>
-                                <div className="space-y-2 mt-2">
-                                    {appointmentData.patient.currentMedications.map((medication, index) => (
-                                        <p key={index} className="text-sm bg-blue-50 p-2 rounded">{medication}</p>
-                                    ))}
-                                </div>
-                            </div>
-                        </CardContent> */}
-                            </Card>
+                          
                         </div>
 
-                        {/* Medical History */}
+                   
                         <div className="lg:col-span-2 space-y-6">
-                            <Card className="health-card">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Calendar className="h-5 w-5 text-health-600" />
-                                        Recent Appointment History
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        {recentAppointments.map((appointment, index) => (
-                                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                <div>
-                                                    <p className="font-medium">{appointment.reason}</p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {appointment.date} at {appointment.time}
-                                                    </p>
-                                                </div>
-                                                <Badge className={getStatusStyle(appointment.status)}>
-                                                    {appointment.status}
-                                                </Badge>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="health-card">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-health-600" />
-                                        Recent Prescriptions
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        {prescriptions.map((prescription, index) => (
-                                            <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <p className="font-medium">{prescription.medication}</p>
-                                                    <p className="text-sm text-muted-foreground">{prescription.date}</p>
-                                                </div>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {prescription.dosage} • {prescription.duration}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <Button className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center w-full mt-2">
-                                        Write New Prescription
-                                    </Button>
-                                </CardContent>
-                            </Card>
+            
+                          
 
                             {/* Quick Actions */}
                             <Card className="health-card">
@@ -436,18 +470,34 @@ const DoctorAppointmentPatient = () => {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <Button className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center">
-                                            <FileText className="h-4 w-4 mr-2" />
-                                            Start Consultation
-                                        </Button>
-                                        <Button variant="outline">
-                                            <MessageSquare className="h-4 w-4 mr-2" />
-                                            Send Message
-                                        </Button>
-                                        <Button variant="outline">
-                                            <Calendar className="h-4 w-4 mr-2" />
-                                            Reschedule
-                                        </Button>
+                                        {
+                                            appointmentData?.status === "PENDING" ? (
+                                                <Button
+                                                    onClick={() => handleConfirmAppointment(appointmentData?.id || "", appointmentData?.patient.patientProfile.fullName || "Patient")}
+                                                    className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center">
+                                                    <FileText className="h-4 w-4 mr-2" />
+                                                    Confirm Appointment
+                                                </Button>
+                                            ) : (
+                                                <>
+                                                    <Button
+                                                        onClick={() => handleCompleteAppointment(appointmentData?.id || "", appointmentData?.patient.patientProfile.fullName || "Patient")}
+                                                        className="bg-[#28A745] text-white hover:bg-[#2ea728] active:shadow-lg flex items-center">
+                                                        <FileText className="h-4 w-4 mr-2" />
+                                                        Complete Appointment
+                                                    </Button>
+                                                    <Button variant="outline">
+                                                        <MessageSquare className="h-4 w-4 mr-2" />
+                                                        Send Message
+                                                    </Button>
+                                                    <Button variant="outline">
+                                                        <Calendar className="h-4 w-4 mr-2" />
+                                                        Reschedule
+                                                    </Button>
+                                                </>
+                                            )
+                                        }
+
                                         <Button
                                             variant="outline"
                                             onClick={() => handleCancelAppointment(appointmentData?.id || "", appointmentData?.patient.patientProfile.fullName || "Patient")}
@@ -461,7 +511,7 @@ const DoctorAppointmentPatient = () => {
                             </Card>
                         </div>
                     </div>
-                </div>
+                </div >
             )
             }
         </>
