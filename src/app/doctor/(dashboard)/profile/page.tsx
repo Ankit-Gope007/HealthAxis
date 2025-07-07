@@ -272,7 +272,7 @@ const Page = () => {
                     className="h-5 mt-1 text-sm" />
                 </div>
                 <div>
-                  <Label htmlFor="fee">Consultation Fee ($)</Label>
+                  <Label htmlFor="fee">Consultation Fee (₹)</Label>
                   <Input
                     defaultValue={doctorProfile?.consultationFee || ""}
                     required

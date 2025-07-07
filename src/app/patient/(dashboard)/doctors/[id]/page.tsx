@@ -29,7 +29,7 @@ type DoctorInfo = {
     email: string;
     doctorProfile: {
         fullName: string;
-        specialty: string;
+        specialization: string;
         rating: number;
         totalReviews: number;
         location: string;
@@ -97,7 +97,7 @@ const page = () => {
     const doctor = {
         id: id || "1",
         name: doctorData?.doctorProfile?.fullName || "N/A",
-        specialty: doctorData?.doctorProfile?.specialty || "Cardiologist",
+        specialty: doctorData?.doctorProfile?.specialization|| "Cardiologist",
         rating: doctorData?.doctorProfile?.rating || 4.8,
         totalReviews: doctorData?.doctorProfile?.totalReviews || 120,
         location: doctorData?.doctorProfile?.location || "New York, NY",
@@ -407,7 +407,7 @@ const page = () => {
                                         <CardContent>
                                             <CardTitle className="mb-2">Consultation Fee</CardTitle>
                                             <div className="text-2xl font-bold text-green-600 mb-2">
-                                                ${doctor.consultationFee}
+                                                ₹{doctor.consultationFee}
                                             </div>
                                             <p className="text-sm text-muted-foreground">Per consultation</p>
                                         </CardContent>
