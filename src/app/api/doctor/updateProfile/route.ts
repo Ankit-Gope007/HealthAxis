@@ -32,7 +32,10 @@ export async function POST(request: Request) {
             address: formData.get("address") as string || undefined, // Optional field
             clinicAddress: formData.get("clinicAddress") as string || undefined, // Optional field
             experience: parseInt(formData.get("yearsOfExperience") as string, 10) || undefined, // Optional field
-            consultationFee: parseFloat(formData.get("consultationFee") as string) || undefined // Optional field
+            consultationFee: parseFloat(formData.get("consultationFee") as string) || undefined ,// Optional field
+            education: formData.get("education") as string || undefined, // Optional field
+            certifications: formData.get("certifications") as string || undefined, // Optional field
+            bio: formData.get("bio") as string || undefined // Optional field
         };
         // If a profile image is provided, upload it to Cloudinary
         if (profileImage) {

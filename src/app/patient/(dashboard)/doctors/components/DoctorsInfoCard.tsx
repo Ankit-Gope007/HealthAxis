@@ -60,10 +60,13 @@ const DoctorsInfoCard = ({ doctor }: {
 
                         <Separator className="my-1" />
 
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <Badge className="w-fit bg-health-100 text-health-800 hover:bg-health-200 border-0">
-                                {doctor.availability}
-                            </Badge>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+                            <Button asChild className="bg-[#007BFF] h-5 hover:bg-[#007BFF] text-white">
+                                <Link href={`/patient/doctors/${doctor.id}`}>
+                                    View Doctor
+                                </Link>
+                            </Button>
+                            
                             <Button asChild className="bg-[#28A745] h-5 hover:bg-[#28A745] text-white">
                                 <Link href={`/patient/appointments/book/${doctor.id}`}>
                                     Book Appointment

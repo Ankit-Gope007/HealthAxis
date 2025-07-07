@@ -38,14 +38,21 @@ model User {
   patientAppointments Appointment[]   @relation("PatientAppointments")
   sentMessages        Message[]       @relation("MessageSender")
   receivedMessages    Message[]       @relation("MessageReceiver")
+
+
+  // Reviews
+  patientReviews Review[] @relation("PatientReviews") // reviews written by this user as patient
+  doctorReviews  Review[] @relation("DoctorReviews")  // reviews received by this user as doctor
 }
 
+// This enum defines the roles a user can have in the healthcare system.
 enum Role {
   PATIENT
   DOCTOR
   ADMIN
 }
 
+// This model represents a patient's profile in the healthcare system.
 model PatientProfile {
   id                     String   @id @default(cuid())
   fullName               String
@@ -65,6 +72,7 @@ model PatientProfile {
   patient   User   @relation("PatientToPatientProfile", fields: [patientId], references: [id])
 }
 
+// This model represents a doctor's profile in the healthcare system.
 model DoctorProfile {
   id              String   @id @default(cuid())
   phone           String   @unique
@@ -80,9 +88,18 @@ model DoctorProfile {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   doctorId        String   @unique
+  bio             String?
+  education       String?
+  certifications  String?
+  languages       String?
+
+
+
+  // Relations
   doctor          User     @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
 }
 
+// This model represents an appointment between a patient and a doctor.
 model Appointment {
   id        String   @id @default(cuid())
   patientId String
@@ -102,6 +119,7 @@ model Appointment {
   messages Message[]
 }
 
+// This model represents a message sent between Doctors and Patient, typically in the context of an appointment.
 model Message {
   id            String      @id @default(cuid())
   content       String
@@ -116,27 +134,47 @@ model Message {
   receiver User @relation("MessageReceiver", fields: [receiverId], references: [id])
 }
 
+// This model represents a prescription given to a patient during an appointment.
 model Prescription {
-  id             String       @id @default(cuid())
-  appointment    Appointment  @relation(fields: [appointmentId], references: [id])
-  appointmentId  String @unique
+  id            String      @id @default(cuid())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String      @unique
 
-  medicines      Medicine[]   // One prescription → many medicines
-  publicNotes    String?
-  privateNotes   String?
+  medicines    Medicine[] // One prescription → many medicines
+  publicNotes  String?
+  privateNotes String?
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
+// This model represents a medicine prescribed in a prescription.
 model Medicine {
-  id              String        @id @default(cuid())
-  prescription    Prescription  @relation(fields: [prescriptionId], references: [id])
-  prescriptionId  String
+  id             String       @id @default(cuid())
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+  prescriptionId String
 
-  name            String
-  dosage          String
-  instructions    String?
+  name         String
+  dosage       String
+  instructions String?
 
-  createdAt       DateTime      @default(now())
+  createdAt DateTime @default(now())
+}
+
+//This model represent the review given by the patient to the doctor
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientId String
+  doctorId  String
+
+  patient User @relation("PatientReviews", fields: [patientId], references: [id])
+  doctor  User @relation("DoctorReviews", fields: [doctorId], references: [id])
+
+  @@unique([patientId, doctorId])
 }

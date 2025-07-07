@@ -318,6 +318,9 @@ export async function updateDoctorProfile(doctorId: string, data: {
     dob?: Date;
     consultationFee?: number;
     imageUrl?: string; // Optional field for profile picture
+    education?: string; // Optional field for education
+    certifications?: string; // Optional field for certifications
+    bio?: string; // Optional field for bio
 }) {
     // Update the doctor profile in the database
     const updatedDoctor = await prisma.doctorProfile.update({

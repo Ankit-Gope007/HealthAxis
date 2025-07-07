@@ -9,6 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { get } from "http";
+import { Textarea } from "@/components/ui/textarea"
 
 type DoctorProfile = {
   id: string;
@@ -23,6 +24,9 @@ type DoctorProfile = {
   dob: string;
   experience?: number; // in years
   consultationFee?: number;
+  education?: string;
+  certifications?: string;
+  bio?: string;
 }
 
 const Page = () => {
@@ -55,7 +59,11 @@ const Page = () => {
             address: docProf.address,
             dob: docProf.dob,
             experience: docProf.experience,
-            consultationFee: docProf.consultationFee
+            consultationFee: docProf.consultationFee,
+            education: docProf.education,
+            certifications: docProf.certifications,
+            bio: docProf.bio
+            
           }
         );
         console.log("Doctor Profile:", docProf);
@@ -82,6 +90,9 @@ const Page = () => {
     const clinicAddress = (form.elements.namedItem("clinicAddress") as HTMLInputElement).value;
     const consultationFee = (form.elements.namedItem("fee") as HTMLInputElement).value;
     const profileImage = (form.elements.namedItem("profileImage") as HTMLInputElement).files?.[0];
+    const education = (form.elements.namedItem("education") as HTMLInputElement).value;
+    const certifications = (form.elements.namedItem("certifications") as HTMLInputElement).value
+    const bio = (form.elements.namedItem("bio") as HTMLInputElement).value;
 
     if (!clinicAddress || !consultationFee) {
       toast.error("Please fill in all required fields.", {
@@ -94,6 +105,10 @@ const Page = () => {
     const formData = new FormData();
     formData.append("address", clinicAddress);
     formData.append("consultationFee", consultationFee);
+    formData.append("education", education);
+    formData.append("certifications", certifications);
+    formData.append("bio", bio);
+
     if (profileImage) {
       formData.append("profileImage", profileImage);
     }
@@ -279,6 +294,38 @@ const Page = () => {
                     readOnly
                     id="address" className="h-5 mt-1 text-sm" />
                 </div> */}
+              </div>
+              <p className="text-xs text-gray-500">Seperate multiple  data with a " , " </p>
+
+              {/* Extra data for Doctors Detail */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <Label htmlFor="education"><MapPin className="h-2 w-2" />Education :</Label>
+                  <Textarea  
+                    id="education" className="h-7 mt-1 text-sm resize-none"
+                    defaultValue={doctorProfile?.education || ""}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="certifications"><MapPin className="h-2 w-2" />Certifications</Label>
+                 <Textarea
+                    id="certifications" className="h-7 mt-1 text-sm resize-none"
+                    defaultValue={doctorProfile?.certifications || ""}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1  gap-4">
+                <div className="relative">
+                  <Label htmlFor="bio"><MapPin className="h-2 w-2" />Bio :</Label>
+                  <Textarea  
+                    id="bio" className="h-7 w-full mt-1 text-sm resize-none"
+                    defaultValue={doctorProfile?.bio|| ""}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="pt-4">

@@ -61,7 +61,8 @@ const page = () => {
     const router = useRouter();
     const { profile } = usePatientProfileStore();
     const searchParams = useSearchParams();
-    const preselectedDoctorId = searchParams.get('doctor');
+    const preselectedDoctorId = searchParams?.get("doctorId");
+
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedDoctor, setSelectedDoctor] = useState<String | null>(preselectedDoctorId || null);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -173,7 +174,7 @@ const page = () => {
                 doctorId: selectedDoctor || "",
                 date: selectedDate || new Date(),
                 timeSlot: selectedTimeSlot || "",
-                reason: appointmentReason|| "No reason provided"
+                reason: appointmentReason || "No reason provided"
             };
 
             const response = await axios.post('/api/appointment/create', appointmentData);
@@ -347,7 +348,7 @@ const page = () => {
 
                 {/* Step 2 */}
                 {currentStep === 'select-time' && selectedDoctorDetails && (
-                  
+
                     <Card className="p-0">
                         <CardHeader className="pt-2">
                             <div className="flex items-center">
@@ -381,7 +382,7 @@ const page = () => {
                                             selected={selectedDate}
                                             onSelect={setSelectedDate}
                                             className="rounded border"
-                                            
+
                                             disabled={(date) =>
                                                 date < new Date() ||
                                                 date.getDay() === 0 ||
