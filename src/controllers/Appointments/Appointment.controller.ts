@@ -337,15 +337,27 @@ export async function completeAppointment(appointmentId: string) {
             }
         })
 
+        // 3. Find that the patient has already reviewed the doctor or not: 
+        const existingReview = await prisma.review.findFirst({
+            where: {
+                patientId: updatedAppointment.patientId,
+                doctorId: updatedAppointment.doctorId
+            }
+        });
+        
 
-        // 3. Send an email to the patient about the appointment completion
-        await transporter.sendMail({
-            from: "Health Axis <noReply> yourdomain.com",
-            to: updatedAppointment.patient.email,
-            subject: `Appointment Completed with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName}`,
-            text: `Dear ${updatedAppointment.patient.patientProfile?.fullName},\n\n
+
+
+
+        // 4. Send an email to the patient about the appointment completion (add the review doc option link only if its the first appointment completed)
+        if (!existingReview) {
+            await transporter.sendMail({
+                from: "Health Axis <noReply> yourdomain.com",
+                to: updatedAppointment.patient.email,
+                subject: `Appointment Completed with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName}`,
+                text: `Dear ${updatedAppointment.patient.patientProfile?.fullName},\n\n
 Your appointment with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName} on ${updatedAppointment.date.toDateString()} at ${updatedAppointment.timeSlot} has been completed.\n\nThank you for choosing Health Axis!`,
-            html: `
+                html: `
         <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
           <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
             <tr>
@@ -379,7 +391,62 @@ Your appointment with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName} o
             </table>
         </div>
         `
-        });
+            });
+        }
+        else {
+            await transporter.sendMail({
+                from: "Health Axis <noReply@yourdomain.com>",
+                to: updatedAppointment.patient.email,
+                subject: `Appointment Completed with  ${updatedAppointment.doctor.doctorProfile?.fullName}`,
+                text: `Dear ${updatedAppointment.patient.patientProfile?.fullName},
+
+Your appointment with Dr. ${updatedAppointment.doctor.doctorProfile?.fullName} on ${updatedAppointment.date.toDateString()} at ${updatedAppointment.timeSlot} has been completed.
+
+Thank you for choosing Health Axis!
+
+You can leave a review for your doctor here: http://localhost:3000/patient/reviews
+`,
+                html: `
+  <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+      <tr>
+        <td style="background-color: #28A745; padding: 20px; text-align: center;">
+          <h2 style="color: #ffffff; margin: 0;">Health Axis</h2>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 30px;">
+          <p style="font-size: 16px; color: #333333;">Dear ${updatedAppointment.patient.patientProfile?.fullName},</p>
+          <p style="font-size: 16px; color: #333333; line-height: 1.5;">
+            Your appointment with <strong>Dr. ${updatedAppointment.doctor.doctorProfile?.fullName}</strong> on <strong>${updatedAppointment.date.toDateString()}</strong> at <strong>${updatedAppointment.timeSlot}</strong> has been completed.
+          </p>
+          <p style="font-size: 16px; color: #333333;">
+            Thank you for choosing Health Axis! We hope you had a great experience.
+          </p>
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="http://localhost:3000/patient/login"
+              style="background-color: #28A745; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 10px;">
+              Go to Dashboard
+            </a>
+            <br/>
+            <a href="http://localhost:3000/patient/review/${updatedAppointment.doctorId}"
+              style="background-color: #007BFF; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; display: inline-block;">
+              Leave a Review
+            </a>
+          </div>
+          <p style="font-size: 14px; color: #999999;">Thank you for choosing Health Axis!</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 12px; color: #777;">
+          &copy; ${new Date().getFullYear()} Health Axis. All rights reserved.
+        </td>
+      </tr>
+    </table>
+  </div>
+  `
+            });
+        }
 
         return updatedAppointment;
 
@@ -420,11 +487,17 @@ export async function getPatientAppointmentsWithDoctor(patientId: string, doctor
                 patient: {
                     select: {
                         email: true,
-                        patientProfile: true,
-                        }
+                        patientProfile: true
                     }
                 },
-            
+                doctor: {
+
+                    select: {
+                        email: true,
+                        doctorProfile: true
+                    }
+                }
+            },
             orderBy: [
                 { date: 'asc' },
                 { timeSlot: 'asc' }
@@ -439,3 +512,4 @@ export async function getPatientAppointmentsWithDoctor(patientId: string, doctor
 
     }
 }
+

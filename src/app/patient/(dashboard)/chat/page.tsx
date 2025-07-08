@@ -243,10 +243,11 @@ const Chat = () => {
 
 
     const handleVoiceCall = () => {
-        window.open(`tel:+1234567890`, '_self');
+        toast("Voice call feature is not implemented yet.");
     };
 
     const handleVideoCall = () => {
+        toast("Video call feature is not implemented yet.");
         setShowVideoCall(true);
     };
 

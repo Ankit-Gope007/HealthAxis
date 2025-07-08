@@ -47,6 +47,7 @@ type DoctorInfo = {
         reviews?: {
             id: number;
             patientName: string;
+            patinetImage?: string;
             rating: number;
             date: string;
             review: string;
@@ -66,6 +67,7 @@ const page = () => {
             console.log("Fetching doctor data for ID:", id);
             setLoading(true);
             fetchDoctorData(id);
+            fetchReviews(id);
         } else {
             setLoading(false);
             toast.error("Doctor ID is missing.");
@@ -93,11 +95,47 @@ const page = () => {
         }
     }
 
+    const fetchReviews = async (doctorId: string) => {
+        try {
+            const response = await axios.get(`/api/review/get?doctorId=${doctorId}`);
+            if (response.status === 200) {
+                console.log("Reviews fetched successfully:", response.data);
+                // Assuming the reviews are part of the doctorData structure
+                setDoctorData(prevData => {
+                    if (!prevData) return prevData;
+                    return {
+                        ...prevData,
+                        doctorProfile: {
+                            ...prevData.doctorProfile,
+                            reviews: response.data.map((review: any) => ({
+                                id: review.id,
+                                patientName: review.patient.patientProfile?.fullName || "Anonymous",
+                                patinetImage: review.patient.patientProfile?.imageUrl || "https://via.placeholder.com/50",
+                                rating: review.rating,
+                                date: new Date(review.createdAt).toLocaleDateString(),
+                                review: review.comment
+                            }))
+                        }
+                    };
+                });
+
+
+            }
+             else {
+                toast.error("Failed to load reviews. Please try again later.");
+            }
+
+        } catch (error) {
+            console.error("Error fetching reviews:", error);
+
+        }
+    }
+
     // Mock doctor data with reviews
     const doctor = {
         id: id || "1",
         name: doctorData?.doctorProfile?.fullName || "N/A",
-        specialty: doctorData?.doctorProfile?.specialization|| "Cardiologist",
+        specialty: doctorData?.doctorProfile?.specialization || "Cardiologist",
         rating: doctorData?.doctorProfile?.rating || 4.8,
         totalReviews: doctorData?.doctorProfile?.totalReviews || 120,
         location: doctorData?.doctorProfile?.location || "New York, NY",
@@ -107,48 +145,12 @@ const page = () => {
         availability: "Available Today",
         experience: doctorData?.doctorProfile?.experience || "N/A",
         education: Array.from(doctorData?.doctorProfile?.education?.split(",") || []).map(edu => edu.trim()) || "N/A",
-        certifications: Array.from(doctorData?.doctorProfile?.certifications.split(",") || []).map(cert => cert.trim()),
-        languages: Array.from(doctorData?.doctorProfile?.languages?.split(",") || []).map(lang => lang.trim()),
+        certifications:doctorData?.doctorProfile?.certifications? Array.from(doctorData?.doctorProfile?.certifications.split(",") || []).map(cert => cert.trim()): ["N/A"],
+        languages: Array.from(doctorData?.doctorProfile?.languages?.split(",") || []).map(lang => lang.trim())|| "N/A",
         consultationFee: doctorData?.doctorProfile?.consultationFee || 100,
         image: doctorData?.doctorProfile?.imageUrl || "https://via.placeholder.com/150",
         bio: doctorData?.doctorProfile?.bio || "N/A",
-        reviews: doctorData?.doctorProfile?.reviews || [
-            {
-                id: 1,
-                patientName: "John D.",
-                rating: 5,
-                date: "2024-01-10",
-                review: "Dr. Johnson is incredibly knowledgeable and caring. She took the time to explain my condition thoroughly and answered all my questions. Highly recommend!"
-            },
-            {
-                id: 2,
-                patientName: "Maria S.",
-                rating: 5,
-                date: "2024-01-08",
-                review: "Excellent doctor! Very professional and compassionate. The treatment plan she provided has significantly improved my heart green."
-            },
-            {
-                id: 3,
-                patientName: "Robert K.",
-                rating: 4,
-                date: "2024-01-05",
-                review: "Great experience overall. Dr. Johnson is thorough in her examinations and provides clear explanations. Wait time was minimal."
-            },
-            {
-                id: 4,
-                patientName: "Lisa M.",
-                rating: 5,
-                date: "2024-01-03",
-                review: "Outstanding care! Dr. Johnson helped me manage my hypertension effectively. She's patient, understanding, and truly cares about her patients."
-            },
-            {
-                id: 5,
-                patientName: "David W.",
-                rating: 4,
-                date: "2023-12-28",
-                review: "Very knowledgeable doctor with a great bedside manner. She made me feel comfortable during my consultation and provided excellent care."
-            }
-        ]
+        reviews: Array.from(doctorData?.doctorProfile?.reviews || []),
     };
 
     const renderStars = (rating: number) => {
@@ -166,14 +168,32 @@ const page = () => {
     };
 
     const getRatingDistribution = () => {
-        const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        const distribution: Record<number, number> = {
+            5: 0,
+            4: 0,
+            3: 0,
+            2: 0,
+            1: 0,
+        };
+
+        if (!doctor.reviews || doctor.reviews.length === 0) {
+            return distribution;
+        }
+
         doctor.reviews.forEach(review => {
-            distribution[review.rating as keyof typeof distribution]++;
+            if (review.rating >= 1 && review.rating <= 5) {
+                distribution[review.rating]++;
+            }
         });
+
         return distribution;
     };
 
+    const totalReviews = doctorData?.doctorProfile?.reviews?.length || 0;
 
+    const avgRating = totalReviews ?
+        (doctorData?.doctorProfile?.reviews?.reduce((sum, review) => sum + review.rating, 0) || 0) / totalReviews
+        : 0;
 
     const ratingDistribution = getRatingDistribution();
 
@@ -184,7 +204,7 @@ const page = () => {
                 loading ?
                     (
 
-                       <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center flex-col gap-2'>
+                        <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] center flex-col gap-2'>
                             <div className="loading-animation h-15 w-15"></div>
                             <div className="ml-4 text-xl mt-2 text-gray-500">Loading doctor details...</div>
                         </div>
@@ -229,10 +249,10 @@ const page = () => {
 
                                                     <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
                                                         <div className="flex items-center gap-1">
-                                                            {renderStars(doctor.rating)}
+                                                            {renderStars(avgRating)}
                                                         </div>
-                                                        <span className="font-semibold">{doctor.rating}</span>
-                                                        <span className="text-muted-foreground">({doctor.totalReviews} reviews)</span>
+                                                        <span className="font-semibold">{avgRating}</span>
+                                                        <span className="text-muted-foreground">({totalReviews} reviews)</span>
                                                     </div>
 
                                                     <div className="flex flex-col md:flex-row gap-2 mb-4">
@@ -249,7 +269,7 @@ const page = () => {
                                                         </div>
                                                         <div className="flex items-center gap-1">
                                                             <Users className="h-3 w-3" />
-                                                            {doctor.totalReviews} patients
+                                                            {totalReviews} patients
                                                         </div>
                                                     </div>
 
@@ -330,11 +350,11 @@ const page = () => {
                                                     {/* Rating Summary */}
                                                     <div className="flex items-center gap-8 mb-6 p-4 bg-gray-50 rounded-lg">
                                                         <div className="text-center">
-                                                            <div className="text-3xl font-bold text-green-600">{doctor.rating}</div>
+                                                            <div className="text-3xl font-bold text-green-600">{avgRating}</div>
                                                             <div className="flex items-center gap-1 mb-1">
-                                                                {renderStars(doctor.rating)}
+                                                                {renderStars(avgRating)}
                                                             </div>
-                                                            <div className="text-sm text-muted-foreground">{doctor.totalReviews} reviews</div>
+                                                            <div className="text-sm text-muted-foreground">{totalReviews} reviews</div>
                                                         </div>
                                                         <div className="flex-1">
                                                             {Object.entries(ratingDistribution).reverse().map(([rating, count]) => (

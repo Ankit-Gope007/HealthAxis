@@ -220,10 +220,11 @@ const Chat = () => {
   };
 
   const handleVoiceCall = () => {
-    window.open(`tel:+1234567890`, '_self');
+    toast("Voice call feature is not implemented yet.");
   };
 
   const handleVideoCall = () => {
+    toast("Video call feature is not implemented yet.");
     setShowVideoCall(true);
   };
 
@@ -282,14 +283,14 @@ const Chat = () => {
               <div
                 key={conversation.id}
                 onClick={() => setSelectedChat(conversation.id)}
-                className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-health-50 border-r-2 border-r-health-500' : ''
+                className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-green-50 border-r-2 border-r-green-500' : ''
                   }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={conversation.patient.patientProfile?.imageUrl} />
-                      <AvatarFallback className="bg-health-100 text-health-700">
+                      <AvatarFallback className="bg-green-100 text-green-700">
                         {conversation.patient.patientProfile.fullName.split(" ").map(n => n[0]).join("")}
                       </AvatarFallback>
                     </Avatar>
