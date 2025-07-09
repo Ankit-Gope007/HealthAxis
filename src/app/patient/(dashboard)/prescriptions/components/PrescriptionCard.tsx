@@ -42,7 +42,7 @@ const PrescriptionCard = ({ prescription }: PrescriptionCardProps) => {
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <h3 className="font-medium">Dr. {prescription.doctor}</h3>
+                                <h3 className="font-medium">{prescription.doctor}</h3>
                                 <p className="text-sm text-muted-foreground">{prescription.specialty}</p>
                             </div>
                         </div>

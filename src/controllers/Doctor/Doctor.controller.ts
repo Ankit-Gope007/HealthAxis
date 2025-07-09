@@ -194,7 +194,7 @@ export async function getAllDoctorsForPatient() {
             }
         },
         include: {
-            doctorProfile: true, // Include doctor profile details
+            doctorProfile:true// Include doctor profile details
         }
     });
 

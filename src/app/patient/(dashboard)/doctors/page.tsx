@@ -61,7 +61,7 @@ const page = () => {
       if (response.status === 200) {
         console.log("Doctors data fetched successfully:", response.data.doctors.data);
         setDoctorsData(response.data.doctors.data);
-        console.log("Doctors data:", doctorsData);
+        console.log("Doctors data:", response.data.doctors.data);
         setLoading(false);
 
         // You can set the fetched data to state or handle it as needed

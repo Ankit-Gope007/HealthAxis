@@ -118,6 +118,8 @@ const page = () => {
                         }
                     };
                 });
+                // reload the page to reflect the new reviews
+                
 
 
             }
@@ -229,9 +231,9 @@ const page = () => {
                                 </Button>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1  lg:grid-cols-3 gap-4">
                                 {/* Doctor Info */}
-                                <div className="lg:col-span-2 space-y-6">
+                                <div className=" lg:col-span-2 space-y-6 ">
                                     <Card className=" py-2 mb-1">
                                         <CardContent className="p-4">
 
@@ -286,7 +288,7 @@ const page = () => {
                                             <TabsTrigger value="reviews">Reviews</TabsTrigger>
 
                                         </TabsList>
-
+                                        <div>
                                         <TabsContent value="about" className="space-y-2">
                                             <Card className="py-4">
                                                 <CardHeader className="mb-0">
@@ -342,7 +344,7 @@ const page = () => {
                                         </TabsContent>
 
                                         <TabsContent value="reviews" className="space-y-4">
-                                            <Card className="green-card">
+                                            <Card className="">
                                                 <CardHeader>
                                                     <CardTitle>Patient Reviews</CardTitle>
                                                 </CardHeader>
@@ -394,15 +396,16 @@ const page = () => {
                                                 </CardContent>
                                             </Card>
                                         </TabsContent>
+                                        </div>
 
 
                                     </Tabs>
                                 </div>
 
                                 {/* Sidebar */}
-                                <div className="space-y-3">
+                                <div className="space-y-3 relative">
                                     {/* Contact Info */}
-                                    <Card className="green-card">
+                                    <Card className="">
                                         <CardHeader>
                                             <CardTitle>Contact Information</CardTitle>
                                         </CardHeader>
@@ -447,6 +450,7 @@ const page = () => {
                                 </div>
                             </div>
                         </div>
+                        
                     )
             }
         </>

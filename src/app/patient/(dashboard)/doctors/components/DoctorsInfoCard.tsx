@@ -46,12 +46,12 @@ const DoctorsInfoCard = ({ doctor }: {
                                 <h3 className="text-lg font-semibold">{doctor.name}</h3>
                                 <p className="text-muted-foreground">{doctor.specialty}</p>
                             </div>
-                            <div className="flex  items-center mt-2 md:mt-0 gap-2">
+                            {/* <div className="flex  items-center mt-2 md:mt-0 gap-2">
                                 <Badge variant="outline" className="text-yellow-600 bg-yellow-50 border-yellow-200">
                                     <Star className="h-3 w-3 mr-1 fill-yellow-500 text-yellow-500" /> {doctor.rating}
                                 </Badge>
                                 <span className="text-sm text-muted-foreground">({doctor.reviews} reviews)</span>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="flex items-center text-sm text-muted-foreground mb-4">

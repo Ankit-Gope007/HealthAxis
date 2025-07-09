@@ -352,9 +352,8 @@ const NewPrescriptionDialog = ({ children }: NewPrescriptionDialogProps) => {
         }
 
         const newPrescription = {
-            appointmentId: appointmentsData.find(
-                (appointment) => appointment.patientId === selectedPatient
-            )?.id,
+            // get the appointment Id from appointmentsData where the status is "CONFIRMED" and the patientId matches the selectedPatient
+            appointmentId: appointmentsData.find(appointment => (appointment.patientId === selectedPatient && appointment.status==="CONFIRMED"))?.id || "",
             publicNotes: notes,
             privateNotes: "", // Assuming no private notes for now
             medicines: medications
@@ -405,6 +404,7 @@ const NewPrescriptionDialog = ({ children }: NewPrescriptionDialogProps) => {
 
     const handlePatientSelect = (patientId: string) => {
         setSelectedPatient(patientId);
+        console.log("Selected patient ID:", patientId,"And the appointmentId is:", appointmentsData.find(appointment => appointment.patientId === patientId)?.id);
         const patient = patients.find(p => p.id === patientId);
         if (patient) {
             toast(`Selected patient: ${patient.name}`);
