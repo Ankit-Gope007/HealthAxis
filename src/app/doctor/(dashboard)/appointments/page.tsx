@@ -107,12 +107,7 @@ const page = () => {
     }
   };
 
-  const filteredAppointments = appointmentData.filter(appointment => {
-    const matchesSearch = appointment.patient.patientProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.reason.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+
 
   const inCompletedAppointments = appointmentData.filter(appointment => {
     const appointmentDate = new Date(appointment.date);
@@ -120,6 +115,14 @@ const page = () => {
     return appointmentDate.setHours(0, 0, 0, 0) >= currentDate && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
   }
   );
+
+  const filteredAppointments = inCompletedAppointments.filter(appointment => {
+    const matchesSearch = appointment.patient.patientProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.reason.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
 
   const handleConfirmAppointment = async (appointmentId: string, patientName: string) => {
@@ -178,8 +181,8 @@ const page = () => {
     ), { duration: 10000 });
   };
 
-  const handleCompleteAppointment = async (appointmentId:string,patientName:string) => {
-     toast((t) => (
+  const handleCompleteAppointment = async (appointmentId: string, patientName: string) => {
+    toast((t) => (
       <div className="text-sm p-3">
         <p className="font-semibold">✅ Complete the appointment for {patientName}?</p>
         <p className="text-xs text-gray-600 mt-1">
@@ -350,7 +353,7 @@ const page = () => {
                   </TableHeader>
                   <TableBody >
                     {
-                      inCompletedAppointments.length === 0 ?
+                      filteredAppointments.length === 0 ?
                         (
                           <TableRow>
                             <TableCell colSpan={5} className="text-center text-muted-foreground">
@@ -359,7 +362,7 @@ const page = () => {
                           </TableRow>
                         )
                         :
-                        inCompletedAppointments.map((appointment) => (
+                        filteredAppointments.map((appointment) => (
                           <TableRow
                             className='overflow-y-scroll max-h-[200px] show-scrollbar'
                             key={appointment.id}>
@@ -411,7 +414,7 @@ const page = () => {
                                 </Button>
                                 {appointment.status === 'CONFIRMED' && (
                                   <Button
-                                    onClick={() => handleCompleteAppointment(appointment.id,appointment.patient.patientProfile.fullName)}
+                                    onClick={() => handleCompleteAppointment(appointment.id, appointment.patient.patientProfile.fullName)}
                                     variant="outline" size="sm" className="bg-[#28A745] text-white">
                                     Complete Appointment
                                   </Button>
@@ -426,7 +429,8 @@ const page = () => {
                               </div>
                             </TableCell>
                           </TableRow>
-                        ))}
+                        ))
+                    }
                   </TableBody>
                 </Table >
               )
