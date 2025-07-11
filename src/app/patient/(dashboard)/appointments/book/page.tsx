@@ -383,11 +383,14 @@ const page = () => {
                                             onSelect={setSelectedDate}
                                             className="rounded border"
 
-                                            disabled={(date) =>
-                                                date < new Date() ||
-                                                date.getDay() === 0 ||
-                                                date.getDay() === 6
-                                            }
+                                            disabled={(date) => {
+                                                const today = new Date();
+                                                today.setHours(0, 0, 0, 0); // zero time for today
+                                                const compareDate = new Date(date);
+                                                compareDate.setHours(0, 0, 0, 0); // zero time for the date too
+
+                                                return compareDate < today || compareDate.getDay() === 0 || compareDate.getDay() === 6;
+                                            }}
                                             classNames={{
                                                 table: "w-full text-xs",
                                                 cell: "w-8 h-8 text-xs",

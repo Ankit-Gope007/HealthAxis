@@ -116,8 +116,8 @@ const page = () => {
 
   const inCompletedAppointments = appointmentData.filter(appointment => {
     const appointmentDate = new Date(appointment.date);
-    const currentDate = new Date();
-    return appointmentDate >= currentDate && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
+    const currentDate = new Date().setHours(0, 0, 0, 0); // Set current date to midnight for comparison
+    return appointmentDate.setHours(0, 0, 0, 0) >= currentDate && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
   }
   );
 
@@ -320,11 +320,11 @@ const page = () => {
       </Card>
 
       {/* Appointments Table */}
-      <Card className="health-card">
+      <Card className="">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-3 w-3 text-health-600" />
-            All Appointments ({filteredAppointments.length})
+            All Appointments ({inCompletedAppointments.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -361,7 +361,7 @@ const page = () => {
                         :
                         inCompletedAppointments.map((appointment) => (
                           <TableRow
-                            className='overflow-y-scroll max-h-[200px]'
+                            className='overflow-y-scroll max-h-[200px] show-scrollbar'
                             key={appointment.id}>
                             <TableCell className=''>
                               <div className="flex items-center gap-3">

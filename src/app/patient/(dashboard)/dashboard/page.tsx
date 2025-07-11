@@ -72,6 +72,7 @@ const Page = () => {
       }
 
       try {
+        setLoading(true);
         const res = await axios.post(`/api/patient/getPatientById`, {
           id: session.user.id,
         });
@@ -80,21 +81,25 @@ const Page = () => {
         const fetchedUser = res.data;
         if (fetchedUser) {
           setUser(fetchedUser);
+          setLoading(false);
         }
         if (fetchedUser && !fetchedUser.profileSetup) {
           toast("Please complete your profile setup to access all features.");
           setActiveItem("profile");
           router.push("/patient/profile");
+          setLoading(false);
         }
         // Fetch patient profile after user data is set
 
         if (user) {
           fetchPatientProfile();
+          setLoading(false);
         }
 
       } catch (error) {
         console.error("Failed to fetch user data:", error);
         toast.error("Failed to load user data.");
+        setLoading(false);
       }
     };
 
@@ -156,73 +161,87 @@ const Page = () => {
 
 
   return (
-    <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#F9FAFC] '>
-      <Toaster />
 
-      {/* Heading and Tagline  + book appoinment button*/}
-      <div className=" flex justify-between flex-col md:flex-row">
-        {/* heading */}
-        <div className="flex flex-col justify-between items-start p-2">
-          <h1 className="text-xl font-semibold">Welcome to Your Dashboard , {profile ? profile.fullName : "Guest"}! </h1>
-          <p>
-            Here's an overview of your health records, appointments, and more.
-          </p>
-        </div>
-        {/* Book  Appoinment Button */}
-        <div className="flex justify-end p-2">
-          <button
-            onClick={() => {
-              setActiveItem("Appointments");
-              router.push("/patient/appointments");
-            }}
-            className="bg-[#28A745] w-full cursor-pointer  text-white px-4 py-2 rounded-lg hover:bg-[#28a746] transition duration-200"
-          >
-            Book Appointment
-          </button>
-        </div>
-      </div>
 
-      {/* Divider */}
-      <hr className="my-2 border-gray-300" />
+    <>
+      {
+        loading ? (
+          <div className="flex items-center justify-center h-screen">
+            <div className="loading-animation h-10 w-10"></div>
+          </div>
+        )
+        :
+        (<div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#F9FAFC] '>
+          <Toaster />
 
-      {/* Your Health Records */}
-
-      {/* Your Upcoming Appointments */}
-      <div className=" h-[300px] p-2">
-        <h2 className="text-lg font-semibold mt-4 ">Your Upcoming Appointments</h2>
-        <p>Manage your appointments and health records here.</p>
-
-        {/* Appointment Cards */}
-        <div className="mt-4 flex justify-start gap-3 h-[250px] overflow-x-auto p-1">
-          {loading ? (
-            <div className="h-full w-full center">
-              <div className="loading-animation h-10 w-10">
-              </div>
+          {/* Heading and Tagline  + book appoinment button*/}
+          <div className=" flex justify-between flex-col md:flex-row">
+            {/* heading */}
+            <div className="flex flex-col justify-between items-start p-2">
+              <h1 className="text-xl font-semibold">Welcome to Your Dashboard , {profile ? profile.fullName : "Guest"}! </h1>
+              <p>
+                Here's an overview of your health records, appointments, and more.
+              </p>
             </div>
+            {/* Book  Appoinment Button */}
+            <div className="flex justify-end p-2">
+              <button
+                onClick={() => {
+                  setActiveItem("Appointments");
+                  router.push("/patient/appointments");
+                }}
+                className="bg-[#28A745] w-full cursor-pointer  text-white px-4 py-2 rounded-lg hover:bg-[#28a746] transition duration-200"
+              >
+                Book Appointment
+              </button>
+            </div>
+          </div>
 
-          ) : upcomingAppointments.length > 0
-            ? (
-              upcomingAppointments.map((appointment) => (
-                <AppointmentCards
-                  key={appointment.id}
-                  fullName={appointment.doctor.doctorProfile.fullName}
-                  specialization={appointment.doctor.doctorProfile.specialization}
-                  imageUrl={appointment.doctor.doctorProfile.imageUrl || ""}
-                  appointmentDate={new Date(appointment.date).toLocaleDateString()}
-                  appointmentTime={appointment.timeSlot}
-                  status={appointment.status}
-                />
-              ))
-            ) : (
-              <div>
-                <p className="text-gray-500">You Have no Upcoming Appointments.</p>
-                <p className="text-gray-500">Please book an appointment to see it here.</p>
-              </div>
-            )}
-        </div>
-      </div>
+          {/* Divider */}
+          <hr className="my-2 border-gray-300" />
 
-    </div>
+          {/* Your Health Records */}
+
+          {/* Your Upcoming Appointments */}
+          <div className=" h-[300px] p-2">
+            <h2 className="text-lg font-semibold mt-4 ">Your Upcoming Appointments</h2>
+            <p>Manage your appointments and health records here.</p>
+
+            {/* Appointment Cards */}
+            <div className="mt-4 flex justify-start gap-3 h-[250px] overflow-x-auto p-1">
+              {loading ? (
+                <div className="h-full w-full center">
+                  <div className="loading-animation h-10 w-10">
+                  </div>
+                </div>
+
+              ) : upcomingAppointments.length > 0
+                ? (
+                  upcomingAppointments.map((appointment) => (
+                    <AppointmentCards
+                      key={appointment.id}
+                      fullName={appointment.doctor.doctorProfile.fullName}
+                      specialization={appointment.doctor.doctorProfile.specialization}
+                      imageUrl={appointment.doctor.doctorProfile.imageUrl || ""}
+                      appointmentDate={new Date(appointment.date).toLocaleDateString()}
+                      appointmentTime={appointment.timeSlot}
+                      status={appointment.status}
+                    />
+                  ))
+                ) : (
+                  <div>
+                    <p className="text-gray-500">You Have no Upcoming Appointments.</p>
+                    <p className="text-gray-500">Please book an appointment to see it here.</p>
+                  </div>
+                )}
+            </div>
+          </div>
+
+        </div>)
+      }
+    </>
+
+
   )
 }
 
