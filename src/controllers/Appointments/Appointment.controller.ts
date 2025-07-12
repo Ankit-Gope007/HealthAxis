@@ -1,5 +1,52 @@
 import { prisma } from "@/src/lib/prisma";
 import { transporter } from "@/src/lib/mail";
+import { google } from "googleapis";
+
+export async function createGoogleCalendarEvent(patient: any, appointment: any) {
+  // ✅ Create ONE OAuth2 client
+  const oAuth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI // you MUST have this set!
+  );
+
+  // ✅ Set the credentials from the signed-in user (patient)
+  oAuth2Client.setCredentials({
+    access_token: patient.accessToken,   // YOU must pass these correctly
+    refresh_token: patient.refreshToken
+  });
+
+  // ✅ Create calendar client using that OAuth2 client
+  const calendar = google.calendar({
+    version: "v3",
+    auth: oAuth2Client
+  });
+
+  // ✅ Define the event
+  const event = {
+    summary: `Appointment with Dr. ${appointment.doctor.doctorProfile?.fullName}`,
+    description: `Your appointment for ${appointment.date} has been confirmed.`,
+    start: {
+      dateTime: new Date(appointment.date).toISOString(),
+      timeZone: "Asia/Kolkata",
+    },
+    end: {
+      dateTime: new Date(new Date(appointment.date).getTime() + 30 * 60000).toISOString(),
+      timeZone: "Asia/Kolkata",
+    },
+    attendees: [
+      { email: patient.email }
+    ]
+  };
+
+  // ✅ Insert the event
+  const response = await calendar.events.insert({
+    calendarId: "primary",
+    requestBody: event,
+  });
+
+  return response.data;
+}
 
 
 // Appointment Creation controller:
@@ -166,6 +213,8 @@ export async function updateAppointmentStatus(appointmentId: string, status: str
                 patient: {
                     select: {
                         email: true,
+                        accessToken: true,
+                        refreshToken: true,
                         patientProfile: {
                             select: {
                                 fullName: true
@@ -188,6 +237,12 @@ export async function updateAppointmentStatus(appointmentId: string, status: str
 
 
         });
+
+        if (status === "CONFIRMED"&& updatedAppointment.patient.accessToken && updatedAppointment.patient.refreshToken) {
+            // Create Google Calendar event
+            await createGoogleCalendarEvent(updatedAppointment.patient, updatedAppointment);
+        }
+
 
         await transporter.sendMail({
             from: "Health Axis <no-reply@yourdomain.com>",
@@ -344,7 +399,7 @@ export async function completeAppointment(appointmentId: string) {
                 doctorId: updatedAppointment.doctorId
             }
         });
-        
+
 
 
 

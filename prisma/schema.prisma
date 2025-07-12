@@ -23,13 +23,16 @@ enum Gender {
 // This model represents a patient in the healthcare system.
 // It includes fields for authentication and a one-to-one relationship with the PatientProfile model.
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   password     String?
-  role         Role     @default(PATIENT)
-  profileSetup Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         Role      @default(PATIENT)
+  profileSetup Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  accessToken  String? // For OAuth providers like Google
+  refreshToken String? // For OAuth providers like Google
+  expiresAt    DateTime? // For OAuth providers like Google
 
   // Relations
   doctorProfile       DoctorProfile?  @relation("DoctorToDoctorProfile")
@@ -39,10 +42,9 @@ model User {
   sentMessages        Message[]       @relation("MessageSender")
   receivedMessages    Message[]       @relation("MessageReceiver")
 
-
   // Reviews
   patientReviews Review[] @relation("PatientReviews") // reviews written by this user as patient
-  doctorReviews  Review[] @relation("DoctorReviews")  // reviews received by this user as doctor
+  doctorReviews  Review[] @relation("DoctorReviews") // reviews received by this user as doctor
 }
 
 // This enum defines the roles a user can have in the healthcare system.
@@ -93,10 +95,8 @@ model DoctorProfile {
   certifications  String?
   languages       String?
 
-
-
   // Relations
-  doctor          User     @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
+  doctor User @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
 }
 
 // This model represents an appointment between a patient and a doctor.
