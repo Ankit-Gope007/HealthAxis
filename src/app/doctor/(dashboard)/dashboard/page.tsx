@@ -45,7 +45,7 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const [appointmentData, setAppointmentData] = useState<AppointmentWithPatient[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
-  const { profile} = useDoctorProfileStore();
+  const { profile } = useDoctorProfileStore();
   const { setActiveItem } = useSidebarStore();
   const router = useRouter();
 
@@ -93,8 +93,8 @@ const page = () => {
     return (
       appointmentDate.getFullYear() === today.getFullYear() &&
       appointmentDate.getMonth() === today.getMonth() &&
-      appointmentDate.getDate() === today.getDate()&&
-      appointment.status === "CONFIRMED" 
+      appointmentDate.getDate() === today.getDate() &&
+      appointment.status === "CONFIRMED"
     );
   });
 
@@ -168,7 +168,7 @@ const page = () => {
       .filter(
         (app) =>
           (app.status === "CONFIRMED" || app.status === "COMPLETED") &&
-          new Date(app.date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) 
+          new Date(app.date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
       )
       .map((appointment) => ({
         id: appointment.patient.id,
@@ -230,37 +230,43 @@ const page = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {todaysAppointments.map((appointment) => (
-                        <div key={appointment.id} className="flex items-center justify-between p-1 bg-gray-50 rounded-lg">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <p className="font-medium text-gray-900">{appointment.patient.patientProfile.fullName}</p>
-                              <span className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(appointment.status)}`}>
-                                {appointment.status}
-                              </span>
+                      {
+                        todaysAppointments.length === 0 ? (
+                          <p className="text-muted-foreground">No appointments scheduled for today.</p>
+                        ) :
+                          todaysAppointments.map((appointment) => (
+                            <div key={appointment.id} className="flex items-center justify-between p-1 bg-gray-50 rounded-lg">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <p className="font-medium text-gray-900">{appointment.patient.patientProfile.fullName}</p>
+                                  <span className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(appointment.status)}`}>
+                                    {appointment.status}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{appointment.reason}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium text-green-600">{appointment.timeSlot}</p>
+                                <Button
+                                  onClick={() => {
+                                    setActiveItem("Appointments");
+                                    router.push(`/doctor/appointments/details/${appointment.id}`);
+                                  }}
+                                  size="sm" variant="outline" className="mt-1 h-5">
+                                  View
+                                </Button>
+                              </div>
                             </div>
-                            <p className="text-sm text-muted-foreground">{appointment.reason}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-green-600">{appointment.timeSlot}</p>
-                            <Button 
-                            onClick={() => {
-                              setActiveItem("Appointments");
-                              router.push(`/doctor/appointments/details/${appointment.id}`);
-                            }}
-                            size="sm" variant="outline" className="mt-1 h-5">
-                              View
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                          ))
+
+                      }
                     </div>
-                    <Button 
-                    onClick={() => {
-                      setActiveItem("Appointments");
-                      router.push("/doctor/appointments");
-                    }}
-                    className="w-full mt-4 health-green">
+                    <Button
+                      onClick={() => {
+                        setActiveItem("Appointments");
+                        router.push("/doctor/appointments");
+                      }}
+                      className="w-full mt-4 health-green">
                       View All Appointments
                     </Button>
                   </CardContent>
@@ -276,7 +282,12 @@ const page = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {recentPatients.map((patient) => (
+                      {
+                      
+                        recentPatients.length === 0 ? (
+                          <p className="text-muted-foreground">No recent patients.</p>
+                        ) :
+                      recentPatients.map((patient) => (
                         <div key={patient.id} className="flex items-center justify-between p-1 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2">
                             <div className="h-7 w-7 bg-green-100 rounded-full flex items-center justify-center">
@@ -293,12 +304,12 @@ const page = () => {
                           </div>
                           <div className="text-right">
                             <p className="text-sm text-muted-foreground">{patient.lastVisit}</p>
-                            <Button 
-                            onClick={() => {
-                              setActiveItem("Patients");
-                              router.push(`/doctor/patient/${patient.id}`);
-                            }}
-                            size="sm" variant="outline" className="mt-1 h-5">
+                            <Button
+                              onClick={() => {
+                                setActiveItem("Patients");
+                                router.push(`/doctor/patient/${patient.id}`);
+                              }}
+                              size="sm" variant="outline" className="mt-1 h-5">
                               View Profile
                             </Button>
                           </div>
@@ -306,10 +317,11 @@ const page = () => {
                       ))}
                     </div>
                     <Button
-                    onClick={() => {
-                      setActiveItem("Patients");
-                      router.push("/doctor/patient");}}
-                     className="w-full mt-4 health-green">
+                      onClick={() => {
+                        setActiveItem("Patients");
+                        router.push("/doctor/patient");
+                      }}
+                      className="w-full mt-4 health-green">
                       View All Patients
                     </Button>
                   </CardContent>
@@ -323,12 +335,12 @@ const page = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Button 
+                    <Button
                       onClick={() => {
                         setActiveItem("Prescriptions");
                         router.push("/doctor/prescriptions");
                       }}
-                    className="health-green  py-4 flex gap-2 h-5">
+                      className="health-green  py-4 flex gap-2 h-5">
                       <FileText className="h-3 w-3 p-0.5" />
                       Write Prescription
                     </Button>
@@ -337,7 +349,7 @@ const page = () => {
                         setActiveItem("Schedule");
                         router.push("/doctor/schedule");
                       }}
-                     className="health-green  py-4 flex gap-2 h-5">
+                      className="health-green  py-4 flex gap-2 h-5">
                       <Calendar className="h-3 w-3 p-0.5" />
                       Schedule Appointment
                     </Button>
@@ -346,7 +358,7 @@ const page = () => {
                         setActiveItem("Chat");
                         router.push("/doctor/chat");
                       }}
-                     className="health-green  py-4 flex gap-2 h-5">
+                      className="health-green  py-4 flex gap-2 h-5">
                       <MessageSquare className="h-3 w-3 p-0.5" />
                       Start Chat
                     </Button>

@@ -476,7 +476,12 @@ const page = () => {
                   <CardContent>
 
                     <div className="space-y-2 max-h-[550px] overflow-y-auto show-scrollbar" >
-                      {filteredAppointmentsByDate.map((appointment) => (
+                      {
+                        filteredAppointmentsByDate.length === 0 ? (
+                          <p className="text-muted-foreground mb-4  ">No appointments for this date.</p>
+                        ) : 
+                      
+                      filteredAppointmentsByDate.map((appointment) => (
                         <div
                           key={appointment.id}
                           className="flex items-center h-5 justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors "

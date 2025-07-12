@@ -11,6 +11,7 @@ import { useSidebarStore } from "@/src/store/useSidebarStore";
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
+import { set } from 'mongoose';
 
 type AppointmentWithPatient = {
   id: string;
@@ -51,6 +52,7 @@ const page = () => {
   const { setActiveItem } = useSidebarStore();
   const [hasFetched, setHasFetched] = useState(false); // New state to track if fetch has occurred
   const [loading, setLoading] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     setActiveItem("Appointments");
@@ -143,10 +145,12 @@ const page = () => {
             onClick={async () => {
               toast.dismiss(t.id);
               try {
+                setUpdatingStatus(true);
                 //  sending the appointmentId and status to the API to confirm the appointment
                 const res = await axios.post("/api/appointment/updateStatus", { appointmentId: appointmentId, status: "CONFIRMED" });
                 if (res.status !== 200) {
                   throw new Error("Failed to confirm appointment");
+                  setUpdatingStatus(false);
                 }
                 toast.success(`✅ Appointment for ${patientName} CONFIRMED!`, {
                   duration: 3000,
@@ -156,6 +160,7 @@ const page = () => {
                     color: "#fff",
                   },
                 });
+                setUpdatingStatus(false);
                 // Optionally, you can refresh the appointments data here
                 window.location.reload(); // Reload the page to reflect changes
 
@@ -168,8 +173,10 @@ const page = () => {
                   style: {
                     background: "#DC3545",
                     color: "#fff",
+
                   },
                 });
+                setUpdatingStatus(false);
               }
             }}
             className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
@@ -201,10 +208,12 @@ const page = () => {
             onClick={async () => {
               toast.dismiss(t.id);
               try {
+                setUpdatingStatus(true);
                 //  sending the appointmentId and status to the API to confirm the appointment
                 const res = await axios.post("/api/appointment/completeAppointment", { appointmentId: appointmentId });
                 if (res.status !== 200) {
                   throw new Error("Failed to confirm appointment");
+                  setUpdatingStatus(false);
                 }
                 toast.success(`✅ Appointment for ${patientName} is Completed! \n
                     you will no longer be able to access ${patientName}'s prescription / notes from the appointment page\n
@@ -216,7 +225,9 @@ const page = () => {
                     background: "#28A745",
                     color: "#fff",
                   },
+
                 });
+                setUpdatingStatus(false);
                 // Optionally, you can refresh the appointments data here
                 window.location.reload(); // Reload the page to reflect changes
 
@@ -231,6 +242,7 @@ const page = () => {
                     color: "#fff",
                   },
                 });
+                setUpdatingStatus(false);
               }
             }}
             className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
@@ -414,6 +426,7 @@ const page = () => {
                                 </Button>
                                 {appointment.status === 'CONFIRMED' && (
                                   <Button
+                                    disabled={updatingStatus}
                                     onClick={() => handleCompleteAppointment(appointment.id, appointment.patient.patientProfile.fullName)}
                                     variant="outline" size="sm" className="bg-[#28A745] text-white">
                                     Complete Appointment
@@ -421,6 +434,7 @@ const page = () => {
                                 )}
                                 {appointment.status === 'PENDING' && (
                                   <Button
+                                    disabled={updatingStatus}
                                     onClick={() => handleConfirmAppointment(appointment.id, appointment.patient.patientProfile.fullName)}
                                     className='bg-[#28A745] text-white' size="sm" variant="outline">
                                     Confirm
