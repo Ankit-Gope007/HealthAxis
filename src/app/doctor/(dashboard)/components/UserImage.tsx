@@ -1,10 +1,10 @@
 "use client"
-import React from 'react'
+import React, { use } from 'react'
 import { User2 } from "lucide-react";
-import { usePatientProfileStore } from '@/src/store/usePatientProfileStore';
+import { useDoctorProfileStore } from '@/src/store/useDoctorProfileStore';
 
 const UserImage = () => {
-    const { profile } = usePatientProfileStore();
+    const { profile } = useDoctorProfileStore();
   return (
     <div className="w-6 h-6 m-1 rounded-full bg-gray-200 flex items-center justify-center">
       {profile?.imageUrl ? (

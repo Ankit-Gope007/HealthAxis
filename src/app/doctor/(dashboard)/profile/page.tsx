@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label";
 import { User, Mail, Phone, MapPin } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
-import { get } from "http";
 import { Textarea } from "@/components/ui/textarea"
 
 type DoctorProfile = {

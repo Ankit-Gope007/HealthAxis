@@ -1,15 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Loader2, Shield } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
 import axios from "axios";
-import { set } from "mongoose";
+
 
 const page = () => {
     const [formData, setFormData] = useState({

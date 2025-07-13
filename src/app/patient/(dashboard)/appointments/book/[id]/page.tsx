@@ -3,14 +3,13 @@ import React from "react";
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { Label } from "@/components/ui/label";
-import { Search, MapPin, User, Calendar as CalendarIcon, ArrowRight, CheckCircle } from "lucide-react";
+import { Calendar as CalendarIcon, ArrowRight, CheckCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import Link from "next/link";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +19,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import { useParams } from "next/navigation";
 
 type DoctorInfo = {
@@ -59,11 +57,12 @@ type AppointmentType = {
 
 
 const page = () => {
-    const router = useRouter();
-    const { id } = useParams();
+    const router = useRouter();  
+    const params = useParams<{id:string}>();
+    const id = params?.id;
     const { profile } = usePatientProfileStore();
     const searchParams = useSearchParams();
-    const preselectedDoctorId = searchParams.get('doctor');
+    const preselectedDoctorId = searchParams?.get('doctor');
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedDoctor, setSelectedDoctor] = useState<String | null>(preselectedDoctorId || null);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);

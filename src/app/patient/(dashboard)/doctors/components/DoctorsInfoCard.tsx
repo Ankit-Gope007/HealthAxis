@@ -2,10 +2,9 @@
 import React from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Star, MapPin } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import Link from 'next/link'
 
 type DoctorsInfoCardProps = {

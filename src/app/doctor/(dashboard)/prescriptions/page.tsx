@@ -9,7 +9,6 @@ import { useState,useEffect } from "react";
 import PrescriptionCard from "./components/PrescriptionCard";
 import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
-import { getStatusStyle } from "@/src/lib/statusStyle";
 import { useSidebarStore } from "@/src/store/useSidebarStore";
 
 type AppointmentPatientData = {

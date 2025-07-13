@@ -1,8 +1,7 @@
 "use client";
-import React, { use } from "react";
+import React from "react";
 import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { PillIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import PrescriptionCard from "./components/PrescriptionCard";
@@ -110,17 +109,6 @@ const page = () => {
 
 
 
-  // Filter prescriptions based on search query
-  // const filteredPrescriptions = {
-  //   current: prescriptions.current.filter(p =>
-  //     p.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     p.medications.some(m => m.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  //   ),
-  //   past: prescriptions.past.filter(p =>
-  //     p.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     p.medications.some(m => m.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  //   )
-  // };
 
   // Filter prescriptions which doesn't have the status "Completed"
   const currentPrescriptions = prescriptionData.filter(p => p.appointment.status !== "COMPLETED");
@@ -131,6 +119,7 @@ const page = () => {
   return (
 
     <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh]'>
+      <Toaster position="top-right" />
       <header className="mb-2 mt-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Prescriptions</h1>
         <p className="text-muted-foreground">View and manage your medical prescriptions</p>

@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Calendar as CalendarIcon,
   Clock,
-  Plus,
   ChevronLeft,
   ChevronRight,
   Users,
@@ -336,6 +335,7 @@ const page = () => {
           (
 
             <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh]  " >
+              <Toaster position="top-right" />
               <header className="mb-8">
                 <div className="flex items-center justify-between">
                   <div>

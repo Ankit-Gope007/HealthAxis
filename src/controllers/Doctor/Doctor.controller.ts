@@ -2,7 +2,6 @@ import { prisma } from "@/src/lib/prisma";
 import { cookies } from "next/headers";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { uploadToCloudinary } from "@/src/helper/uploadToCloudinary";
 import { transporter } from "@/src/lib/mail";
 
 

@@ -6,47 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, X, Search } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Plus, X } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 
-// type AppointmentPatientData = {
-
-//     id: string;
-//     patientId: string;
-//     doctorId: string;
-//     date: string;
-//     timeSlot: string;
-//     reason?: string;
-//     status: string
-//     location: string
-
-//     // Relations
-//     patient: {
-//         email: string;
-//         patientProfile: {
-//             fullName: string;
-//             imageUrl: string;
-//             phone: string;
-//             address: string;
-//             dob: string; // Date of Birth
-//         }
-
-//     }
-
-//     doctor: {
-//         id: string;
-//         doctorProfile: {
-//             fullName: string;
-//             imageUrl: string;
-
-//         }
-//     }
-
-// }
 
 
 interface NewPrescriptionDialogProps {

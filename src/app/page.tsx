@@ -9,7 +9,6 @@ import Testimonial from './components/Testimonial/Testimonial'
 import DoctorLogin from './components/DoctorLogin/DoctorLogin'
 import Footer from './components/Footer/Footer'
 import { useRef } from 'react'
-import PageLoader from "../app/components/PageLoader/PageLoader"
 
 
 const page = () => {

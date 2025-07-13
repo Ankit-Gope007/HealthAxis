@@ -1,9 +1,9 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Calendar, FileText, MessageSquare, Phone, Mail, StickyNote } from "lucide-react";
+import { User, Calendar, Phone, Mail } from "lucide-react";
 import { useParams } from "next/navigation";
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import axios from "axios";
@@ -126,6 +126,7 @@ const patient = data.length > 0 ? {
                     (
                         
                         <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh]  " >
+                            <Toaster position="top-right" />
                             <header className="mb-3 mt-4">
                                 <div className="flex items-center justify-start">
 

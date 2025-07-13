@@ -1,5 +1,3 @@
-import { CANCELLED } from "dns";
-import { string } from "zod";
 
 // Define styles for different appointment statuses
 const statusStyles: Record<string, string> = {

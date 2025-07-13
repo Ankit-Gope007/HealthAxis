@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, X, Mail, FileText, Calendar, Phone, MapPin } from "lucide-react";
+import { Check, X, Mail, FileText } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { set } from "mongoose";
+
 
 type Doctor = {
     id: string;
@@ -27,7 +27,8 @@ type Doctor = {
 
 
 const AdminDoctorDetails = () => {
-    const { id } = useParams();
+    const params = useParams<{ id: string }>();
+    const id = params?.id;
     const [doctor, setDoctor] = useState<Doctor | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -131,7 +132,7 @@ const AdminDoctorDetails = () => {
                                         color: "#fff",
                                     },
                                 });
-                                
+
                             } catch (error) {
                                 setLoading(false);
                                 toast.error(`❌ Failed to verify Dr. ${doctorName}`, {
@@ -227,9 +228,9 @@ const AdminDoctorDetails = () => {
                 </div>
                 <div className="flex flex-col md:flex-row mb-2 md:mb-0  mt-2 space-y-2  space-x-2">
                     {!doctor?.verified && (
-                        <Button 
+                        <Button
                             onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
-                        className="bg-green-600 h-5 w-full  md:w-auto hover:bg-green-700">
+                            className="bg-green-600 h-5 w-full  md:w-auto hover:bg-green-700">
                             <Check className="h-4 w-4 mr-1" />
                             Verify Doctor
                         </Button>
@@ -402,8 +403,8 @@ const AdminDoctorDetails = () => {
                         <CardContent className="space-y-3">
                             {!doctor?.verified && (
                                 <Button
-                                 onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
-                                 className="w-full bg-green-600 hover:bg-green-700 h-5">
+                                    onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
+                                    className="w-full bg-green-600 hover:bg-green-700 h-5">
                                     <Check className="h-4 w-4 mr-2" />
                                     Approve & Verify
                                 </Button>

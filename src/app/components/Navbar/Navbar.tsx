@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import { FaHandHoldingMedical } from "react-icons/fa";
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 type NavbarProps = {

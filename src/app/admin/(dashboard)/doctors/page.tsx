@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Eye, Check, X, Mail, FileText } from "lucide-react";
+import { Search, Eye, Check, X, Mail} from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import Link from 'next/link';
 import axios from 'axios';

@@ -28,7 +28,7 @@ import { User2 } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import Link from 'next/link';
 import SignOutButton from './components/SignOutButton';
-import Username from './components/Username';
+
 
 
 

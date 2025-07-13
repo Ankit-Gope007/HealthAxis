@@ -1,8 +1,7 @@
 import { prisma } from "@/src/lib/prisma";
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { verifyJwt } from "@/src/helper/verifyJwt";
-import { EnumValues } from "zod";
+
 
 // Function to register a new patient with email and password
 export const registerPatientCredential = async (data: { email: string, password: string }) => {

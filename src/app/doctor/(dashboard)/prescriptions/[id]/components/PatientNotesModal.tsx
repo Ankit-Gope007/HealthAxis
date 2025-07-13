@@ -15,7 +15,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Lock, Eye, Save } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { stat } from "fs";
 
 interface PatientNotesModalProps {
   children: React.ReactNode;

@@ -15,11 +15,8 @@ import {
   Phone,
   Mail,
   ArrowLeft,
-  Clock,
-  AlertTriangle,
   Download,
   Edit,
-  Plus,
   StickyNote
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";

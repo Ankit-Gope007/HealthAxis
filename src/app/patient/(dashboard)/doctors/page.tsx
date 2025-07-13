@@ -3,9 +3,6 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import DoctorsInfoCard from './components/DoctorsInfoCard';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CiSearch } from "react-icons/ci";
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -111,6 +108,7 @@ const page = () => {
       </div>
       ):(
       <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
+        <Toaster position="top-right" />
         <div className="p-6 md:p-8 max-w-7xl mx-auto">
           <header className="mb-4">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">Find a Doctor</h1>

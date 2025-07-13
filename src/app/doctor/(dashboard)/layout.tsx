@@ -2,7 +2,6 @@ import Sidebar from './components/sidebar/sidebar'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SessionProvider } from 'next-auth/react'
 import { FaHandHoldingMedical } from "react-icons/fa";
-import { User2 } from "lucide-react";
 import UserImage from './components/UserImage';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {

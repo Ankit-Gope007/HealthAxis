@@ -405,7 +405,7 @@ export async function completeAppointment(appointmentId: string) {
 
 
         // 4. Send an email to the patient about the appointment completion (add the review doc option link only if its the first appointment completed)
-        if (!existingReview) {
+        if (existingReview) {
             await transporter.sendMail({
                 from: "Health Axis <noReply> yourdomain.com",
                 to: updatedAppointment.patient.email,

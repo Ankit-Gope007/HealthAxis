@@ -11,7 +11,6 @@ import { useSidebarStore } from "@/src/store/useSidebarStore";
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
-import { set } from 'mongoose';
 
 type AppointmentWithPatient = {
   id: string;

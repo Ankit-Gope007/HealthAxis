@@ -1,5 +1,4 @@
 import { prisma } from "@/src/lib/prisma";
-import { m } from "framer-motion";
 
 type medicineType = {
     name: string;

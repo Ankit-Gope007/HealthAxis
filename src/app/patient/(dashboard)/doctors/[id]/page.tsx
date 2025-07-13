@@ -11,7 +11,6 @@ import Link from "next/link";
 import {
     Star,
     MapPin,
-    Clock,
     Phone,
     Mail,
     Calendar,
