@@ -2,15 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type SidebarStore = {
-    activeItem: String;
-    setActiveItem: (item: String) => void;
+    activeItem: string;
+    setActiveItem: (item: string) => void;
 }
 
 export const useSidebarStore = create<SidebarStore>()(
     persist(
         (set) => ({
             activeItem: "dashboard",
-            setActiveItem: (item: String) => set({ activeItem: item })
+            setActiveItem: (item: string) => set({ activeItem: item })
 
         }),
         {

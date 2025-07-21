@@ -1,7 +1,7 @@
 "use client";
 
-import { useState,useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {useEffect } from "react";
+// import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Users, UserCheck, Calendar, Activity, UserPlus, Mail,
@@ -12,13 +12,12 @@ import { Button } from "@/components/ui/button";
 import { useSidebarStore } from '@/src/store/useSidebarStore';
 
 const Page = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const {setActiveItem} = useSidebarStore();
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     setActiveItem("Dashboard"); // Set the active item to "Dashboard" when the component mounts
-  }, [])
+  }, [setActiveItem])
   
 
   const insights = [
@@ -92,7 +91,7 @@ const Page = () => {
     <div className="w-full lg:w-[90%] lg:ml-14 h-[100vh] bg-[#f9fdfb] ">
       <header>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Welcome back, Admin!</h1>
-        <p className="text-gray-500">Here's what's happening with your platform today.</p>
+        <p className="text-gray-500">Here&apos;s what&apos;s happening with your platform today.</p>
       </header>
 
       {/* separator */}

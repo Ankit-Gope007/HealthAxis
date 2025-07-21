@@ -16,8 +16,34 @@ export async function getMessages(appointmentId: string) {
     const messages = await prisma.message.findMany({
         where: { appointmentId },
         include: {
-            sender: true,
-            receiver: true,
+            sender: {
+                select: {
+                    id: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    profileSetup: true,
+                    accessToken: true,
+                    refreshToken: true,
+                    expiresAt: true,
+                    // password excluded
+                },
+            },
+            receiver: {
+                select: {
+                    id: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    profileSetup: true,
+                    accessToken: true,
+                    refreshToken: true,
+                    expiresAt: true,
+                    // password excluded
+                },
+            },
         },
     });
 

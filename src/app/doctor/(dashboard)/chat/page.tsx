@@ -17,6 +17,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { useSocket } from "@/src/lib/useSocket";
+  import { useCallback } from "react";
 
 
 type AppointmentPatientData = {
@@ -53,33 +54,57 @@ type AppointmentPatientData = {
 
 }
 
-type Message = {
-  id: number;
-  sender: "doctor" | "patient";
-  content: string;
-  time: string;
-  avatar?: string;
-  isFile?: boolean;
-};
-
-type MessagePayload = {
-  appointmentId: string;
+type MessageResponse = {
+  appiointmentId: string;
   senderId: string;
   receiverId: string;
   content: string;
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+  sender: {
+    id: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+    profileSetup: boolean;
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: string;
+  };
+  receiver: {
+    id: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+    profileSetup: boolean;
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: string;
+  };
 };
+
+type Messages = {
+  id: string;
+  sender: "doctor" | "patient";
+  content: string;
+  time: string;
+  avatar: string;
+}
 
 const Chat = () => {
   const [selectedChat, setSelectedChat] = useState(null as string | null);
   const [message, setMessage] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
-  const [showVideoCall, setShowVideoCall] = useState(false);
-  const [showFileAttachment, setShowFileAttachment] = useState(false);
+  const [messages, setMessages] = useState<Messages[]>([]);
+  // const [showVideoCall, setShowVideoCall] = useState(false);
+  // const [showFileAttachment, setShowFileAttachment] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useDoctorProfileStore() // Assuming you have a store for patient profile
   const [appointmentsData, setAppointmentsData] = useState<AppointmentPatientData[]>([]);
-   const bottomRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const [appointmentLoading, setAppointmentLoading] = useState(false);
 
 
@@ -104,69 +129,22 @@ const Chat = () => {
 
   }, [profile]);
 
-   useEffect(() => {
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-  useEffect(() => {
-    if (!socket || !selectedConversation) return;
-
-    socket.emit("joinRoom", { appointmentId: selectedConversation.id });
-
-   
-
-    socket.on("newMessage", (msg) => {
-      const timeString = msg.createdAt
-        ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-      const newMsg = {
-        id: msg.id ?? Date.now(),
-        sender: msg.senderId === selectedConversation?.patientId ? "patient" : "doctor",
-        content: msg.content,
-        time: timeString,
-        avatar: msg.senderId === selectedConversation?.patientId
-          ? selectedConversation?.patient?.patientProfile?.imageUrl || ""
-          : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl || "",
-      };
-
-      setMessages((prev) => [...prev, newMsg]);
-    });
-
-    fetchMessages(selectedConversation.id);
-
-    return () => {
-      socket.off("newMessage");
-    };
-  }, [socket, selectedConversation]);
-
-  const fetchAppointments = async (id: string) => {
-    try {
-      setAppointmentLoading(true);
-      console.log("Fetching appointments for patient ID:", id);
-      const response = await axios.get(`/api/appointment/getAllForDoctor?doctorId=${id}`);
-      if (response.status === 200) {
-        console.log("Appointments fetched successfully:", response.data);
-        setAppointmentsData(response.data);
-        setAppointmentLoading(false);
-      } else {
-        console.error("Failed to fetch appointments:", response.statusText);
-        setAppointmentLoading(false);
-      }
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-      setAppointmentLoading(false);
-    }
-  };
 
   // Get all the previous messages that are already stored in the database
-  const fetchMessages = async (appointmentId: string) => {
+
+
+  const fetchMessages = useCallback(async (appointmentId: string) => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/messages/getMessages?appointmentId=${appointmentId}`);
       console.log("Fetching messages for appointment ID:", appointmentId);
       console.log("Response data:", response.data);
       if (response.status === 200) {
-        const fetchedMessages = response.data.map((msg: any) => ({
+        console.log("Messages fetched successfully:", response.data);
+        const fetchedMessages = response.data.map((msg: MessageResponse) => ({
           id: msg.id,
           sender: msg.senderId === selectedConversation?.patientId ? 'patient' : 'doctor',
           content: msg.content,
@@ -187,10 +165,63 @@ const Chat = () => {
       toast.error("Failed to fetch messages");
 
     }
-  }
+  }, [selectedConversation, profile]);
 
-  const chatListData = filteredConversations.filter((conversation) =>{
-    return conversation.status === "CONFIRMED" 
+  useEffect(() => {
+    if (!socket || !selectedConversation) return;
+
+    socket.emit("joinRoom", { appointmentId: selectedConversation.id });
+
+
+
+    socket.on("newMessage", (msg) => {
+      const timeString = msg.createdAt
+        ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+      const newMsg: Messages = {
+        id: msg.id ?? Date.now(),
+        sender: msg.senderId === selectedConversation?.patientId ? "patient" : "doctor",
+        content: msg.content,
+        time: timeString,
+        avatar: msg.senderId === selectedConversation?.patientId
+          ? selectedConversation?.patient?.patientProfile?.imageUrl || ""
+          : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl || "",
+      };
+
+      setMessages((prev) => [...prev, newMsg]);
+    });
+
+    fetchMessages(selectedConversation.id);
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [socket, selectedConversation, fetchMessages, profile?.imageUrl]);
+
+  const fetchAppointments = async (id: string) => {
+    try {
+      setAppointmentLoading(true);
+      console.log("Fetching appointments for patient ID:", id);
+      const response = await axios.get(`/api/appointment/getAllForDoctor?doctorId=${id}`);
+      if (response.status === 200) {
+        console.log("Appointments fetched successfully:", response.data);
+        setAppointmentsData(response.data);
+        setAppointmentLoading(false);
+      } else {
+        console.error("Failed to fetch appointments:", response.statusText);
+        setAppointmentLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      setAppointmentLoading(false);
+    }
+  };
+
+
+
+  const chatListData = filteredConversations.filter((conversation) => {
+    return conversation.status === "CONFIRMED"
   })
 
 
@@ -221,7 +252,7 @@ const Chat = () => {
 
   const handleVideoCall = () => {
     toast("Video call feature is not implemented yet.");
-    setShowVideoCall(true);
+    // setShowVideoCall(true);
   };
 
   // const handleSendFile = (files: File[]) => {
@@ -274,37 +305,37 @@ const Chat = () => {
                   <div className="loading-animation h-10 w-10"></div>
                 </div>
               )
-            :
-            chatListData.map((conversation) => (
-              <div
-                key={conversation.id}
-                onClick={() => setSelectedChat(conversation.id)}
-                className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-green-50 border-r-2 border-r-green-500' : ''
-                  }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={conversation.patient.patientProfile?.imageUrl} />
-                      <AvatarFallback className="bg-green-100 text-green-700">
-                        {conversation.patient.patientProfile.fullName.split(" ").map(n => n[0]).join("")}
-                      </AvatarFallback>
-                    </Avatar>
+                :
+                chatListData.map((conversation) => (
+                  <div
+                    key={conversation.id}
+                    onClick={() => setSelectedChat(conversation.id)}
+                    className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-green-50 border-r-2 border-r-green-500' : ''
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={conversation.patient.patientProfile?.imageUrl} />
+                          <AvatarFallback className="bg-green-100 text-green-700">
+                            {conversation.patient.patientProfile.fullName.split(" ").map(n => n[0]).join("")}
+                          </AvatarFallback>
+                        </Avatar>
 
-                  </div>
+                      </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center w-full justify-between">
-                      <h3 className="font-medium text-gray-900 truncate">{conversation.patient.patientProfile.fullName}</h3>
-                      {/* <span className="text-xs text-muted-foreground">{conversation.time}</span> */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center w-full justify-between">
+                          <h3 className="font-medium text-gray-900 truncate">{conversation.patient.patientProfile.fullName}</h3>
+                          {/* <span className="text-xs text-muted-foreground">{conversation.time}</span> */}
+                        </div>
+                        <p className="text-xs text-health-600 mb-1">{conversation.patient.patientProfile.phone}</p>
+
+                      </div>
+
                     </div>
-                    <p className="text-xs text-health-600 mb-1">{conversation.patient.patientProfile.phone}</p>
-            
                   </div>
-
-                </div>
-              </div>
-            ))}
+                ))}
           </div>
         </div>
 
@@ -380,7 +411,7 @@ const Chat = () => {
                             </p>
                           </div>
                         </div>
-                        
+
                       ))}
                       <div ref={bottomRef} />
                     </div>
@@ -390,7 +421,7 @@ const Chat = () => {
               {/* Message Input */}
               <div className="p-1 bg-white border-t">
                 <div className="flex items-center gap-2">
-                  <Button className="h-5 w-5" variant="outline" onClick={() => setShowFileAttachment(true)}>
+                  <Button className="h-5 w-5" variant="outline" >
                     <Paperclip className="h-4 w-4" />
                   </Button>
                   <div className="flex-1 relative">

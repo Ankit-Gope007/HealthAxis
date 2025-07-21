@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Clock, User, MessageSquare } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
 import { useState } from "react";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { useSidebarStore } from "@/src/store/useSidebarStore";
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type AppointmentWithPatient = {
   id: string;
@@ -43,7 +44,7 @@ type AppointmentWithPatient = {
   };
 };
 
-const page = () => {
+const Page = () => {
   const { profile } = useDoctorProfileStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -166,6 +167,7 @@ const page = () => {
                 // Optional: Refresh data after confirm
                 // await refetchAppointments();
               } catch (error) {
+                console.error("Error confirming appointment:", error);
                 toast.error(`❌ Could not confirm appointment for ${patientName}`, {
                   duration: 3000,
                   position: "top-right",
@@ -233,6 +235,7 @@ const page = () => {
                 // Optional: Refresh data after confirm
                 // await refetchAppointments();
               } catch (error) {
+                console.log ("Error confirming appointment:", error);
                 toast.error(`❌ Could not confirm appointment for ${patientName}`, {
                   duration: 3000,
                   position: "top-right",
@@ -381,9 +384,11 @@ const page = () => {
                               <div className="flex items-center gap-3">
                                 <div className="h-6 w-6 bg-health-100 rounded-full flex items-center justify-center">
                                   {appointment.patient.patientProfile.imageUrl ? (
-                                    <img
+                                    <Image
                                       src={appointment.patient.patientProfile.imageUrl}
                                       alt={appointment.patient.patientProfile.fullName}
+                                      width={24}
+                                      height={24}
                                       className="h-full w-full rounded-full object-cover"
                                     />
                                   ) : (
@@ -455,4 +460,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

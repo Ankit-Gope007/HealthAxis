@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, Shield } from "lucide-react";
@@ -6,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from "axios";
 
 
-const page = () => {
+const Page = () => {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -53,7 +54,7 @@ const page = () => {
                 setTimeout(() => {
                     router.push("/admin/dashboard");
                 }, 2500);
-                
+
             } else {
                 setIsLoading(false);
                 toast.error("Login failed. Please check your credentials.");
@@ -64,13 +65,13 @@ const page = () => {
             toast.error("An error occurred while processing your request");
             console.error("Login error:", error);
             return;
-            
+
         }
-        
+
     };
 
     return (
-     
+
         <div className="min-h-screen flex items-center justify-center bg-[#f4fcf7] px-4 py-10">
             <Toaster position="top-right" />
             <div className="w-full max-w-md bg-white rounded-xl shadow-md px-6 py-3">
@@ -162,4 +163,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

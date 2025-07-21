@@ -16,7 +16,7 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, label, link }) => {
     const router = useRouter();
     const { activeItem, setActiveItem } = useSidebarStore()
 
-    const handleNavigation = (label: String, link: String) => {
+    const handleNavigation = (label: string, link: string) => {
         if (activeItem === label) return; // Prevent navigation if the item is already active
         setActiveItem(label); // Update the active item in the store
         router.push(`/admin/${link}`); // Navigate to the new link

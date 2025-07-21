@@ -32,15 +32,11 @@ const AdminDoctorDetails = () => {
     const [doctor, setDoctor] = useState<Doctor | null>(null);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        doctorsData();
-    }
-        , [id]);
-
-    const doctorsData = async () => {
+    const doctorsData = React.useCallback(async () => {
         try {
+            setLoading(true);
             console.log("Fetching doctor data for ID:", id);
-            const response = await axios.get(`/api/doctor/getById?id=${id}`);
+            const response = await axios.get(`/api/doctor/getById?doctorId=${id}`);
             console.log("Response Status:", response.status);
             if (response.status === 200) {
                 const doctor = response.data.data;
@@ -60,15 +56,23 @@ const AdminDoctorDetails = () => {
                     createdAt: doctor.createdAt,
 
                 });
+            setLoading(false);
             } else {
                 console.error("Failed to fetch doctor data");
+                setLoading(false);
             }
 
         } catch (error) {
             console.error("Error fetching doctor data:", error);
-
+            setLoading(false);
         }
-    }
+    }, [id]);
+
+    useEffect(() => {
+        if (id) {
+            doctorsData();
+        }
+    }, [id, doctorsData]);
 
 
 
@@ -133,7 +137,7 @@ const AdminDoctorDetails = () => {
                                     },
                                 });
 
-                            } catch (error) {
+                            } catch {
                                 setLoading(false);
                                 toast.error(`❌ Failed to verify Dr. ${doctorName}`, {
                                     duration: 3000,
@@ -185,7 +189,7 @@ const AdminDoctorDetails = () => {
                                     },
                                 });
 
-                            } catch (error) {
+                            } catch {
                                 toast.error(`❌ Failed to reject Dr. ${doctorName}`, {
                                     duration: 3000,
                                     position: "top-right",
@@ -217,83 +221,92 @@ const AdminDoctorDetails = () => {
     };
 
     return (
-
-        <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
-            {/* Header */}
-            <Toaster />
-            <div className="flex justify-between items-start">
-                <div className="m-2">
-                    <h1 className="text-3xl font-bold text-gray-900">{doctor?.name}</h1>
-                    <p className="text-muted-foreground">Doctor Details & Management</p>
-                </div>
-                <div className="flex flex-col md:flex-row mb-2 md:mb-0  mt-2 space-y-2  space-x-2">
-                    {!doctor?.verified && (
-                        <Button
-                            onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
-                            className="bg-green-600 h-5 w-full  md:w-auto hover:bg-green-700">
-                            <Check className="h-4 w-4 mr-1" />
-                            Verify Doctor
-                        </Button>
-                    )}
-                    <Button variant="outline" className="h-5" onClick={handleSendEmail}>
-                        <Mail className="h-4 w-4 mr-1" />
-                        Send Email
-                    </Button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Doctor Information */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Basic Info */}
-                    <Card className="gap-3">
-                        <CardHeader className="">
-                            <CardTitle className="flex items-center justify-between">
-                                Doctor Information
-                                <Badge variant={doctor?.verified ? "default" : "secondary"}>
-                                    {doctor?.verified ? "Verified" : "Pending Verification"}
-                                </Badge>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2 ">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-sm font-medium text-muted-foreground">Full Name</label>
-                                    <p className="text-sm">{doctor?.name}</p>
+        <>
+            {
+                loading ?
+                    (
+                        <div className="flex items-center justify-center h-screen">
+                            <div className="loading-animation h-10 w-10"></div>
+                        </div>
+                    )
+                    :
+                    (
+                        <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
+                            {/* Header */}
+                            <Toaster />
+                            <div className="flex justify-between items-start">
+                                <div className="m-2">
+                                    <h1 className="text-3xl font-bold text-gray-900">{doctor?.name}</h1>
+                                    <p className="text-muted-foreground">Doctor Details & Management</p>
                                 </div>
-                                <div>
-                                    <label className="text-sm font-medium text-muted-foreground">Email</label>
-                                    <p className="text-sm">{doctor?.email}</p>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium text-muted-foreground">Phone</label>
-                                    <p className="text-sm">{doctor?.phone}</p>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium text-muted-foreground">Specialization</label>
-                                    <p className="text-sm">{doctor?.specialization}</p>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium text-muted-foreground">Experience</label>
-                                    <p className="text-sm">{doctor?.experience} years</p>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium text-muted-foreground">License Number</label>
-                                    <p className="text-sm">{doctor?.licenseNumber}</p>
+                                <div className="flex flex-col md:flex-row mb-2 md:mb-0  mt-2 space-y-2  space-x-2">
+                                    {!doctor?.verified && (
+                                        <Button
+                                            onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
+                                            className="bg-green-600 h-5 w-full  md:w-auto hover:bg-green-700">
+                                            <Check className="h-4 w-4 mr-1" />
+                                            Verify Doctor
+                                        </Button>
+                                    )}
+                                    <Button variant="outline" className="h-5" onClick={handleSendEmail}>
+                                        <Mail className="h-4 w-4 mr-1" />
+                                        Send Email
+                                    </Button>
                                 </div>
                             </div>
 
-                            {/* <div>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Doctor Information */}
+                                <div className="lg:col-span-2 space-y-6">
+                                    {/* Basic Info */}
+                                    <Card className="gap-3">
+                                        <CardHeader className="">
+                                            <CardTitle className="flex items-center justify-between">
+                                                Doctor Information
+                                                <Badge variant={doctor?.verified ? "default" : "secondary"}>
+                                                    {doctor?.verified ? "Verified" : "Pending Verification"}
+                                                </Badge>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-2 ">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">Full Name</label>
+                                                    <p className="text-sm">{doctor?.name}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">Email</label>
+                                                    <p className="text-sm">{doctor?.email}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                                                    <p className="text-sm">{doctor?.phone}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">Specialization</label>
+                                                    <p className="text-sm">{doctor?.specialization}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">Experience</label>
+                                                    <p className="text-sm">{doctor?.experience} years</p>
+                                                </div>
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">License Number</label>
+                                                    <p className="text-sm">{doctor?.licenseNumber}</p>
+                                                </div>
+                                            </div>
+
+                                            {/* <div>
                   <label className="text-sm font-medium text-muted-foreground">Address</label>
                   <p className="text-sm">{doctor.address}</p>
                 </div> */}
 
-                            {/* <div>
+                                            {/* <div>
                   <label className="text-sm font-medium text-muted-foreground">Education</label>
                   <p className="text-sm">{doctor.education}</p>
                 </div> */}
 
-                            {/* <div>
+                                            {/* <div>
                   <label className="text-sm font-medium text-muted-foreground">Certifications</label>
                   <div className="flex flex-wrap gap-2 mt-1">
                    
@@ -305,152 +318,158 @@ const AdminDoctorDetails = () => {
                   </div>
                 </div> */}
 
-                            {/* <div>
+                                            {/* <div>
                   <label className="text-sm font-medium text-muted-foreground">Bio</label>
                   <p className="text-sm">{doctor.bio}</p>
                 </div> */}
-                        </CardContent>
-                    </Card>
+                                        </CardContent>
+                                    </Card>
 
-                    {/* Appointments */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Recent Appointments</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Patient</TableHead>
-                                        <TableHead>Date & Time</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {appointments.map((appointment) => (
-                                        <TableRow key={appointment.id}>
-                                            <TableCell className="font-medium">{appointment.patientName}</TableCell>
-                                            <TableCell>
-                                                <div>
-                                                    <div>{appointment.date}</div>
-                                                    <div className="text-sm text-muted-foreground">{appointment.time}</div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{appointment.type}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={
-                                                    appointment.status === "Completed" ? "default" :
-                                                        appointment.status === "Scheduled" ? "secondary" : "outline"
-                                                }>
-                                                    {appointment.status}
-                                                </Badge>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </div>
+                                    {/* Appointments */}
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Recent Appointments</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Patient</TableHead>
+                                                        <TableHead>Date & Time</TableHead>
+                                                        <TableHead>Type</TableHead>
+                                                        <TableHead>Status</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {appointments.map((appointment) => (
+                                                        <TableRow key={appointment.id}>
+                                                            <TableCell className="font-medium">{appointment.patientName}</TableCell>
+                                                            <TableCell>
+                                                                <div>
+                                                                    <div>{appointment.date}</div>
+                                                                    <div className="text-sm text-muted-foreground">{appointment.time}</div>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>{appointment.type}</TableCell>
+                                                            <TableCell>
+                                                                <Badge variant={
+                                                                    appointment.status === "Completed" ? "default" :
+                                                                        appointment.status === "Scheduled" ? "secondary" : "outline"
+                                                                }>
+                                                                    {appointment.status}
+                                                                </Badge>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </CardContent>
+                                    </Card>
+                                </div>
 
-                {/* License & Actions */}
-                <div className="space-y-2">
-                    {/* License Document */}
-                    <Card className="px-0 gap-2">
-                        <CardHeader>
-                            <CardTitle>License Document</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" className="w-full h-5">
-                                        <FileText className="h-3 w-3 mr-2" />
-                                        View License
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-3xl p-6">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-lg font-semibold">
-                                            License Document - {doctor?.name}
-                                            <span className="text-sm text-muted-foreground ml-2">
-                                                {doctor?.licenseNumber}
-                                            </span>
-                                        </DialogTitle>
-                                    </DialogHeader>
+                                {/* License & Actions */}
+                                <div className="space-y-2">
+                                    {/* License Document */}
+                                    <Card className="px-0 gap-2">
+                                        <CardHeader>
+                                            <CardTitle>License Document</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline" className="w-full h-5">
+                                                        <FileText className="h-3 w-3 mr-2" />
+                                                        View License
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-w-3xl p-6">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="text-lg font-semibold">
+                                                            License Document - {doctor?.name}
+                                                            <span className="text-sm text-muted-foreground ml-2">
+                                                                {doctor?.licenseNumber}
+                                                            </span>
+                                                        </DialogTitle>
+                                                    </DialogHeader>
 
 
 
-                                    <div className="w-full rounded-lg overflow-hidden border border-gray-300 shadow-sm">
-                                        <iframe
-                                            src={doctor?.licenseUrl}
-                                            title="License Document"
-                                            className="w-full h-[500px] rounded-md"
-                                            style={{ border: "none" }}
-                                        ></iframe>
-                                    </div>
+                                                    <div className="w-full rounded-lg overflow-hidden border border-gray-300 shadow-sm">
+                                                        <iframe
+                                                            src={doctor?.licenseUrl}
+                                                            title="License Document"
+                                                            className="w-full h-[500px] rounded-md"
+                                                            style={{ border: "none" }}
+                                                        ></iframe>
+                                                    </div>
 
-                                </DialogContent>
-                            </Dialog>
-                        </CardContent>
-                    </Card>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </CardContent>
+                                    </Card>
 
-                    {/* Quick Actions */}
-                    <Card className="px-0 gap-2">
-                        <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            {!doctor?.verified && (
-                                <Button
-                                    onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
-                                    className="w-full bg-green-600 hover:bg-green-700 h-5">
-                                    <Check className="h-4 w-4 mr-2" />
-                                    Approve & Verify
-                                </Button>
-                            )}
+                                    {/* Quick Actions */}
+                                    <Card className="px-0 gap-2">
+                                        <CardHeader>
+                                            <CardTitle>Quick Actions</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3">
+                                            {!doctor?.verified && (
+                                                <Button
+                                                    onClick={() => handleVerify(doctor?.id || "", doctor?.name || "")}
+                                                    className="w-full bg-green-600 hover:bg-green-700 h-5">
+                                                    <Check className="h-4 w-4 mr-2" />
+                                                    Approve & Verify
+                                                </Button>
+                                            )}
 
-                            <Button variant="outline"
-                                onClick={() => handleReject(doctor?.id || "", doctor?.name || "")}
-                                className="w-full text-red-600 hover:text-red-700 h-5">
-                                <X className="h-4 w-4 mr-2" />
-                                Reject Application
-                            </Button>
+                                            <Button variant="outline"
+                                                onClick={() => handleReject(doctor?.id || "", doctor?.name || "")}
+                                                className="w-full text-red-600 hover:text-red-700 h-5">
+                                                <X className="h-4 w-4 mr-2" />
+                                                Reject Application
+                                            </Button>
 
-                            <Button variant="outline" onClick={handleSendEmail} className="w-full h-5">
-                                <Mail className="h-4 w-4 mr-2" />
-                                Send Email
-                            </Button>
-                        </CardContent>
-                    </Card>
+                                            <Button variant="outline" onClick={handleSendEmail} className="w-full h-5">
+                                                <Mail className="h-4 w-4 mr-2" />
+                                                Send Email
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
 
-                    {/* Statistics */}
-                    <Card className="mt-4">
-                        <CardHeader>
-                            <CardTitle>Statistics</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Total Appointments</span>
-                                <span className="text-sm font-medium">48</span>
+                                    {/* Statistics */}
+                                    <Card className="mt-4">
+                                        <CardHeader>
+                                            <CardTitle>Statistics</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3">
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-muted-foreground">Total Appointments</span>
+                                                <span className="text-sm font-medium">48</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-muted-foreground">This Month</span>
+                                                <span className="text-sm font-medium">12</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-muted-foreground">Patient Rating</span>
+                                                <span className="text-sm font-medium">4.8/5.0</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-muted-foreground">Joined</span>
+                                                <span className="text-sm font-medium"> {new Date(doctor?.createdAt || "").toLocaleDateString()}</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">This Month</span>
-                                <span className="text-sm font-medium">12</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Patient Rating</span>
-                                <span className="text-sm font-medium">4.8/5.0</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Joined</span>
-                                <span className="text-sm font-medium"> {new Date(doctor?.createdAt || "").toLocaleDateString()}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-        </div>
+                        </div >
+                    )
+            }
+
+        </>
+
+
 
     );
 };

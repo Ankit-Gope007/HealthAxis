@@ -3,6 +3,11 @@ import { getDoctorById } from "@/src/controllers/Doctor/Doctor.controller";
 import jwt from 'jsonwebtoken';
 import { cookies } from "next/headers";
 
+interface DecodedToken {
+    id: string;
+    // add other properties if needed
+}
+
 export async function GET(req: Request) {
     try {
         const cookieStore = await cookies();
@@ -11,7 +16,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Authorizationtoken is required" }, { status: 401 });
         }
         // Verify the token
-        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as DecodedToken;
         if (!decoded || !decoded.id) {
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
         }

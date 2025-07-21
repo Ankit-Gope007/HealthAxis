@@ -48,11 +48,11 @@ type DoctorInfo = {
 };
 
 type AppointmentType = {
-    patientId: String;
-    doctorId: String;
+    patientId: string;
+    doctorId: string;
     date: Date;
-    timeSlot: String;
-    reason: String;
+    timeSlot: string;
+    reason: string;
 }
 
 
@@ -63,7 +63,7 @@ const page = () => {
     const preselectedDoctorId = searchParams?.get("doctorId");
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedDoctor, setSelectedDoctor] = useState<String | null>(preselectedDoctorId || null);
+    const [selectedDoctor, setSelectedDoctor] = useState<string | null>(preselectedDoctorId || null);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
     const [appointmentReason, setAppointmentReason] = useState("");
