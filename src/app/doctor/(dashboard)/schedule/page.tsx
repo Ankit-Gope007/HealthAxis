@@ -54,7 +54,7 @@ type AppointmentWithPatient = {
   };
 };
 
-const page = () => {
+const Page = () => {
 
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -111,10 +111,10 @@ const page = () => {
   const confirmedAppointments = filteredAppointmentsByDate.filter(appointment => appointment.status === 'CONFIRMED');
 
   // 3. Pending Appointments filtered by date
-  const pendingAppointments = filteredAppointmentsByDate.filter((app) => { app.status === 'PENDING' });
+  const pendingAppointments = filteredAppointmentsByDate.filter(app => app.status === 'PENDING' );
 
   // 4. Cancelled Appointments filtered by date
-  const cancelledAppointments = filteredAppointmentsByDate.filter((app) => { app.status === 'CANCELLED' });
+  const cancelledAppointments = filteredAppointmentsByDate.filter(app => app.status === 'CANCELLED' );
 
 
   useEffect(() => {
@@ -243,18 +243,12 @@ const page = () => {
   //   { day: "Sun", date: "21", appointments: 0 }
   // ];
 
-  const timeSlots = [
-    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-    "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM"
-  ];
+
 
   // const totalAppointments = todayAppointments.length;
   // const confirmedCount = todayAppointments.filter(a => a.status === 'confirmed').length;
   // const pendingCount = todayAppointments.filter(a => a.status === 'pending').length;
 
-  const handleNewAppointment = () => {
-    toast("New appointment created successfully!")
-  };
 
   // const handleViewMode = (mode: "day" | "week") => {
   //   setViewMode(mode);
@@ -269,16 +263,7 @@ const page = () => {
     toast("Navigated to " + newDate.toLocaleDateString());
   };
 
-  const handleAppointmentDetails = (appointmentId: string) => {
-    const appointment = filteredAppointmentsByDate.find(a => a.id === appointmentId);
-    toast("Appointment Details:\n" +
-      `Patient: ${appointment?.patient}\n` +
-      `Time: ${appointment?.timeSlot}\n` +
-      `Type: ${appointment?.reason}\n` +
-      `Status: ${appointment?.status}\n` +
-      `Image: ${appointment?.patient.patientProfile.imageUrl ? appointment.patient.patientProfile.imageUrl : "No image available"}`);
-    // Here you can also navigate to a detailed appointment page if needed
-  };
+
 
 
 
@@ -529,4 +514,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

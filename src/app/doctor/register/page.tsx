@@ -10,7 +10,7 @@ import axios from "axios";
 import { doctorRegisterSchemaWithPasswordMatch } from "@/src/utils/doctorFormValidator";
 import "./page.css";
 
-const page = () => {
+const Page = () => {
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -355,4 +355,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

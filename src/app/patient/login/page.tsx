@@ -1,8 +1,6 @@
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import LoginForm from "./components/LoginForm"
 import SignInForm from "./components/SignInForm"
 

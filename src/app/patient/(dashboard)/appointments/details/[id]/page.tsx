@@ -49,7 +49,7 @@ type AppointmentData = {
     };
 }
 
-const page = () => {
+const Page = () => {
     const params = useParams<{ id: string }>();
     const id = params?.id;
     const router = useRouter();
@@ -103,13 +103,6 @@ const page = () => {
     }, [id]);
 
 
-
-    const statusLabels = {
-        pending: "Pending",
-        approved: "Approved",
-        completed: "Completed",
-        cancelled: "Cancelled",
-    };
 
     return (
         <>
@@ -341,4 +334,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

@@ -11,7 +11,7 @@ import Footer from './components/Footer/Footer'
 import { useRef } from 'react'
 
 
-const page = () => {
+const Page = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
   const doctorRef = useRef<HTMLDivElement>(null);
   const reviewRef = useRef<HTMLDivElement>(null);
@@ -42,4 +42,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

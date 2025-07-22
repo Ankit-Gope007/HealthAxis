@@ -49,7 +49,7 @@ type AppointmentPatientData = {
 
 
 
-const page = () => {
+const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [appointmentsData, setAppointmentsData] = useState<AppointmentPatientData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -68,7 +68,7 @@ const page = () => {
     }
 
 
-  }, [profile]);
+  }, [profile, setActiveItem]);
 
 
   const fetchAppointments = async (id: string) => {
@@ -251,4 +251,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

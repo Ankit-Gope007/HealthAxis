@@ -18,6 +18,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
 import { useSocket } from "@/src/lib/useSocket";
 import { useRef } from "react";
+ import { useCallback } from "react";
 
 
 type AppointmentDoctorData = {
@@ -51,29 +52,29 @@ type AppointmentDoctorData = {
 
 }
 
-type Message = {
-    id: number;
-    sender: "doctor" | "patient";
-    content: string;
-    time: string;
-    avatar?: string;
-    isFile?: boolean;
-};
+// type Message = {
+//     id: number;
+//     sender: "doctor" | "patient";
+//     content: string;
+//     time: string;
+//     avatar?: string;
+//     isFile?: boolean;
+// };
 
-type MessagePayload = {
-    appointmentId: string;
-    senderId: string;
-    receiverId: string;
-    content: string;
-};
+// type MessagePayload = {
+//     appointmentId: string;
+//     senderId: string;
+//     receiverId: string;
+//     content: string;
+// };
 
 const Chat = () => {
     const [selectedChat, setSelectedChat] = useState(null as string | null);
     const [message, setMessage] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
     const [messages, setMessages] = useState<any[]>([]);
-    const [showVideoCall, setShowVideoCall] = useState(false);
-    const [showFileAttachment, setShowFileAttachment] = useState(false);
+    // const [showVideoCall, setShowVideoCall] = useState(false);
+    // const [showFileAttachment, setShowFileAttachment] = useState(false);
     const [loading, setLoading] = useState(false);
     const { profile } = usePatientProfileStore(); // Assuming you have a store for patient profile
     const [appointmentsData, setAppointmentsData] = useState<AppointmentDoctorData[]>([]);
@@ -82,38 +83,7 @@ const Chat = () => {
 
     const { socket } = useSocket(); // Custom hook to manage socket connection
 
-    const conversations = [
-        {
-            id: 1,
-            name: "Dr. Sarah Wilson",
-            specialty: "Cardiologist",
-            lastMessage: "Your test results look good. Let's schedule a follow-up.",
-            time: "2:30 PM",
-            unread: 2,
-            online: true,
-            image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=200&auto=format&fit=crop"
-        },
-        {
-            id: 2,
-            name: "Dr. Michael Chen",
-            specialty: "General Practitioner",
-            lastMessage: "Please take the medication as prescribed.",
-            time: "1:15 PM",
-            unread: 0,
-            online: false,
-            image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop"
-        },
-        {
-            id: 3,
-            name: "Dr. Emily Johnson",
-            specialty: "Dermatologist",
-            lastMessage: "The appointment is confirmed for tomorrow.",
-            time: "11:45 AM",
-            unread: 1,
-            online: true,
-            image: "https://images.unsplash.com/photo-1594824708400-61b5ad3e0023?q=80&w=200&auto=format&fit=crop"
-        }
-    ];
+ 
 
     const selectedConversation = appointmentsData.find(c => c.id === selectedChat);
     const filteredConversations = appointmentsData.filter(conv =>
@@ -133,63 +103,10 @@ const Chat = () => {
 
 
 
-    useEffect(() => {
-        if (!socket || !selectedConversation) return;
-
-        socket.emit("joinRoom", { appointmentId: selectedConversation.id });
-
-
-        socket.on("newMessage", (msg) => {
-            const timeString = msg.createdAt
-                ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-            const newMsg = {
-                id: msg.id ?? Date.now(),
-                sender: msg.senderId === selectedConversation?.patientId ? "patient" : "doctor",
-                content: msg.content,
-                time: timeString,
-                avatar: msg.senderId === selectedConversation?.patientId
-                    ? profile?.imageUrl
-                    : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl || "",
-            };
-
-            setMessages((prev) => [...prev, newMsg]);
-        });
-
-        fetchMessages(selectedConversation.id);
-
-        return () => {
-            socket.off("newMessage");
-        };
-    }, [socket, selectedConversation]);
-
-    const fetchAppointments = async (id: string) => {
-        try {
-            setappointmentLoading(true);
-            console.log("Fetching appointments for patient ID:", id);
-            const response = await axios.get(`/api/appointment/getAllForPatient?patientId=${id}`);
-            if (response.status === 200) {
-                console.log("Appointments fetched successfully:", response.data);
-                setAppointmentsData(response.data);
-                setappointmentLoading(false);
-            } else {
-                console.error("Failed to fetch appointments:", response.statusText);
-               setappointmentLoading(false);
-            }
-        } catch (error) {
-            console.error("Error fetching appointments:", error);
-            setappointmentLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-
-
     // Get all the previous messages that are already stored in the database
-    const fetchMessages = async (appointmentId: string) => {
+   
+
+    const fetchMessages = useCallback(async (appointmentId: string) => {
         try {
             setLoading(true);
             const response = await axios.get(`/api/messages/getMessages?appointmentId=${appointmentId}`);
@@ -209,13 +126,66 @@ const Chat = () => {
                 console.error("Failed to fetch messages:", response.statusText);
                 setLoading(false);
             }
-
+    
         } catch (error) {
             console.error("Error fetching messages:", error);
             toast.error("Failed to fetch messages");
-
+    
         }
-    }
+    }, [selectedConversation, profile?.imageUrl]);
+    
+    useEffect(() => {
+        if (!socket || !selectedConversation) return;
+    
+        socket.emit("joinRoom", { appointmentId: selectedConversation.id });
+    
+        socket.on("newMessage", (msg) => {
+            const timeString = msg.createdAt
+                ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    
+            const newMsg = {
+                id: msg.id ?? Date.now(),
+                sender: msg.senderId === selectedConversation?.patientId ? "patient" : "doctor",
+                content: msg.content,
+                time: timeString,
+                avatar: msg.senderId === selectedConversation?.patientId
+                    ? profile?.imageUrl
+                    : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl || "",
+            };
+    
+            setMessages((prev) => [...prev, newMsg]);
+        });
+    
+        fetchMessages(selectedConversation.id);
+    
+        return () => {
+            socket.off("newMessage");
+        };
+    }, [socket, selectedConversation, fetchMessages, profile?.imageUrl]);
+    
+    const fetchAppointments = async (id: string) => {
+        try {
+            setappointmentLoading(true);
+            console.log("Fetching appointments for patient ID:", id);
+            const response = await axios.get(`/api/appointment/getAllForPatient?patientId=${id}`);
+            if (response.status === 200) {
+                console.log("Appointments fetched successfully:", response.data);
+                setAppointmentsData(response.data);
+                setappointmentLoading(false);
+            } else {
+                console.error("Failed to fetch appointments:", response.statusText);
+               setappointmentLoading(false);
+            }
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+            setappointmentLoading(false);
+        }
+    };
+    
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
 
 
@@ -244,7 +214,7 @@ const Chat = () => {
 
     const handleVideoCall = () => {
         toast("Video call feature is not implemented yet.");
-        setShowVideoCall(true);
+        // setShowVideoCall(true);
     };
 
     // const handleSendFile = (files: File[]) => {
@@ -421,7 +391,7 @@ const Chat = () => {
                             {/* Message Input */}
                             <div className="p-1 bg-white border-t">
                                 <div className="flex items-center gap-2">
-                                    <Button className="h-5 w-5" variant="outline" onClick={() => setShowFileAttachment(true)}>
+                                    <Button className="h-5 w-5" variant="outline" >
                                         <Paperclip className="h-4 w-4" />
                                     </Button>
                                     <div className="flex-1 relative">

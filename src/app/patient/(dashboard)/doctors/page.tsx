@@ -38,9 +38,9 @@ type DoctorInfo = {
 
 
 
-const page = () => {
+const Page = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState("all");
+  // const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [filterSpecialization, setFilterSpecialization] = useState("all");
   const [loading, setLoading] = useState(false);
   const [doctorsData, setDoctorsData] = useState<DoctorInfo[]>([]);
@@ -192,4 +192,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

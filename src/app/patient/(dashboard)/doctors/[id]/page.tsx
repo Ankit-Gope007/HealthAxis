@@ -55,7 +55,7 @@ type DoctorInfo = {
 };
 
 
-const page = () => {
+const Page = () => {
     const params = useParams<{ id: string }>();
     const id = params?.id;
     const [loading, setLoading] = useState(false);
@@ -117,7 +117,7 @@ const page = () => {
                         }
                     };
                 });
-                // reload the page to reflect the new reviews
+                // reload the Page to reflect the new reviews
                 
 
 
@@ -460,4 +460,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

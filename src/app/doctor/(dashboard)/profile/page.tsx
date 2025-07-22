@@ -8,6 +8,7 @@ import { User, Mail, Phone, MapPin } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea"
+import Image from "next/image";
 
 type DoctorProfile = {
   id: string;
@@ -61,7 +62,7 @@ const Page = () => {
             education: docProf.education,
             certifications: docProf.certifications,
             bio: docProf.bio
-            
+
           }
         );
         console.log("Doctor Profile:", docProf);
@@ -177,11 +178,25 @@ const Page = () => {
             </CardHeader>
             <CardContent className="text-center">
               <div className="h-24 w-24 bg-gray-100 rounded-full overflow-hidden mx-auto mb-4 flex items-center justify-center">
-                {doctorProfile?.imageUrl ? (
+                {/* {doctorProfile?.imageUrl ? (
                   <img
-                    src={doctorProfile.imageUrl}
+                    src={doctorProfile?.imageUrl}
                     alt="Profile"
                     className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <User className="h-10 w-10 text-white bg-gray-400 rounded-full p-2" />
+                )} */}
+                {doctorProfile?.imageUrl ? (
+                  <Image // <--- Change <img> to <Image>
+                    src={doctorProfile?.imageUrl}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    width={100} // <--- REQUIRED: Provide a width
+                    height={100} // <--- REQUIRED: Provide a height
+                  // OR use 'fill' prop for responsive images within a container (see explanation below)
+                  // fill={true}
+                  // style={{ objectFit: 'cover' }} // If using 'fill', move object-cover here
                   />
                 ) : (
                   <User className="h-10 w-10 text-white bg-gray-400 rounded-full p-2" />
@@ -293,13 +308,13 @@ const Page = () => {
                     id="address" className="h-5 mt-1 text-sm" />
                 </div> */}
               </div>
-              <p className="text-xs text-gray-500">Seperate multiple  data with a " , " </p>
+              <p className="text-xs text-gray-500">Seperate multiple  data with a &quot; , &quot; </p>
 
               {/* Extra data for Doctors Detail */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                   <Label htmlFor="education"><MapPin className="h-2 w-2" />Education :</Label>
-                  <Textarea  
+                  <Textarea
                     id="education" className="h-7 mt-1 text-sm resize-none"
                     defaultValue={doctorProfile?.education || ""}
                     required
@@ -307,7 +322,7 @@ const Page = () => {
                 </div>
                 <div>
                   <Label htmlFor="certifications"><MapPin className="h-2 w-2" />Certifications</Label>
-                 <Textarea
+                  <Textarea
                     id="certifications" className="h-7 mt-1 text-sm resize-none"
                     defaultValue={doctorProfile?.certifications || ""}
                     required
@@ -318,9 +333,9 @@ const Page = () => {
               <div className="grid grid-cols-1  gap-4">
                 <div className="relative">
                   <Label htmlFor="bio"><MapPin className="h-2 w-2" />Bio :</Label>
-                  <Textarea  
+                  <Textarea
                     id="bio" className="h-7 w-full mt-1 text-sm resize-none"
-                    defaultValue={doctorProfile?.bio|| ""}
+                    defaultValue={doctorProfile?.bio || ""}
                     required
                   />
                 </div>

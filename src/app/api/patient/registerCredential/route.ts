@@ -15,6 +15,6 @@ export async function POST(request: Request) {
         return response;
     } catch (error) {
         // Handle any errors that occur during registration
-        return NextResponse.json({ error: "An error occurred during registration" }, { status: 500 });
+        return NextResponse.json({ error: "An error occurred during registration", details: error }, { status: 500 });
     }
 }

@@ -7,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 
-const page = () => {
+const Page = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -73,7 +73,7 @@ const page = () => {
        setIsLoading(false);
        setFormData({ email: "", password: "", rememberMe: false });
        toast.success("Login successful!");
-       // Redirect to the dashboard or home page
+       // Redirect to the dashboard or home Page
        if (result.data.data.doctorProfile.profileSetup) {
          router.push("/doctor/dashboard");
        } else {
@@ -184,4 +184,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

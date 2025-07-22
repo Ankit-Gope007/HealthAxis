@@ -68,7 +68,7 @@ type PresData = {
   };
 }
 
-const page = () => {
+const Page = () => {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
@@ -114,64 +114,9 @@ const page = () => {
     console.log("Updated prescription data:", presData);
   }, [presData]);
 
-  useEffect(() => {
-    setActiveItem("Prescriptions");
-    if (id) {
-      fetchPrescriptionData(id);
-    }
-    console.log("Prescription ID:", presData?.id);
-  }, [id]);
 
 
-
-  const prescriptionData = {
-    id: presData.id || id,
-    patient: {
-      id: presData.patientId || "N/A",
-      name: presData.appointment?.patient.patientProfile.fullName || "N/A",
-      age: presData.appointment?.patient.patientProfile.dob
-        ? new Date().getFullYear() - new Date(presData.appointment.patient.patientProfile.dob).getFullYear()
-        : "N/A",
-      gender: presData.appointment?.patient.patientProfile.gender || "N/A",
-      phone: presData.appointment?.patient.patientProfile.phone || "N/A",
-      email: presData.appointment?.patient.email || "N/A",
-      bloodType: presData.appointment?.patient.patientProfile.bloodGroup || "N/A",
-      allergies: presData.appointment?.patient.patientProfile.medicalHistory
-        ? presData.appointment?.patient.patientProfile.medicalHistory.split(",")
-        : [],
-      currentConditions: presData.appointment?.reason,
-      avatar: presData.appointment?.patient.patientProfile.imageUrl,
-      medicalHistory: presData.appointment?.patient.patientProfile.medicalHistory || "N/A"
-    },
-    prescription: {
-      id: presData.id || id,
-      dateIssued: presData.dateIssued.split("T")[0] || new Date().toISOString().split("T")[0],
-      status: presData.status || "N/A",
-      medications: presData.medications,
-      notes: presData.publicNotes || "N/A",
-      nextRefillDate: "N/A", // or real value
-      refillsRemaining: 0 // or real value
-    }
-  };
-
-  const previousPrescriptions = [
-    {
-      id: "prev1",
-      date: "2023-12-15",
-      medications: ["Vitamin D3 1000IU", "Calcium 500mg"],
-      status: "completed"
-    },
-    {
-      id: "prev2",
-      date: "2023-11-10",
-      medications: ["Lisinopril 5mg"],
-      status: "completed"
-    }
-  ];
-
-
-
-  const fetchPrescriptionData = async (appointmentId: string) => {
+  const fetchPrescriptionData = React.useCallback(async (appointmentId: string) => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/prescription/getForDoctor?appointmentId=${appointmentId}`);
@@ -214,7 +159,51 @@ const page = () => {
 
 
     }
-  }
+  }, [router]);
+
+
+  useEffect(() => {
+    setActiveItem("Prescriptions");
+    if (id) {
+      fetchPrescriptionData(id);
+    }
+    console.log("Prescription ID:", presData?.id);
+  }, [fetchPrescriptionData, id, presData?.id, setActiveItem]);
+
+
+
+  const prescriptionData = {
+    id: presData.id || id,
+    patient: {
+      id: presData.patientId || "N/A",
+      name: presData.appointment?.patient.patientProfile.fullName || "N/A",
+      age: presData.appointment?.patient.patientProfile.dob
+        ? new Date().getFullYear() - new Date(presData.appointment.patient.patientProfile.dob).getFullYear()
+        : "N/A",
+      gender: presData.appointment?.patient.patientProfile.gender || "N/A",
+      phone: presData.appointment?.patient.patientProfile.phone || "N/A",
+      email: presData.appointment?.patient.email || "N/A",
+      bloodType: presData.appointment?.patient.patientProfile.bloodGroup || "N/A",
+      allergies: presData.appointment?.patient.patientProfile.medicalHistory
+        ? presData.appointment?.patient.patientProfile.medicalHistory.split(",")
+        : [],
+      currentConditions: presData.appointment?.reason,
+      avatar: presData.appointment?.patient.patientProfile.imageUrl,
+      medicalHistory: presData.appointment?.patient.patientProfile.medicalHistory || "N/A"
+    },
+    prescription: {
+      id: presData.id || id,
+      dateIssued: presData.dateIssued.split("T")[0] || new Date().toISOString().split("T")[0],
+      status: presData.status || "N/A",
+      medications: presData.medications,
+      notes: presData.publicNotes || "N/A",
+      nextRefillDate: "N/A", // or real value
+      refillsRemaining: 0 // or real value
+    }
+  };
+
+
+
 
 
   return (
@@ -322,7 +311,7 @@ const page = () => {
                     <>
                       <Separator className="my-6" />
                       <div>
-                        <h4 className="font-medium text-lg mb-2">Doctor's Notes</h4>
+                        <h4 className="font-medium text-lg mb-2">Doctor&apos;s Notes</h4>
                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                           <p className="text-sm">{prescriptionData.prescription.notes}</p>
                         </div>
@@ -427,4 +416,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

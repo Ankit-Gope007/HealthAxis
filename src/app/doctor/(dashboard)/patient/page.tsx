@@ -11,6 +11,7 @@ import axios from "axios";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { useSidebarStore } from "@/src/store/useSidebarStore";
 import { useEffect } from "react";
+import Image from "next/image";
 
 type AppointmentWithPatient = {
   id: string;
@@ -195,7 +196,7 @@ const DoctorPatients = () => {
                       <div className="flex items-center gap-1">
                         <div className="h-9 w-9 bg-green-100 rounded-full flex items-center justify-center">
                           {patient.imageUrl ? (
-                            <img src={patient.imageUrl} alt={patient.name} className="h-9 w-9 rounded-full object-cover" />
+                            <Image src={patient.imageUrl} alt={patient.name} className="h-9 w-9 rounded-full object-cover" />
                           ) : (
                             <User className="h-6 w-6 text-green-700" />
                           )}

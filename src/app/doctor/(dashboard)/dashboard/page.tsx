@@ -9,6 +9,7 @@ import { useDoctorProfileStore } from '@/src/store/useDoctorProfileStore';
 import { useSidebarStore } from '@/src/store/useSidebarStore';
 import { getStatusStyle } from '@/src/lib/statusStyle';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 type AppointmentWithPatient = {
   id: string;
@@ -41,7 +42,7 @@ type AppointmentWithPatient = {
   };
 };
 
-const page = () => {
+const Page = () => {
   const [loading, setLoading] = useState(false);
   const [appointmentData, setAppointmentData] = useState<AppointmentWithPatient[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
@@ -156,12 +157,6 @@ const page = () => {
     }
   ];
 
-  const upcomingAppointments = [
-    { id: 1, patient: "Sarah Johnson", time: "10:00 AM", condition: "Follow-up checkup", status: "confirmed" },
-    { id: 2, patient: "Michael Brown", time: "10:30 AM", condition: "Chest pain consultation", status: "pending" },
-    { id: 3, patient: "Emily Davis", time: "11:15 AM", condition: "Routine examination", status: "confirmed" },
-    { id: 4, patient: "David Wilson", time: "2:00 PM", condition: "Blood pressure check", status: "confirmed" },
-  ];
 
   const recentPatients =
     appointmentData
@@ -196,7 +191,7 @@ const page = () => {
             <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
               <header className="mb-4 mt-4">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Good morning, Dr. Smith</h1>
-                <p className="text-muted-foreground">Here's what's happening with your practice today.</p>
+                <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your practice today.</p>
               </header>
 
               {/* Stats Grid */}
@@ -225,7 +220,7 @@ const page = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-green-600" />
-                      Today's Schedule
+                      Today&apos;s Schedule
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -292,7 +287,7 @@ const page = () => {
                           <div className="flex items-center gap-2">
                             <div className="h-7 w-7 bg-green-100 rounded-full flex items-center justify-center">
                               {patient.imageUrl ? (
-                                <img src={patient.imageUrl} alt={patient.name} className="h-full w-full rounded-full object-cover" />
+                                <Image src={patient.imageUrl} alt={patient.name} className="h-full w-full rounded-full object-cover" />
                               ) : (
                                 <span className="text-green-600">{patient.name.charAt(0).toUpperCase()}</span>
                               )}
@@ -372,4 +367,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

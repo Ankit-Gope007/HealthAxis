@@ -34,7 +34,7 @@ type PresData = {
   publicNotes: string;
 }
 
-const page = () => {
+const Page = () => {
   const [activeTab, setActiveTab] = useState("current");
   const [searchQuery, setSearchQuery] = useState("");
   const { profile } = usePatientProfileStore();
@@ -70,42 +70,42 @@ const page = () => {
     }
   }
 
-  const transformedPrescriptions = prescriptionData.map((pres, index) => ({
-    id: index + 1,
-    status: pres.appointment.status,
-    doctor: pres.appointment.doctor.doctorProfile.fullName,
-    specialty: pres.appointment.doctor.doctorProfile.specialization || "General",
-    date: new Date(pres.appointment.createdAt).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    }),
-    appointmentDate: new Date(pres.appointment.createdAt).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    }),
-    medications: pres.medicines.map(med => ({
-      name: med.name,
-      dosage: med.dosage,
-      instructions: med.instructions                    // you can enhance this if you have duration
-    })),
-    notes: pres.publicNotes || "-",
-    image: pres.appointment.doctor.doctorProfile.imageUrl || "https://source.unsplash.com/200x200/?doctor"
-  }));
+  // const transformedPrescriptions = prescriptionData.map((pres, index) => ({
+  //   id: index + 1,
+  //   status: pres.appointment.status,
+  //   doctor: pres.appointment.doctor.doctorProfile.fullName,
+  //   specialty: pres.appointment.doctor.doctorProfile.specialization || "General",
+  //   date: new Date(pres.appointment.createdAt).toLocaleDateString('en-US', {
+  //     month: 'long',
+  //     day: 'numeric',
+  //     year: 'numeric'
+  //   }),
+  //   appointmentDate: new Date(pres.appointment.createdAt).toLocaleDateString('en-US', {
+  //     month: 'long',
+  //     day: 'numeric',
+  //     year: 'numeric'
+  //   }),
+  //   medications: pres.medicines.map(med => ({
+  //     name: med.name,
+  //     dosage: med.dosage,
+  //     instructions: med.instructions                    // you can enhance this if you have duration
+  //   })),
+  //   notes: pres.publicNotes || "-",
+  //   image: pres.appointment.doctor.doctorProfile.imageUrl || "https://source.unsplash.com/200x200/?doctor"
+  // }));
 
 
 
-  const prescriptions = {
-    current: transformedPrescriptions.filter(p => {
-      const pres = prescriptionData.find(data => data.publicNotes === p.notes);
-      return pres?.appointment.status === "CONFIRMED";
-    }),
-    past: transformedPrescriptions.filter(p => {
-      const pres = prescriptionData.find(data => data.publicNotes === p.notes);
-      return pres?.appointment.status === "COMPLETED";
-    })
-  };
+  // const prescriptions = {
+  //   current: transformedPrescriptions.filter(p => {
+  //     const pres = prescriptionData.find(data => data.publicNotes === p.notes);
+  //     return pres?.appointment.status === "CONFIRMED";
+  //   }),
+  //   past: transformedPrescriptions.filter(p => {
+  //     const pres = prescriptionData.find(data => data.publicNotes === p.notes);
+  //     return pres?.appointment.status === "COMPLETED";
+  //   })
+  // };
 
 
 
@@ -187,7 +187,7 @@ const page = () => {
                   <div className="bg-gray-50 border border-gray-100 rounded-lg p-8 text-center">
                     <PillIcon className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
                     <h3 className="text-lg font-medium mb-1">No Current Prescriptions</h3>
-                    <p className="text-muted-foreground">You don't have any active prescriptions.</p>
+                    <p className="text-muted-foreground">You don&apos;t have any active prescriptions.</p>
                   </div>
                 )}
               </TabsContent>
@@ -224,7 +224,7 @@ const page = () => {
                 ) : (
                   <div className="bg-gray-50 border border-gray-100 rounded-lg p-8 text-center">
                     <h3 className="text-lg font-medium mb-1">No Past Prescriptions</h3>
-                    <p className="text-muted-foreground">You don't have any past prescriptions.</p>
+                    <p className="text-muted-foreground">You don&apos;t have any past prescriptions.</p>
                   </div>
                 )}
               </TabsContent>
@@ -240,4 +240,4 @@ const page = () => {
 };
 
 
-export default page;
+export default Page;

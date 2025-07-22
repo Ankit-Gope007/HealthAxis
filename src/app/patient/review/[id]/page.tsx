@@ -6,12 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, ArrowLeft, CheckCircle } from "lucide-react";
+import { Star,  CheckCircle } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import axios from "axios";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
-import { is } from "date-fns/locale";
 
 type AppointmentData = {
     id: string;
@@ -27,7 +26,7 @@ type AppointmentData = {
     reason: string;
 };
 
-const page = () => {
+const Page = () => {
     const params = useParams<{ id: string }>()
     const id = params?.id;
     const router = useRouter();
@@ -53,7 +52,7 @@ const page = () => {
                 redirect("/patient/dashboard");
             }
         } 
-    }, [id, profile?.id,isDocReviewed]);
+    }, [id, profile?.id, isDocReviewed, profile?.patientId]);
 
 
     // Mock appointment and doctor data - in real app, fetch based on appointment ID
@@ -363,4 +362,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

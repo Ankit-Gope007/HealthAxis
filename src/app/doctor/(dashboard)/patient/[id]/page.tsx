@@ -10,10 +10,10 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { getStatusStyle } from "@/src/lib/statusStyle";
+import Image from "next/image";
 
 
-
-const page = () => {
+const Page = () => {
     const params = useParams<{ id: string }>();
     const patientId = params?.id as string;
     const [loading, setLoading] = useState(false);
@@ -133,7 +133,7 @@ const patient = data.length > 0 ? {
                                     {/* image */}
                                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-2 mr-2">
                                         {patient?.imageUrl ? (
-                                            <img src={patient.imageUrl} alt={patient.name} className="h-12 w-12 rounded-full object-cover" />
+                                            <Image src={patient.imageUrl} alt={patient.name} className="h-12 w-12 rounded-full object-cover" />
                                         ) : (
                                             <User className="h-6 w-6 text-gray-500" />
                                         )}
@@ -237,4 +237,4 @@ const patient = data.length > 0 ? {
     );
 };
 
-export default page;
+export default Page;

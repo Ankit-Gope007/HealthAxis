@@ -17,7 +17,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { useDoctorProfileStore } from "@/src/store/useDoctorProfileStore";
 import { useSocket } from "@/src/lib/useSocket";
-  import { useCallback } from "react";
+import { useCallback } from "react";
 
 
 type AppointmentPatientData = {

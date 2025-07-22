@@ -15,7 +15,7 @@ import {
     ArrowLeft,
     Clock,
     MapPin,
-    AlertTriangle,
+
     X
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -67,16 +67,9 @@ const DoctorAppointmentPatient = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     
-    const recentAppointments = [
-        { date: "2024-01-10", time: "10:00 AM", reason: "Follow-up checkup", status: "completed" },
-        { date: "2023-12-15", time: "11:00 AM", reason: "Routine examination", status: "completed" },
-        { date: "2023-11-20", time: "2:00 PM", reason: "Blood pressure check", status: "completed" },
-    ];
+    
 
-    const prescriptions = [
-        { date: "2024-01-10", medication: "Lisinopril 10mg", dosage: "Once daily", duration: "30 days" },
-        { date: "2023-12-15", medication: "Vitamin D3", dosage: "Twice daily", duration: "60 days" },
-    ];
+   
 
     const getAppoinmentDetail = async (appointmentId: string) => {
         setLoading(true);
@@ -191,6 +184,7 @@ const DoctorAppointmentPatient = () => {
                                 // Optional: Refresh data after confirm
                                 // await refetchAppointments();
                             } catch (error) {
+                                console.error("Error confirming appointment:", error);
                                 toast.error(`❌ Could not confirm appointment for ${patientName}`, {
                                     duration: 3000,
                                     position: "top-right",
@@ -256,6 +250,7 @@ const DoctorAppointmentPatient = () => {
                                 // Optional: Refresh data after confirm
                                 // await refetchAppointments();
                             } catch (error) {
+                                console.error("Error confirming appointment:", error);
                                 toast.error(`❌ Could not confirm appointment for ${patientName}`, {
                                     duration: 3000,
                                     position: "top-right",

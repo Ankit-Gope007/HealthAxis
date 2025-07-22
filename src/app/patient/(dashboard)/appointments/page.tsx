@@ -48,13 +48,13 @@ type AppointmentWithDoctor = {
 };
 
 
-const page = () => {
+const Page = () => {
   const { setActiveItem } = useSidebarStore();
   const { profile } = usePatientProfileStore();
 
   const router = useRouter();
   const [appointmentsData, setAppointmentsData] = useState<AppointmentWithDoctor[]>([]);
-  const [profileId, setProfileId] = useState<string | null>(null);
+  // const [profileId, setProfileId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -215,4 +215,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
