@@ -40,7 +40,7 @@ const PastAppointments: React.FC<PastAppProps> = ({
           src={imageUrl}
           alt={doctorName}
           className="w-10 h-10 rounded-full  object-cover mb-4 shadow-md"
-         
+
         />
         {/* Doctor Name */}
         <h3 className="text-lg font-semibold text-gray-800 text-center md:text-left">{doctorName}</h3>
@@ -54,18 +54,33 @@ const PastAppointments: React.FC<PastAppProps> = ({
           {/* Date and Time */}
           <div className="flex items-center text-gray-700 mb-1 sm:mb-0">
             {/* Calendar Icon */}
-            <CiCalendar className="text-xl font-bold mr-1"/>
+            <CiCalendar className="text-xl font-bold mr-1" />
             <span className="font-medium text-gray-800">{date}</span>
             {/* Clock Icon */}
-            <CiClock2 className="text-xl font-bold ml-4 mr-1"/>
+            <CiClock2 className="text-xl font-bold ml-4 mr-1" />
             <span className="font-medium text-gray-800">{time}</span>
           </div>
           {/* Status Tag */}
-          <span
-            className={`px-3 py-1 text-center rounded-full text-xs font-semibold ${getStatusStyle(status)}`}
-          >
-            {status}
-          </span>
+          {
+            (status === "COMPLETED" || status === "CANCELLED") ?
+              (
+                <span
+                  className={`px-3 py-1 text-center rounded-full text-xs font-semibold ${getStatusStyle(status)}`}
+                >
+                  {status}
+                </span>
+              )
+              :
+              (
+                // The date expired so the appointment is no longer active
+                <span
+                  className={`px-3 py-1 text-center rounded-full text-xs font-semibold bg-gray-400 text-white `}
+                >
+                  Expired
+                </span>
+              )
+          }
+
         </div>
 
         {/* Location */}
@@ -85,7 +100,7 @@ const PastAppointments: React.FC<PastAppProps> = ({
           <p className="text-base text-gray-800 font-medium">{notes}</p>
         </div>
 
-       
+
       </div>
     </div>
   );

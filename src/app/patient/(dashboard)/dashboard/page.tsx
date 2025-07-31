@@ -222,7 +222,7 @@ const Page = () => {
       const hasShown = sessionStorage.getItem("dashboardToastShown");
 
       if (!hasShown) {
-        toast.success(`Welcome back, ${user.email}! 🎉`);
+        toast.success(`Welcome back 🎉`);
         sessionStorage.setItem("dashboardToastShown", "true");
       }
     }
@@ -243,7 +243,7 @@ const Page = () => {
   const upcomingAppointments = appointmentsData.filter((app) => {
     const appointmentDate = new Date(app.date);
     const currentDate = new Date();
-    return appointmentDate >= currentDate && app.status === "CONFIRMED" || app.status === "PENDING";
+    return appointmentDate >= currentDate &&( app.status === "CONFIRMED" || app.status === "PENDING");
   })
 
 

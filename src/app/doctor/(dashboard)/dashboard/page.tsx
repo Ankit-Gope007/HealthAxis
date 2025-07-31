@@ -11,6 +11,7 @@ import { getStatusStyle } from '@/src/lib/statusStyle';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+
 type AppointmentWithPatient = {
   id: string;
   patientId: string;
@@ -166,11 +167,11 @@ const Page = () => {
           new Date(app.date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
       )
       .map((appointment) => ({
-        id: appointment.patient.id,
-        name: appointment.patient.patientProfile.fullName,
+        id: appointment.id,
+        name: appointment.patient.patientProfile?.fullName || "Unknown Patient",
         condition: appointment.reason || "No condition specified",
         lastVisit: new Date(appointment.date).toLocaleDateString(),
-        imageUrl: appointment.patient.patientProfile.imageUrl || "",
+        imageUrl: appointment.patient.patientProfile?.imageUrl || "",
       })) || [];
 
   return (
@@ -190,7 +191,7 @@ const Page = () => {
           (
             <div className='w-full lg:w-[90%] lg:ml-14 h-[100vh] '>
               <header className="mb-4 mt-4">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Good morning, Dr. Smith</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Good morning, {"Dr." + profile?.fullName.split(" ")[1] || "Doctor"}!</h1>
                 <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your practice today.</p>
               </header>
 
@@ -287,7 +288,7 @@ const Page = () => {
                           <div className="flex items-center gap-2">
                             <div className="h-7 w-7 bg-green-100 rounded-full flex items-center justify-center">
                               {patient.imageUrl ? (
-                                <Image src={patient.imageUrl} alt={patient.name} className="h-full w-full rounded-full object-cover" />
+                                <Image src={patient.imageUrl} width={28} height={28} alt={patient.name} className="h-full w-full rounded-full object-cover" />
                               ) : (
                                 <span className="text-green-600">{patient.name.charAt(0).toUpperCase()}</span>
                               )}

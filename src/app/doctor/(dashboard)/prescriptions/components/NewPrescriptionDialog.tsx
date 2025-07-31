@@ -101,8 +101,8 @@ const NewPrescriptionDialog = ({ children }: NewPrescriptionDialogProps) => {
 
     const patients = appointmentsData.filter(appointment => appointment.status === "CONFIRMED").map(appointment => ({
         id: appointment.patientId,
-        name: appointment.patient.patientProfile.fullName,
-        age: new Date().getFullYear() - new Date(appointment.patient.patientProfile.dob).getFullYear(),
+        name: appointment.patient.patientProfile?.fullName|| "Unknown Patient",
+        age: new Date().getFullYear() - new Date(appointment.patient.patientProfile?.dob).getFullYear(),
         condition: appointment.reason || "No condition specified"
     }));
 
@@ -414,7 +414,7 @@ const NewPrescriptionDialog = ({ children }: NewPrescriptionDialogProps) => {
     };
 
     const filteredPatients = patients.filter(patient =>
-        patient.name.toLowerCase().includes(searchPatient.toLowerCase())
+        patient?.name.toLowerCase().includes(searchPatient.toLowerCase())
     );
 
     return (

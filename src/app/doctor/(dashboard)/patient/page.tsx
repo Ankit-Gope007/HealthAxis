@@ -91,13 +91,13 @@ const DoctorPatients = () => {
 
   const patients = appointmentData.map(appointment => ({
     id: appointment.patient.id,
-    imageUrl: appointment.patient.patientProfile.imageUrl || null,
-    name: appointment.patient.patientProfile.fullName,
-    age: new Date().getFullYear() - new Date(appointment.patient.patientProfile.dob).getFullYear(),
-    gender: appointment.patient.patientProfile.gender,
-    lastVisit: lastVisitDate(appointment.patient.id), // Use the lastVisitDate function
-    condition: latestCondition(appointment.patient.id), // Use the latest condition function
-    totalVisits: patientVisitCount[appointment.patient.id] || 1 // Use the count from patientVisitCount
+    imageUrl: appointment.patient.patientProfile?.imageUrl || null,
+    name: appointment.patient.patientProfile?.fullName || "Unknown Patient",
+    age: new Date().getFullYear() - new Date(appointment.patient.patientProfile?.dob).getFullYear(),
+    gender: appointment.patient.patientProfile?.gender || "Male",
+    lastVisit: lastVisitDate(appointment.patient?.id), // Use the lastVisitDate function
+    condition: latestCondition(appointment.patient?.id), // Use the latest condition function
+    totalVisits: patientVisitCount[appointment.patient?.id] || 1 // Use the count from patientVisitCount
   }));
 
 
@@ -196,7 +196,7 @@ const DoctorPatients = () => {
                       <div className="flex items-center gap-1">
                         <div className="h-9 w-9 bg-green-100 rounded-full flex items-center justify-center">
                           {patient.imageUrl ? (
-                            <Image src={patient.imageUrl} alt={patient.name} className="h-9 w-9 rounded-full object-cover" />
+                            <Image src={patient.imageUrl} width={36} height={36} alt={patient.name} className="h-9 w-9 rounded-full object-cover" />
                           ) : (
                             <User className="h-6 w-6 text-green-700" />
                           )}

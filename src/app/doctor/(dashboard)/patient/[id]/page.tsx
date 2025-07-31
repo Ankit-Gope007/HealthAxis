@@ -133,7 +133,7 @@ const patient = data.length > 0 ? {
                                     {/* image */}
                                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-2 mr-2">
                                         {patient?.imageUrl ? (
-                                            <Image src={patient.imageUrl} alt={patient.name} className="h-12 w-12 rounded-full object-cover" />
+                                            <Image src={patient.imageUrl} width={28} height={28} alt={patient.name} className="h-12 w-12 rounded-full object-cover" />
                                         ) : (
                                             <User className="h-6 w-6 text-gray-500" />
                                         )}
