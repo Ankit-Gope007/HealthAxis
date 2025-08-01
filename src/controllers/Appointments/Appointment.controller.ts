@@ -3,49 +3,73 @@ import { transporter } from "@/src/lib/mail";
 import { google } from "googleapis";
 
 export async function createGoogleCalendarEvent(patient: any, appointment: any) {
-  // ✅ Create ONE OAuth2 client
-  const oAuth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI // you MUST have this set!
-  );
+    // ✅ Create ONE OAuth2 client
+    const oAuth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        process.env.GOOGLE_REDIRECT_URI // you MUST have this set!
+    );
 
-  // ✅ Set the credentials from the signed-in user (patient)
-  oAuth2Client.setCredentials({
-    access_token: patient.accessToken,   // YOU must pass these correctly
-    refresh_token: patient.refreshToken
-  });
+    // ✅ Set the credentials from the signed-in user (patient)
+    oAuth2Client.setCredentials({
+        access_token: patient.accessToken,   // YOU must pass these correctly
+        refresh_token: patient.refreshToken
+    });
 
-  // ✅ Create calendar client using that OAuth2 client
-  const calendar = google.calendar({
-    version: "v3",
-    auth: oAuth2Client
-  });
+    // ✅ Create calendar client using that OAuth2 client
+    const calendar = google.calendar({
+        version: "v3",
+        auth: oAuth2Client
+    });
+    console.log("Appointment date received from database:", appointment.date);
 
-  // ✅ Define the event
-  const event = {
-    summary: `Appointment with Dr. ${appointment.doctor.doctorProfile?.fullName}`,
-    description: `Your appointment for ${appointment.date} has been confirmed.`,
-    start: {
-      dateTime: new Date(appointment.date).toISOString(),
-      timeZone: "Asia/Kolkata",
-    },
-    end: {
-      dateTime: new Date(new Date(appointment.date).getTime() + 30 * 60000).toISOString(),
-      timeZone: "Asia/Kolkata",
-    },
-    attendees: [
-      { email: patient.email }
-    ]
-  };
+    const startDate = new Date(appointment.date);
+    if (isNaN(startDate.getTime())) {
+        console.error("Invalid appointment date received from database:", appointment.date);
+        throw new Error("Invalid appointment date format.");
+    }
 
-  // ✅ Insert the event
-  const response = await calendar.events.insert({
-    calendarId: "primary",
-    requestBody: event,
-  });
+    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
+    console.log("Start date for Google Calendar event:", startDate);
+    console.log("End date for Google Calendar event:", endDate);
 
-  return response.data;
+
+    // ✅ Define the event
+    const event = {
+        summary: `Appointment with  ${appointment.doctor.doctorProfile?.fullName}`,
+        description: `Your appointment for ${appointment.date} has been confirmed.`,
+        start: {
+            dateTime: startDate.toISOString(),
+            timeZone: "Asia/Kolkata",
+        },
+        end: {
+            dateTime: endDate.toISOString(),
+            timeZone: "Asia/Kolkata",
+        },
+        attendees: [
+            { email: patient.email }
+        ]
+    };
+
+    // ✅ Insert the event
+    try {
+        const response = await calendar.events.insert({
+            calendarId: "primary",
+            requestBody: event,
+        });
+        return response.data;
+    } catch (error: any) { // Catch as 'any' to easily access error properties
+        console.error("Error inserting Google Calendar event:", error);
+        if (error.response && error.response.data && error.response.data.error) {
+            console.error("Google API Error Details:", error.response.data.error);
+        }
+        if (error.errors) { // Sometimes errors are directly on the error object
+            console.error("Google API Error Array:", error.errors);
+        }
+        throw new Error("Failed to create Google Calendar event: invalid_request or other API error.");
+    }
+
+    
 }
 
 
@@ -238,7 +262,7 @@ export async function updateAppointmentStatus(appointmentId: string, status: str
 
         });
 
-        if (status === "CONFIRMED"&& updatedAppointment.patient.accessToken && updatedAppointment.patient.refreshToken) {
+        if (status === "CONFIRMED" && updatedAppointment.patient.accessToken && updatedAppointment.patient.refreshToken) {
             // Create Google Calendar event
             await createGoogleCalendarEvent(updatedAppointment.patient, updatedAppointment);
         }
@@ -293,6 +317,16 @@ export async function updateAppointmentStatus(appointmentId: string, status: str
 
     } catch (error) {
         console.error("Error updating appointment status:", error);
+        // remove the updated appointment from the database if it fails
+        await prisma.appointment.update({
+            where: {
+                id: appointmentId
+            },
+            data: {
+                status: "PENDING"
+            }
+        });
+
         throw new Error("Failed to update appointment status");
 
     }

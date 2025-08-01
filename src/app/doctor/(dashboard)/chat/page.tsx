@@ -94,6 +94,14 @@ type Messages = {
   avatar: string;
 }
 
+type NewMessageEvent = {
+  id?: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt?: string;
+}
+
 const Chat = () => {
   const [selectedChat, setSelectedChat] = useState(null as string | null);
   const [message, setMessage] = useState<string>("");
@@ -174,13 +182,15 @@ const Chat = () => {
 
 
 
-    socket.on("newMessage", (msg) => {
+
+
+    socket.on("newMessage", (msg: NewMessageEvent) => {
       const timeString = msg.createdAt
         ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
       const newMsg: Messages = {
-        id: msg.id ?? Date.now(),
+        id: msg.id ?? Date.now().toString(),
         sender: msg.senderId === selectedConversation?.patientId ? "patient" : "doctor",
         content: msg.content,
         time: timeString,
@@ -189,7 +199,7 @@ const Chat = () => {
           : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl || "",
       };
 
-      setMessages((prev) => [...prev, newMsg]);
+      setMessages((prev: Messages[]) => [...prev, newMsg]);
     });
 
     fetchMessages(selectedConversation.id);

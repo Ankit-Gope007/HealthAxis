@@ -20,6 +20,8 @@ import { useEffect } from "react";
 // import { useSearchParams } from "next/navigation";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
+import { parse } from 'date-fns';
+// import { enUS } from 'date-fns/locale';
 
 type DoctorInfo = {
     id: string;
@@ -68,6 +70,7 @@ const Page = () => {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
     const [appointmentReason, setAppointmentReason] = useState("");
+    // const [isoStringForDb, setIsoStringForDb] = useState<string | null>(null);
     // const [currentStep, setCurrentStep] = useState<'select-doctor' | 'select-time' | 'confirm'>(
     //     selectedDoctor ? 'select-time' : 'select-doctor'
     // );
@@ -166,7 +169,7 @@ const Page = () => {
         handleDoctorData();
     }, [handleDoctorData]);
 
-    
+
 
 
     const selectedDoctorDetails = doctorsData.find(doctor => doctor.id === selectedDoctor?.toString());
@@ -177,6 +180,11 @@ const Page = () => {
         "11:00 AM", "11:30 AM", "01:30 PM", "02:00 PM",
         "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM"
     ];
+
+    const handleTime = (time: string) => {
+        setSelectedTimeSlot(time);
+        // We will construct the final ISO string in handleSubmit
+    }
 
     const handleContinue = () => {
         if (currentStep === 'select-doctor' && selectedDoctor) {
@@ -194,17 +202,106 @@ const Page = () => {
         }
     };
 
-    const handleSubmit = async () => {
-        // Here you would handle the appointment booking
+    // const handleSubmit = async () => {
+    //     // Here you would handle the appointment booking
 
+
+    //     try {
+
+    //         const appointmentData: AppointmentType = {
+    //             patientId: profile?.patientId || "",
+    //             doctorId: selectedDoctor || "",
+    //             date: selectedDate || new Date(),
+    //             timeSlot: selectedTimeSlot || "",
+    //             reason: appointmentReason || "No reason provided"
+    //         };
+
+    //         const response = await axios.post('/api/appointment/create', appointmentData);
+    //         if (response.status === 201) {
+    //             console.log("Appointment booked successfully:", response.data);
+    //             toast.success("Appointment booked successfully!", {
+    //                 duration: 3000,
+    //                 position: "top-right",
+    //                 style: {
+    //                     background: "#28A745",
+    //                     color: "#fff",
+    //                 },
+    //             });
+    //             // Reset form or redirect as needed
+    //             setSelectedDoctor(null);
+    //             setSelectedDate(undefined);
+    //             setSelectedTimeSlot(null);
+    //             setAppointmentReason("");
+    //             setCurrentStep('select-doctor');
+    //         }
+
+    //     } catch (error) {
+    //         console.error("Error submitting appointment:", error);
+    //         toast.error("Failed to book appointment", {
+    //             duration: 3000,
+    //             position: "top-right",
+    //             style: {
+    //                 background: "#DC3545",
+    //                 color: "#fff",
+    //             },
+    //         });
+
+    //     }
+    // };
+
+    const handleSubmit = async () => {
+        if (!profile?.patientId || !selectedDoctor || !selectedDate || !selectedTimeSlot) {
+            toast.error("Please fill all required appointment details.");
+            return;
+        }
+
+        let combinedDateTimeObject: Date;
 
         try {
+            // 1. Get the date components from selectedDate
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth(); // 0-indexed
+            const day = selectedDate.getDate();
 
+            // 2. Parse the time slot string (e.g., "11:00 AM") into a temporary Date object
+            const parsedTime = parse(selectedTimeSlot, 'hh:mm a', new Date());
+
+            // 3. Create a NEW Date object by combining the date components with the parsed time components
+            combinedDateTimeObject = new Date(
+                year,
+                month,
+                day,
+                parsedTime.getHours(),
+                parsedTime.getMinutes(),
+                parsedTime.getSeconds(),
+                parsedTime.getMilliseconds() // Include milliseconds for full precision
+            );
+
+            // 4. Validate the constructed Date object
+            if (isNaN(combinedDateTimeObject.getTime())) {
+                console.error("Failed to construct a valid Date object from selectedDate and selectedTimeSlot.", {
+                    selectedDate: selectedDate.toISOString(), // Log as ISO string for clarity
+                    selectedTimeSlot: selectedTimeSlot,
+                    parsedTimeHours: parsedTime.getHours(),
+                    parsedTimeMinutes: parsedTime.getMinutes(),
+                    combinedResult: combinedDateTimeObject.toString()
+                });
+                toast.error("Internal error: Could not generate valid appointment date.");
+                return;
+            }
+
+        } catch (error) {
+            console.error("Error processing date and time for appointment:", error);
+            toast.error("Failed to process appointment date/time.");
+            return;
+        }
+
+        try {
             const appointmentData: AppointmentType = {
-                patientId: profile?.patientId || "",
-                doctorId: selectedDoctor || "",
-                date: selectedDate || new Date(),
-                timeSlot: selectedTimeSlot || "",
+                patientId: profile.patientId,
+                doctorId: selectedDoctor,
+                date: combinedDateTimeObject, // <-- NOW SENDING A PROPER DATE OBJECT
+                timeSlot: selectedTimeSlot,
                 reason: appointmentReason || "No reason provided"
             };
 
@@ -239,8 +336,7 @@ const Page = () => {
             });
 
         }
-    };
-
+    }
 
 
     return (
@@ -460,7 +556,7 @@ const Page = () => {
                                                                             ? "bg-[#28A745] hover:bg-[#218838] text-white"
                                                                             : ""
                                                                     }
-                                                                    onClick={() => setSelectedTimeSlot(time)}
+                                                                    onClick={() => handleTime(time)}
                                                                 >
                                                                     {time}
                                                                 </Button>

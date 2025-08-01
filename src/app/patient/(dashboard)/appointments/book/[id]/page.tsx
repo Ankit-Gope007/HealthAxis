@@ -13,14 +13,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
 import { useParams } from "next/navigation";
-  import { useCallback } from "react";
+import { useCallback } from "react";
+import { parse } from 'date-fns';
 
 type DoctorInfo = {
     id: string;
@@ -58,7 +59,7 @@ type AppointmentType = {
 
 
 const Page = () => {
-    const router = useRouter();
+    // const router = useRouter();
     const params = useParams<{ id: string }>();
     const id = params?.id;
     const { profile } = usePatientProfileStore();
@@ -73,7 +74,7 @@ const Page = () => {
     const [loading, setLoading] = useState(false);
 
 
-  
+
 
     const handleDoctorData = useCallback(async () => {
         try {
@@ -82,7 +83,7 @@ const Page = () => {
             if (response.status === 200) {
                 console.log("Doctors data fetched successfully:", response.data.doctors.data);
                 setDoctorsData(response.data.doctors.data);
-          
+
                 setLoading(false);
 
                 // You can set the fetched data to state or handle it as needed
@@ -152,17 +153,106 @@ const Page = () => {
         }
     };
 
-    const handleSubmit = async () => {
-        // Here you would handle the appointment booking
+    // const handleSubmit = async () => {
+    //     // Here you would handle the appointment booking
 
+
+    //     try {
+
+    //         const appointmentData: AppointmentType = {
+    //             patientId: profile?.patientId || "",
+    //             doctorId: id?.toString() || "",
+    //             date: selectedDate || new Date(),
+    //             timeSlot: selectedTimeSlot || "",
+    //             reason: appointmentReason || "No reason provided"
+    //         };
+
+    //         const response = await axios.post('/api/appointment/create', appointmentData);
+    //         if (response.status === 201) {
+    //             console.log("Appointment booked successfully:", response.data);
+    //             toast.success("Appointment booked successfully!", {
+    //                 duration: 3000,
+    //                 position: "top-right",
+    //                 style: {
+    //                     background: "#28A745",
+    //                     color: "#fff",
+    //                 },
+    //             });
+    //             // Reset form or redirect as needed
+    //             setSelectedDoctor(null);
+    //             setSelectedDate(undefined);
+    //             setSelectedTimeSlot(null);
+    //             setAppointmentReason("");
+    //             router.push('/patient/appointments'); // Redirect to appointments Page
+    //         }
+
+    //     } catch (error) {
+    //         console.error("Error submitting appointment:", error);
+    //         toast.error("Failed to book appointment", {
+    //             duration: 3000,
+    //             position: "top-right",
+    //             style: {
+    //                 background: "#DC3545",
+    //                 color: "#fff",
+    //             },
+    //         });
+
+    //     }
+    // };
+
+    const handleSubmit = async () => {
+        if (!profile?.patientId || !selectedDoctor || !selectedDate || !selectedTimeSlot) {
+            toast.error("Please fill all required appointment details.");
+            return;
+        }
+
+        let combinedDateTimeObject: Date;
 
         try {
+            // 1. Get the date components from selectedDate
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth(); // 0-indexed
+            const day = selectedDate.getDate();
 
+            // 2. Parse the time slot string (e.g., "11:00 AM") into a temporary Date object
+            const parsedTime = parse(selectedTimeSlot, 'hh:mm a', new Date());
+
+            // 3. Create a NEW Date object by combining the date components with the parsed time components
+            combinedDateTimeObject = new Date(
+                year,
+                month,
+                day,
+                parsedTime.getHours(),
+                parsedTime.getMinutes(),
+                parsedTime.getSeconds(),
+                parsedTime.getMilliseconds() // Include milliseconds for full precision
+            );
+
+            // 4. Validate the constructed Date object
+            if (isNaN(combinedDateTimeObject.getTime())) {
+                console.error("Failed to construct a valid Date object from selectedDate and selectedTimeSlot.", {
+                    selectedDate: selectedDate.toISOString(), // Log as ISO string for clarity
+                    selectedTimeSlot: selectedTimeSlot,
+                    parsedTimeHours: parsedTime.getHours(),
+                    parsedTimeMinutes: parsedTime.getMinutes(),
+                    combinedResult: combinedDateTimeObject.toString()
+                });
+                toast.error("Internal error: Could not generate valid appointment date.");
+                return;
+            }
+
+        } catch (error) {
+            console.error("Error processing date and time for appointment:", error);
+            toast.error("Failed to process appointment date/time.");
+            return;
+        }
+
+        try {
             const appointmentData: AppointmentType = {
-                patientId: profile?.patientId || "",
-                doctorId: id?.toString() || "",
-                date: selectedDate || new Date(),
-                timeSlot: selectedTimeSlot || "",
+                patientId: profile.patientId,
+                doctorId: selectedDoctor,
+                date: combinedDateTimeObject, // <-- NOW SENDING A PROPER DATE OBJECT
+                timeSlot: selectedTimeSlot,
                 reason: appointmentReason || "No reason provided"
             };
 
@@ -182,7 +272,7 @@ const Page = () => {
                 setSelectedDate(undefined);
                 setSelectedTimeSlot(null);
                 setAppointmentReason("");
-                router.push('/patient/appointments'); // Redirect to appointments Page
+                setCurrentStep('select-doctor');
             }
 
         } catch (error) {
@@ -197,8 +287,7 @@ const Page = () => {
             });
 
         }
-    };
-
+    }
 
 
     return (
