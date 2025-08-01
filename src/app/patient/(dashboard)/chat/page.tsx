@@ -52,6 +52,14 @@ type AppointmentDoctorData = {
 
 }
 
+    type NewMessageEvent ={
+      id?: string;
+      senderId: string;
+      receiverId: string;
+      content: string;
+      createdAt?: string;
+    }
+
 // type Message = {
 //     id: number;
 //     sender: "doctor" | "patient";
@@ -138,8 +146,8 @@ const Chat = () => {
         if (!socket || !selectedConversation) return;
     
         socket.emit("joinRoom", { appointmentId: selectedConversation.id });
-    
-        socket.on("newMessage", (msg) => {
+
+        socket.on("newMessage", (msg: NewMessageEvent) => {
             const timeString = msg.createdAt
                 ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                 : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
