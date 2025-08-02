@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import io from "socket.io-client";
-import type { Socket } from "socket.io-client";
+iimport io from "socket.io-client";
 
-let socket: Socket | null = null;
+let socket: ReturnType<typeof io> | null = null;
 export const useSocket = () => {
   const [connected, setConnected] = useState(false);
 
