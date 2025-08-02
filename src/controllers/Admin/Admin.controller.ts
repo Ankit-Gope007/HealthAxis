@@ -43,7 +43,8 @@ export async function loginAdmin(data: {
     const cookieStore = await cookies();
     cookieStore.set('adminToken', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        //secure: process.env.NODE_ENV === 'production',
+        secure: true,
         sameSite: 'strict',
         maxAge: 60 * 60 * 24 // 1 Day
     });
@@ -57,7 +58,8 @@ export async function logoutAdmin() {
     const cookieStore = await cookies();
     cookieStore.set('adminToken', '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        // secure: process.env.NODE_ENV === 'production',
+        secure: true,
         sameSite: 'strict',
         maxAge: 0 // Expire the cookie immediately
     });
