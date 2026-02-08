@@ -45,6 +45,9 @@ model User {
   // Reviews
   patientReviews Review[] @relation("PatientReviews") // reviews written by this user as patient
   doctorReviews  Review[] @relation("DoctorReviews") // reviews received by this user as doctor
+
+  @@index([email]) // Already unique, but explicit index for login queries
+  @@index([role, profileSetup]) // Filter users by role (doctors/patients) and setup status
 }
 
 // This enum defines the roles a user can have in the healthcare system.
@@ -97,6 +100,11 @@ model DoctorProfile {
 
   // Relations
   doctor User @relation("DoctorToDoctorProfile", fields: [doctorId], references: [id])
+
+  @@index([verified]) // Filter verified doctors in booking page
+  @@index([specialization, verified]) // Search by specialty + verification
+  @@index([consultationFee]) // Sort by price
+  @@index([doctorId]) // FK lookup optimization (already has FK index, but explicit)
 }
 
 // This model represents an appointment between a patient and a doctor.
@@ -117,6 +125,11 @@ model Appointment {
   prescription Prescription?
 
   messages Message[]
+  @@index([doctorId, date, status]) // Dashboard queries: "Show my appointments for today/week/month by status"
+  @@index([patientId, status, date]) // Patient dashboard: "My upcoming/past appointments"
+  @@index([status, date]) // Admin queries: "All pending appointments"
+  @@index([doctorId, status]) // Chat list: "Active confirmed appointments for doctor"
+  @@index([patientId, doctorId]) // Deduplication in chat: "Latest conversation between patient-doctor"
 }
 
 // This model represents a message sent between Doctors and Patient, typically in the context of an appointment.
@@ -132,6 +145,9 @@ model Message {
 
   sender   User @relation("MessageSender", fields: [senderId], references: [id])
   receiver User @relation("MessageReceiver", fields: [receiverId], references: [id])
+  @@index([appointmentId, createdAt]) // Fetch messages for a chat room, ordered by time
+  @@index([senderId, receiverId, createdAt]) // Direct messages between two users
+  @@index([appointmentId]) // Already exists via FK, but explicit for performance
 }
 
 // This model represents a prescription given to a patient during an appointment.
@@ -146,6 +162,9 @@ model Prescription {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([appointmentId]) // Already unique, index exists
+  @@index([createdAt]) // Recent prescriptions query
 }
 
 // This model represents a medicine prescribed in a prescription.
@@ -159,6 +178,9 @@ model Medicine {
   instructions String?
 
   createdAt DateTime @default(now())
+
+  @@index([prescriptionId]) // FK lookup (already indexed)
+  @@index([name]) // Search by medicine name
 }
 
 //This model represent the review given by the patient to the doctor
@@ -176,5 +198,8 @@ model Review {
   patient User @relation("PatientReviews", fields: [patientId], references: [id])
   doctor  User @relation("DoctorReviews", fields: [doctorId], references: [id])
 
-  @@unique([patientId, doctorId])
+  @@unique([patientId, doctorId]) // Prevent duplicate reviews from the same patient for the same doctor
+  @@index([doctorId, rating]) // Calculate average rating for doctor
+  @@index([doctorId, createdAt]) // Recent reviews first
+
 }

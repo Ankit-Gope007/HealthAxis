@@ -101,7 +101,17 @@ const Page = () => {
   });
 
   // 2. Pending Appointments
-  const pendingAppointments = appointmentData.filter((appointment) => appointment.status === "PENDING");
+  const pendingAppointments = appointmentData.filter((appointment) => {
+    const appointmentDate = new Date(appointment.date);
+    const today = new Date();
+    // the apppointment should not be of the past and should be pending
+    return (
+      appointmentDate.getFullYear() === today.getFullYear() &&
+      appointmentDate.getMonth() >= today.getMonth() &&
+      appointmentDate.getDate() >= today.getDate() &&
+      appointment.status === "PENDING"
+    );
+  });
 
   // 3. Patients This Week
   const startOfWeek = new Date();
@@ -168,6 +178,7 @@ const Page = () => {
       )
       .map((appointment) => ({
         id: appointment.id,
+        patientId: appointment.patientId,
         name: appointment.patient.patientProfile?.fullName || "Unknown Patient",
         condition: appointment.reason || "No condition specified",
         lastVisit: new Date(appointment.date).toLocaleDateString(),
@@ -246,7 +257,7 @@ const Page = () => {
                                 <Button
                                   onClick={() => {
                                     setActiveItem("Appointments");
-                                    router.push(`/doctor/appointments/details/${appointment.id}`);
+                                    router.push(`/doctor/appointments/details/${appointment.patientId}`);
                                   }}
                                   size="sm" variant="outline" className="mt-1 h-5">
                                   View
@@ -303,7 +314,7 @@ const Page = () => {
                             <Button
                               onClick={() => {
                                 setActiveItem("Patients");
-                                router.push(`/doctor/patient/${patient.id}`);
+                                router.push(`/doctor/patient/${patient.patientId}`);
                               }}
                               size="sm" variant="outline" className="mt-1 h-5">
                               View Profile

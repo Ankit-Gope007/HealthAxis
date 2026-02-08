@@ -554,6 +554,7 @@ export async function getPatientAppointmentsWithDoctor(patientId: string, doctor
         const patient = await prisma.user.findUnique({
             where: { id: patientId }
         });
+        console.log("Patient found with thwe ID:", patientId);
         if (!patient) {
             throw new Error("Patient with that Id was not found in the DB");
         }

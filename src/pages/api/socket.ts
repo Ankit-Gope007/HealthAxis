@@ -4,7 +4,7 @@ import { Server as IOServer } from "socket.io";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Server as NetServer } from "http";
 import type { Socket as NetSocket } from "net";
-import { prisma } from "@/src/lib/prisma"; // Adjust the import path as needed
+import { prisma } from "@/src/lib/prisma"; 
 
 export const config = {
     api: {
@@ -12,7 +12,7 @@ export const config = {
     },
 };
 
-// Extend NextApiResponse to attach Socket.IO server
+
 interface SocketServer extends NetServer {
     io?: IOServer;
 }
@@ -30,33 +30,21 @@ export default function handler(
     res: NextApiResponseWithSocket
 ) {
     if (!res.socket.server.io) {
-        console.log("🟢 Setting up new Socket.io server...");
+        console.log(" Setting up new Socket.io server");
         const io = new IOServer(res.socket.server as HTTPServer, {
             path: "/api/socket",
             addTrailingSlash: false,
         });
 
         io.on("connection", (socket) => {
-            console.log("✅ New client connected:", socket.id);
+            console.log("New client connected:", socket.id);
 
             socket.on("joinRoom", ({ appointmentId }) => {
-                console.log(`👥 Socket ${socket.id} joined room ${appointmentId}`);
+                console.log(`Socket ${socket.id} joined room ${appointmentId}`);
                 socket.join(appointmentId);
             });
 
-            // socket.on("sendMessage", async (msgData) => {
-            //     const savedMessage = await prisma.message.create({
-            //         data: {
-            //             content: msgData.content,
-            //             senderId: msgData.senderId,
-            //             receiverId: msgData.receiverId,
-            //             appointmentId: msgData.appointmentId,
-            //         },
-            //     });
-
-            //     // Emit the saved message with all info
-            //     io.to(msgData.appointmentId).emit("newMessage", savedMessage);
-            // });
+           
 
             socket.on("sendMessage", async (msgData) => {
                 const saved = await prisma.message.create({
@@ -70,18 +58,18 @@ export default function handler(
 
                 io.to(msgData.appointmentId).emit("newMessage", {
                     ...msgData,
-                    createdAt: saved.createdAt, // ✅ attach actual timestamp
+                    createdAt: saved.createdAt,
                 });
             });
 
             socket.on("disconnect", () => {
-                console.log(`❌ Socket ${socket.id} disconnected`);
+                console.log(` Socket ${socket.id} disconnected`);
             });
         });
 
         res.socket.server.io = io;
     } else {
-        console.log("✅ Reusing existing Socket.io server");
+        console.log(" Reusing existing Socket.io server");
     }
 
     res.end();

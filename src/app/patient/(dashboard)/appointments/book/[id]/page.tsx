@@ -201,6 +201,7 @@ const Page = () => {
     // };
 
     const handleSubmit = async () => {
+        
         if (!profile?.patientId || !selectedDoctor || !selectedDate || !selectedTimeSlot) {
             toast.error("Please fill all required appointment details.");
             return;
@@ -248,6 +249,7 @@ const Page = () => {
         }
 
         try {
+            
             const appointmentData: AppointmentType = {
                 patientId: profile.patientId,
                 doctorId: selectedDoctor,
@@ -274,8 +276,10 @@ const Page = () => {
                 setAppointmentReason("");
                 setCurrentStep('select-doctor');
             }
+            
 
         } catch (error) {
+            
             console.error("Error submitting appointment:", error);
             toast.error("Failed to book appointment", {
                 duration: 3000,

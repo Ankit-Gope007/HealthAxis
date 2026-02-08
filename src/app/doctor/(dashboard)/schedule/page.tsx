@@ -474,13 +474,13 @@ const Page = () => {
                           <div className="flex items-center gap-2 ">
 
                             <Avatar className="h-5 w-5">
-                              <AvatarImage src={appointment.patient.patientProfile.imageUrl || ""} />
+                              <AvatarImage src={appointment.patient.patientProfile?.imageUrl || ""} />
                               <AvatarFallback className="bg-green-100 text-green-700">
-                                {appointment.patient.patientProfile.fullName.split(" ").map(n => n[0]).join("")}
+                                {appointment.patient.patientProfile?.fullName.split(" ").map(n => n[0]).join("")}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium text-sm">{appointment.patient.patientProfile.fullName}</p>
+                              <p className="font-medium text-sm">{appointment.patient.patientProfile?.fullName}</p>
                               <p className=" text-xs text-muted-foreground">{appointment.timeSlot}</p>
                             </div>
                           </div>

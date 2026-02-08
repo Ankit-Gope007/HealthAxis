@@ -65,7 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt", // or "database" for stateful sessions
   },
   callbacks: {
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account }) {
       if (account?.provider === "google") {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;

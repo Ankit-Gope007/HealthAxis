@@ -45,6 +45,8 @@ export default function handler(
       });
 
       socket.on("sendMessage", async (msgData) => {
+        io.to(msgData.appointmentId).emit("newMessage", msgData);
+        
         // Save to DB
         await prisma.message.create({
           data: {
@@ -55,7 +57,6 @@ export default function handler(
           },
         });
 
-        io.to(msgData.appointmentId).emit("newMessage", msgData);
       });
 
       socket.on("disconnect", () => {

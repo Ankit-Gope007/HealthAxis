@@ -18,7 +18,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { usePatientProfileStore } from "@/src/store/usePatientProfileStore";
 import { useSocket } from "@/src/lib/useSocket";
 import { useRef } from "react";
- import { useCallback } from "react";
+import { useCallback } from "react";
 
 
 type AppointmentDoctorData = {
@@ -52,13 +52,13 @@ type AppointmentDoctorData = {
 
 }
 
-    type NewMessageEvent ={
-      id?: string;
-      senderId: string;
-      receiverId: string;
-      content: string;
-      createdAt?: string;
-    }
+type NewMessageEvent = {
+    id?: string;
+    senderId: string;
+    receiverId: string;
+    content: string;
+    createdAt?: string;
+}
 
 // type Message = {
 //     id: number;
@@ -91,7 +91,7 @@ const Chat = () => {
 
     const { socket } = useSocket(); // Custom hook to manage socket connection
 
- 
+
 
     const selectedConversation = appointmentsData.find(c => c.id === selectedChat);
     const filteredConversations = appointmentsData.filter(conv =>
@@ -112,7 +112,7 @@ const Chat = () => {
 
 
     // Get all the previous messages that are already stored in the database
-   
+
 
     const fetchMessages = useCallback(async (appointmentId: string) => {
         try {
@@ -134,24 +134,24 @@ const Chat = () => {
                 console.error("Failed to fetch messages:", response.statusText);
                 setLoading(false);
             }
-    
+
         } catch (error) {
             console.error("Error fetching messages:", error);
             toast.error("Failed to fetch messages");
-    
+
         }
     }, [selectedConversation, profile?.imageUrl]);
-    
+
     useEffect(() => {
         if (!socket || !selectedConversation) return;
-    
+
         socket.emit("joinRoom", { appointmentId: selectedConversation.id });
 
         socket.on("newMessage", (msg: NewMessageEvent) => {
             const timeString = msg.createdAt
                 ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                 : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    
+
             const newMsg = {
                 id: msg.id ?? Date.now(),
                 sender: msg.senderId === selectedConversation?.patientId ? "patient" : "doctor",
@@ -161,17 +161,17 @@ const Chat = () => {
                     ? profile?.imageUrl
                     : selectedConversation?.doctor?.doctorProfile?.imageUrl || profile?.imageUrl || "",
             };
-    
+
             setMessages((prev) => [...prev, newMsg]);
         });
-    
+
         fetchMessages(selectedConversation.id);
-    
+
         return () => {
             socket.off("newMessage");
         };
     }, [socket, selectedConversation, fetchMessages, profile?.imageUrl]);
-    
+
     const fetchAppointments = async (id: string) => {
         try {
             setappointmentLoading(true);
@@ -183,14 +183,14 @@ const Chat = () => {
                 setappointmentLoading(false);
             } else {
                 console.error("Failed to fetch appointments:", response.statusText);
-               setappointmentLoading(false);
+                setappointmentLoading(false);
             }
         } catch (error) {
             console.error("Error fetching appointments:", error);
             setappointmentLoading(false);
         }
     };
-    
+
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
@@ -225,26 +225,30 @@ const Chat = () => {
         // setShowVideoCall(true);
     };
 
-    // const handleSendFile = (files: File[]) => {
-    //     files.forEach(file => {
-    //         const newMessage = {
-    //             id: messages.length + 1,
-    //             sender: "patient" as const,
-    //             content: `📎 Sent file: ${file.name}`,
-    //             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    //             isFile: true
-    //         };
-    //         setMessages(prev => [...prev, newMessage]);
-    //     });
 
-    //     toast.success("File(s) sent successfully!");
-    // };
 
     const handleNewChat = () => {
         toast("To start a new chat, please have an conformed appointment \n with a doctor from the list.");
     };
 
     const chatListData = filteredConversations.filter((conversation) => conversation.status === "CONFIRMED");
+    const latestConversationsMap = new Map<string, AppointmentDoctorData>();
+    chatListData.forEach((conversation) => {
+        const key = `${conversation.patientId}-${conversation.doctorId}`; // Unique key for patient-doctor pair
+
+        const existingLatest = latestConversationsMap.get(key);
+
+        // If no conversation exists for this pair, or if the current conversation is newer
+        if (
+            !existingLatest ||
+            new Date(conversation.date).getTime() > new Date(existingLatest.date).getTime()
+        ) {
+            latestConversationsMap.set(key, conversation);
+        }
+    });
+    const uniqueLatestConversations = Array.from(latestConversationsMap.values());
+
+
 
     return (
         <>
@@ -271,49 +275,49 @@ const Chat = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
-                        {   
-                        appointmentLoading ? (
-                            <div className="h-full w-full center">
-                                <div className="loading-animation h-10 w-10"></div>
-                            </div>
-                        )
-                        
-                        :
-                        chatListData.filter((conversation) => conversation.status == "CONFIRMED").map((conversation) => (
-                            <div
-                                key={conversation.id}
-                                onClick={() => setSelectedChat(conversation.id)}
-                                className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-green-50 border-r-2 border-r-green-500' : ''
-                                    }`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="relative">
-                                        <Avatar className="h-6 w-6">
-                                            <AvatarImage src={conversation.doctor.doctorProfile.imageUrl} />
-                                            <AvatarFallback className="bg-health-100 text-health-700">
-                                                {conversation.doctor.doctorProfile.fullName.split(" ").map(n => n[0]).join("")}
-                                            </AvatarFallback>
-                                        </Avatar>
+                        {
+                            appointmentLoading ? (
+                                <div className="h-full w-full center">
+                                    <div className="loading-animation h-10 w-10"></div>
+                                </div>
+                            )
 
-                                    </div>
+                                :
+                                uniqueLatestConversations.filter((conversation) => conversation.status == "CONFIRMED").map((conversation) => (
+                                    <div
+                                        key={conversation.id}
+                                        onClick={() => setSelectedChat(conversation.id)}
+                                        className={`p-1 border-b cursor-pointer hover:bg-gray-50 transition-colors ${selectedChat === conversation.id ? 'bg-green-50 border-r-2 border-r-green-500' : ''
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="relative">
+                                                <Avatar className="h-6 w-6">
+                                                    <AvatarImage src={conversation.doctor.doctorProfile.imageUrl} />
+                                                    <AvatarFallback className="bg-health-100 text-health-700">
+                                                        {conversation.doctor.doctorProfile.fullName.split(" ").map(n => n[0]).join("")}
+                                                    </AvatarFallback>
+                                                </Avatar>
 
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center w-full justify-between">
-                                            <h3 className="font-medium text-gray-900 truncate">{conversation.doctor.doctorProfile.fullName}</h3>
-                                            {/* <span className="text-xs text-muted-foreground">{conversation.time}</span> */}
-                                        </div>
-                                        <p className="text-xs text-health-600 mb-1">{conversation.doctor.doctorProfile.specialization}</p>
-                                        {/* <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p> */}
-                                    </div>
+                                            </div>
 
-                                    {/* {conversation.unread > 0 && (
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center w-full justify-between">
+                                                    <h3 className="font-medium text-gray-900 truncate">{conversation.doctor.doctorProfile.fullName}</h3>
+                                                    {/* <span className="text-xs text-muted-foreground">{conversation.time}</span> */}
+                                                </div>
+                                                <p className="text-xs text-health-600 mb-1">{conversation.doctor.doctorProfile.specialization}</p>
+                                                {/* <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p> */}
+                                            </div>
+
+                                            {/* {conversation.unread > 0 && (
                                         <Badge className="bg-health-500 text-white text-xs h-5 w-5 rounded-full flex items-center justify-center">
                                             {conversation.unread}
                                         </Badge>
                                     )} */}
-                                </div>
-                            </div>
-                        ))}
+                                        </div>
+                                    </div>
+                                ))}
                     </div>
                 </div>
 

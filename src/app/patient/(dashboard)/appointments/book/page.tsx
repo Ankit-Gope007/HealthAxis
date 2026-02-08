@@ -77,6 +77,7 @@ const Page = () => {
     const [currentStep, setCurrentStep] = useState<'select-doctor' | 'select-time' | 'confirm'>('select-doctor');
     const [doctorsData, setDoctorsData] = useState<DoctorInfo[]>([]);
     const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     // pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -297,6 +298,7 @@ const Page = () => {
         }
 
         try {
+            setSubmitting(true); // Set submitting state to true
             const appointmentData: AppointmentType = {
                 patientId: profile.patientId,
                 doctorId: selectedDoctor,
@@ -322,9 +324,11 @@ const Page = () => {
                 setSelectedTimeSlot(null);
                 setAppointmentReason("");
                 setCurrentStep('select-doctor');
+                setSubmitting(false); // Reset submitting state
             }
 
         } catch (error) {
+            setSubmitting(false); // Reset submitting state
             console.error("Error submitting appointment:", error);
             toast.error("Failed to book appointment", {
                 duration: 3000,

@@ -231,10 +231,26 @@ const Chat = () => {
 
 
   const chatListData = filteredConversations.filter((conversation) => {
-    return conversation.status === "CONFIRMED"
-  })
+    return conversation.status === "CONFIRMED";
+  });
 
+  
+  const latestConversationsMap = new Map<string, AppointmentPatientData>();
 
+  chatListData.forEach((conversation) => {
+    const key = `${conversation.patientId}-${conversation.doctorId}`; // Unique key for patient-doctor pair
+
+    const existingLatest = latestConversationsMap.get(key);
+
+    // If no conversation exists for this pair, or if the current conversation is newer
+    if (
+      !existingLatest ||
+      new Date(conversation.date).getTime() > new Date(existingLatest.date).getTime()
+    ) {
+      latestConversationsMap.set(key, conversation);
+    }
+  });
+  const uniqueLatestConversations = Array.from(latestConversationsMap.values());
 
 
 
@@ -316,7 +332,7 @@ const Chat = () => {
                 </div>
               )
                 :
-                chatListData.map((conversation) => (
+                uniqueLatestConversations.map((conversation) => (
                   <div
                     key={conversation.id}
                     onClick={() => setSelectedChat(conversation.id)}
