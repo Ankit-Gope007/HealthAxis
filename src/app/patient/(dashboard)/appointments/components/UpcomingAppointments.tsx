@@ -5,6 +5,7 @@ import { CiClock2 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { GoArrowRight } from "react-icons/go";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface UpcomingAppProps {
   id: string;
@@ -33,6 +34,7 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
   reason,
   status,
 }) => {
+  const router = useRouter();
 
   const handleCancleAppointment = async () => {
     toast((t) => (
@@ -65,8 +67,8 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
                   },
                 });
                 setTimeout(() => {
-                  window.location.reload();
-                }, 3000); // Optional delay before reloading
+                  router.refresh();
+                }, 800);
                 
               } catch (error) {
                 toast.error(`❌ Failed to reject Dr. ${doctorName}`, {

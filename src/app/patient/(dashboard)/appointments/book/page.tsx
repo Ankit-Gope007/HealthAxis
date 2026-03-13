@@ -251,6 +251,7 @@ const Page = () => {
     // };
 
     const handleSubmit = async () => {
+        
         if (!profile?.patientId || !selectedDoctor || !selectedDate || !selectedTimeSlot) {
             toast.error("Please fill all required appointment details.");
             return;
