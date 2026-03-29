@@ -12,11 +12,7 @@ export default async function BookAppointment() {
 
     // So i need patient profile info and doctors info ..
     const [profile, doctors] = await Promise.all([
-        prisma.patientProfile.findUnique({
-            where:{id: session.user.id},
-            select: {id:true}
-        }),
-
+        session.user.id,
         prisma.user.findMany({
             where: { role: "DOCTOR", profileSetup: true },
             select:{
@@ -34,13 +30,15 @@ export default async function BookAppointment() {
             }
         })
     ]);
+    console.log("User Session:", session.user.id);
+    console.log("Profile :", profile);
 
 
 
     return(
         <PatientBookClient
         doctors= {doctors}
-        patientId = {profile?.id || ""}
+        patientId = {profile || ""}
         />
 
     )

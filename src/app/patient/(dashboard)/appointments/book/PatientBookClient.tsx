@@ -15,7 +15,6 @@ import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
 // import { useSearchParams } from "next/navigation";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import { parse } from 'date-fns';
@@ -82,7 +81,7 @@ const PatientBookClient = ({ doctors, patientId }: Props) => {
     const [appointmentReason, setAppointmentReason] = useState("");
 
     const [currentStep, setCurrentStep] = useState<'select-doctor' | 'select-time' | 'confirm'>('select-doctor');
-    const [doctorsData, setDoctorsData] = useState<DoctorInfo[]>([]);
+    // const [doctorsData, setDoctorsData] = useState<DoctorInfo[]>([]);
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
@@ -212,8 +211,13 @@ const PatientBookClient = ({ doctors, patientId }: Props) => {
     // };
 
     const handleSubmit = async () => {
-
+        console.log("Patient ID:", patientId);
+        console.log("Selected Doctor ID:", selectedDoctor);
+        console.log("Selected Date:", selectedDate);
+        console.log("Selected Time Slot:", selectedTimeSlot);
+        console.log("Appointment Reason:", appointmentReason);
         if (!patientId || !selectedDoctor || !selectedDate || !selectedTimeSlot) {
+            
             toast.error("Please fill all required appointment details.");
             return;
         }
