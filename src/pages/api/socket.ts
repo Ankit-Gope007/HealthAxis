@@ -46,20 +46,32 @@ export default function handler(
 
            
 
-            socket.on("sendMessage", async (msgData) => {
-                const saved = await prisma.message.create({
-                    data: {
-                        content: msgData.content,
-                        senderId: msgData.senderId,
-                        receiverId: msgData.receiverId,
-                        appointmentId: msgData.appointmentId,
-                    },
-                });
+            socket.on("sendMessage", async (msgData, ack) => {
+                try {
+                    const saved = await prisma.message.create({
+                        data: {
+                            content: msgData.content,
+                            senderId: msgData.senderId,
+                            receiverId: msgData.receiverId,
+                            appointmentId: msgData.appointmentId,
+                        },
+                    });
 
-                io.to(msgData.appointmentId).emit("newMessage", {
-                    ...msgData,
-                    createdAt: saved.createdAt,
-                });
+                    io.to(msgData.appointmentId).emit("newMessage", {
+                        ...msgData,
+                        id: saved.id,
+                        createdAt: saved.createdAt,
+                    });
+
+                    if (typeof ack === "function") {
+                        ack({ ok: true, id: saved.id, createdAt: saved.createdAt });
+                    }
+                } catch (error) {
+                    console.error("sendMessage failed:", error);
+                    if (typeof ack === "function") {
+                        ack({ ok: false, error: "Failed to save message" });
+                    }
+                }
             });
 
             socket.on("disconnect", () => {

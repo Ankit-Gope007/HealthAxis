@@ -114,9 +114,11 @@ const Chat = () => {
     // Get all the previous messages that are already stored in the database
 
 
-    const fetchMessages = useCallback(async (appointmentId: string) => {
+    const fetchMessages = useCallback(async (appointmentId: string, showLoader = true) => {
         try {
-            setLoading(true);
+            if (showLoader) {
+                setLoading(true);
+            }
             const response = await axios.get(`/api/messages/getMessages?appointmentId=${appointmentId}`);
             console.log("Fetching messages for appointment ID:", appointmentId);
             console.log("Response data:", response.data);
@@ -129,15 +131,22 @@ const Chat = () => {
                     avatar: msg.senderId === selectedConversation?.patientId ? profile?.imageUrl : selectedConversation?.doctor.doctorProfile.imageUrl,
                 }));
                 setMessages(fetchedMessages);
-                setLoading(false);
+                if (showLoader) {
+                    setLoading(false);
+                }
             } else {
                 console.error("Failed to fetch messages:", response.statusText);
-                setLoading(false);
+                if (showLoader) {
+                    setLoading(false);
+                }
             }
 
         } catch (error) {
             console.error("Error fetching messages:", error);
             toast.error("Failed to fetch messages");
+            if (showLoader) {
+                setLoading(false);
+            }
 
         }
     }, [selectedConversation, profile?.imageUrl]);
@@ -145,7 +154,15 @@ const Chat = () => {
     useEffect(() => {
         if (!socket || !selectedConversation) return;
 
-        socket.emit("joinRoom", { appointmentId: selectedConversation.id });
+        const joinCurrentRoom = () => {
+            socket.emit("joinRoom", { appointmentId: selectedConversation.id });
+        };
+
+        if (socket.connected) {
+            joinCurrentRoom();
+        }
+
+        socket.on("connect", joinCurrentRoom);
 
         socket.on("newMessage", (msg: NewMessageEvent) => {
             const timeString = msg.createdAt
@@ -168,6 +185,7 @@ const Chat = () => {
         fetchMessages(selectedConversation.id);
 
         return () => {
+            socket.off("connect", joinCurrentRoom);
             socket.off("newMessage");
         };
     }, [socket, selectedConversation, fetchMessages, profile?.imageUrl]);
@@ -200,6 +218,12 @@ const Chat = () => {
     const handleSendMessage = () => {
         if (!message.trim() || !socket || !selectedConversation) return;
 
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        socket.emit("joinRoom", { appointmentId: selectedConversation.id });
+
         const msgData = {
             appointmentId: selectedConversation.id,
             senderId: selectedConversation.patientId,
@@ -207,7 +231,14 @@ const Chat = () => {
             content: message.trim(),
         };
 
-        socket.emit("sendMessage", msgData);
+        socket.emit("sendMessage", msgData, (ack: { ok?: boolean; error?: string }) => {
+            if (ack?.ok) {
+                fetchMessages(selectedConversation.id, false);
+                return;
+            }
+
+            toast.error(ack?.error || "Failed to send message");
+        });
 
         // You can still add optimistic update if you want, or just rely on the server push
         // setMessages(prev => [...prev, ...]);
