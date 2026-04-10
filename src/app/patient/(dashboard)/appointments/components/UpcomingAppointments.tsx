@@ -93,10 +93,10 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
 
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-2 flex flex-col md:flex-row items-start md:items-center w-full   max-w-6xl">
+    <div className="bg-white rounded-xl shadow-lg p-2 flex flex-col md:flex-row items-start md:items-center w-full max-w-6xl dark:bg-slate-900 dark:border dark:border-slate-700/70">
       {/* Left Section: Doctor Info */}
       <Toaster position="top-right" reverseOrder={false} />
-      <div className="flex center  w-full pt-2 flex-col  h-full items-center justify-center md:items-start md:w-1/4 mb-6 md:mb-0 md:pr-6 bg-[#F9FAFB] pb-6 md:pb-0">
+      <div className="flex center w-full pt-2 flex-col h-full items-center justify-center md:items-start md:w-1/4 mb-6 md:mb-0 md:pr-6 bg-[#F9FAFB] pb-6 md:pb-0 dark:bg-slate-800/70 rounded-lg">
         {/* Doctor Image */}
         {
           imageUrl ? (
@@ -106,31 +106,31 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
               className="w-24 h-24 rounded-full object-cover mb-2"
             />
           ) : (
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-2 dark:bg-slate-700">
               {/* Break the name and get the initials */}
-              <span className="text-gray-500 text-2xl">
+              <span className="text-gray-500 text-2xl dark:text-slate-300">
                 {doctorName.split(" ").map((n) => n[0]).join(" ")}
               </span>
             </div>
           )
         }
         {/* Doctor Name */}
-        <h3 className="text-lg font-semibold text-gray-800 text-center md:text-left">{doctorName}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 text-center md:text-left dark:text-slate-100">{doctorName}</h3>
         {/* Specialty */}
-        <p className="text-sm text-gray-600 text-center md:text-left">{specialty}</p>
+        <p className="text-sm text-gray-600 text-center md:text-left dark:text-slate-300">{specialty}</p>
       </div>
 
       {/* Right Section: Appointment Details and Actions */}
       <div className="flex-1 md:pl-6 w-full">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
           {/* Date and Time */}
-          <div className="flex items-center text-gray-700 mb-1 sm:mb-0">
+          <div className="flex items-center text-gray-700 mb-1 sm:mb-0 dark:text-slate-300">
             {/* Calendar Icon */}
             <CiCalendar className="text-xl font-bold mr-1" />
-            <span className="font-medium text-gray-800">{date}</span>
+            <span className="font-medium text-gray-800 dark:text-slate-100">{date}</span>
             {/* Clock Icon */}
             <CiClock2 className="text-xl font-bold ml-4 mr-1" />
-            <span className="font-medium text-gray-800">{time}</span>
+            <span className="font-medium text-gray-800 dark:text-slate-100">{time}</span>
           </div>
           {/* Status Tag */}
           <span
@@ -147,14 +147,14 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
 
         {/* Location */}
         <div className="mb-2">
-          <p className="text-sm text-gray-500 mb-1">Location</p>
-          <p className="text-base text-gray-800 font-medium">{location}</p>
+          <p className="text-sm text-gray-500 mb-1 dark:text-slate-400">Location</p>
+          <p className="text-base text-gray-800 font-medium dark:text-slate-100">{location}</p>
         </div>
 
         {/* reason */}
         <div className="mb-4">
-          <p className="text-sm text-gray-500 mb-1">reason</p>
-          <p className="text-base text-gray-800 font-medium">{reason}</p>
+          <p className="text-sm text-gray-500 mb-1 dark:text-slate-400">reason</p>
+          <p className="text-base text-gray-800 font-medium dark:text-slate-100">{reason}</p>
         </div>
 
         {/* Action Buttons */}
@@ -175,7 +175,7 @@ const UpcomingAppointments: React.FC<UpcomingAppProps> = ({
               </Button>
             )
           }
-          <Button className=" py-1 h-[50px] border-1  bg-gray-100 text-gray-700 rounded-sm hover:bg-gray-200 transition-colors duration-200 active:shadow-sm flex items-center justify-center text-sm font-medium">
+          <Button className=" py-1 h-[50px] border-1 bg-gray-100 text-gray-700 rounded-sm hover:bg-gray-200 transition-colors duration-200 active:shadow-sm flex items-center justify-center text-sm font-medium dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600">
            <Link href= {`/patient/appointments/details/${id}`} className="flex items-center">
               View Details
            </Link>

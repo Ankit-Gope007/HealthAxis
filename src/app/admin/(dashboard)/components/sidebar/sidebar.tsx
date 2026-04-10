@@ -28,6 +28,7 @@ import { User2 } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import Link from 'next/link';
 import SignOutButton from './components/SignOutButton';
+import ThemeToggle from '@/src/components/theme-toggle';
 
 
 
@@ -75,7 +76,8 @@ const sidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-3">
+      <SidebarFooter className="border-t p-3 space-y-2">
+        <ThemeToggle mode="sidebar" />
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
+import ThemeRouteController from "@/src/components/theme-route-controller";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,14 +25,35 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeInitScript = `
+    (() => {
+      try {
+        const saved = localStorage.getItem("theme");
+        const isLandingPage = window.location.pathname === "/";
+        const isDark = isLandingPage
+          ? false
+          : saved
+            ? saved === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const root = document.documentElement;
+        root.classList.toggle("dark", isDark);
+        root.setAttribute("data-theme", isDark ? "dark" : "light");
+      } catch {
+        // no-op
+      }
+    })();
+  `;
+
   return (
-    <html lang="en">
-      <head />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-       
-          {children}
+        {children}
+        <ThemeRouteController />
         <SpeedInsights />
         <Analytics />
       </body>
